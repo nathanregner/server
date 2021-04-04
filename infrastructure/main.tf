@@ -1,6 +1,6 @@
 terraform {
   backend "kubernetes" {
-    secret_suffix    = "no-ip"
+    secret_suffix    = "infrastructure"
     load_config_file = true
   }
 }
@@ -15,11 +15,15 @@ resource "kubernetes_namespace" "infrastructure" {
   }
 }
 
-module "no_ip" {
-  source = "./no-ip"
-
+module "http_bin" {
+  source    = "./httpbin"
   namespace = kubernetes_namespace.infrastructure.metadata[0].name
-  domain    = "nregner.ddns.net"
+}
+
+module "no_ip" {
+  source    = "./no-ip"
+  namespace = kubernetes_namespace.infrastructure.metadata[0].name
+  domains   = ["nregner.ddns.net"]
   username  = "nathanregner@gmail.com"
   password  = file("no-ip.password.secret")
 }

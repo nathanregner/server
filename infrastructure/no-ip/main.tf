@@ -1,4 +1,4 @@
-resource "kubernetes_secret" "login" {
+resource "kubernetes_secret" "password" {
   metadata {
     generate_name = "no-ip-"
     namespace = var.namespace
@@ -10,7 +10,7 @@ resource "kubernetes_secret" "login" {
   }
 }
 
-resource "kubernetes_cron_job" "cron" {
+resource "kubernetes_cron_job" "cron_job" {
   metadata {
     generate_name = "no-ip-update-"
     namespace = var.namespace
@@ -44,22 +44,17 @@ resource "kubernetes_cron_job" "cron" {
               ]
               env {
                 name = "NO_IP_DOMAIN"
-                value = var.domain
+                value = join(",", var.domains)
               }
               env {
                 name = "NO_IP_USERNAME"
-                value_from {
-                  secret_key_ref {
-                    name = kubernetes_secret.login.metadata[0].name
-                    key = "username"
-                  }
-                }
+                value = var.username
               }
               env {
                 name = "NO_IP_PASSWORD"
                 value_from {
                   secret_key_ref {
-                    name = kubernetes_secret.login.metadata[0].name
+                    name = kubernetes_secret.password.metadata[0].name
                     key = "password"
                   }
                 }
