@@ -1,6 +1,6 @@
 terraform {
   backend "kubernetes" {
-    secret_suffix    = "infrastructure"
+    secret_suffix    = "no-ip"
     load_config_file = true
   }
 }
@@ -11,12 +11,12 @@ provider "kubernetes" {
 
 resource "kubernetes_namespace" "no_ip" {
   metadata {
-    name = "infrastructure"
+    name = "no-ip"
   }
 }
 
 module "no_ip" {
-  source    = "./modules/no-ip"
+  source    = "./cron"
   namespace = kubernetes_namespace.no_ip.metadata[0].name
   domains   = ["nregner.ddns.net"]
   username  = "nathanregner@gmail.com"
