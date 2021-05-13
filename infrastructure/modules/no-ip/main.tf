@@ -1,7 +1,7 @@
 resource "kubernetes_secret" "password" {
   metadata {
     generate_name = "no-ip-"
-    namespace = var.namespace
+    namespace     = var.namespace
   }
   type = "kubernetes.io/basic-auth"
   data = {
@@ -13,13 +13,13 @@ resource "kubernetes_secret" "password" {
 resource "kubernetes_cron_job" "cron_job" {
   metadata {
     generate_name = "no-ip-update-"
-    namespace = var.namespace
+    namespace     = var.namespace
   }
   spec {
-    schedule = "*/15 * * * *"
-    concurrency_policy = "Forbid"
+    schedule                      = "*/15 * * * *"
+    concurrency_policy            = "Forbid"
     successful_jobs_history_limit = 1
-    failed_jobs_history_limit = 1
+    failed_jobs_history_limit     = 1
 
     job_template {
       metadata {}
@@ -31,7 +31,7 @@ resource "kubernetes_cron_job" "cron_job" {
             restart_policy = "Never"
 
             container {
-              name = "no-ip"
+              name  = "no-ip"
               image = "curlimages/curl"
               command = [
                 "/bin/sh",
@@ -43,11 +43,11 @@ resource "kubernetes_cron_job" "cron_job" {
                 EOT
               ]
               env {
-                name = "NO_IP_DOMAIN"
+                name  = "NO_IP_DOMAIN"
                 value = join(",", var.domains)
               }
               env {
-                name = "NO_IP_USERNAME"
+                name  = "NO_IP_USERNAME"
                 value = var.username
               }
               env {
@@ -55,7 +55,7 @@ resource "kubernetes_cron_job" "cron_job" {
                 value_from {
                   secret_key_ref {
                     name = kubernetes_secret.password.metadata[0].name
-                    key = "password"
+                    key  = "password"
                   }
                 }
               }

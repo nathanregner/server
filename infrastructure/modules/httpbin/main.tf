@@ -1,13 +1,13 @@
 resource "kubernetes_pod" "httpbin" {
   metadata {
-    name = "httpbin"
+    name          = "httpbin"
     generate_name = "httpbin-"
-    namespace = var.namespace
+    namespace     = var.namespace
   }
   spec {
     restart_policy = "Always"
     container {
-      name = "httpbin"
+      name  = "httpbin"
       image = "kennethreitz/httpbin"
     }
   }
