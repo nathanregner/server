@@ -13,7 +13,7 @@ terraform {
   }
 }
 
-resource "kubectl_manifest" "gateway_httpbin_gateway" {
+resource "kubectl_manifest" "gateway" {
   yaml_body = yamlencode({
     "apiVersion" = local.api_version
     "kind"       = "Gateway"
@@ -38,7 +38,7 @@ resource "kubectl_manifest" "gateway_httpbin_gateway" {
   })
 }
 
-resource "kubectl_manifest" "virtualservice_httpbin" {
+resource "kubectl_manifest" "virtualservice" {
   yaml_body = yamlencode({
     "apiVersion" = local.api_version
     "kind"       = "VirtualService"

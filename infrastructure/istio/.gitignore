@@ -1,0 +1,11 @@
+istio-*/*
+
+!istio-*/install
+istio-*/install/*
+!istio-*/install/kubernetes
+!istio-*/install/kubernetes/*
+
+!istio-*/manifests
+istio-*/manifests/*
+!istio-*/manifests/charts
+!istio-*/manifests/charts/*
