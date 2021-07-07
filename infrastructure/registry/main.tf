@@ -20,6 +20,11 @@ locals {
   labels = {
     app = local.name
   }
+
+  registry_host     = "nregner.ddns.net"
+  registry_port     = 31500
+  registry_username = "nregner"
+  registry_secret   = "regcred"
 }
 
 resource "kubernetes_namespace" "registry" {
@@ -28,7 +33,7 @@ resource "kubernetes_namespace" "registry" {
   }
 }
 
-resource "random_password" "password" {
+resource "random_password" "registry_password" {
   length = 30
 }
 
@@ -39,26 +44,38 @@ resource "helm_release" "registry" {
   chart      = "docker-registry"
 
   values = [file("chart_values.yaml")]
+  set {
+    name  = "service.type"
+    value = "NodePort"
+  }
+  set {
+    name  = "service.nodePort"
+    value = local.registry_port
+  }
 
   set {
     name  = "secrets.htpasswd"
     value = <<EOF
-nregner:${bcrypt(random_password.password.result)}
+${local.registry_username}:${bcrypt(random_password.registry_password.result)}
 EOF
   }
 }
 
+data "kubernetes_all_namespaces" "all" {
+}
+
 resource "kubernetes_secret" "regcred" {
+  for_each = toset(data.kubernetes_all_namespaces.all.namespaces)
   metadata {
-    name      = "regcred"
-    namespace = local.namespace
+    name      = local.registry_secret
+    namespace = each.value
   }
   data = {
     ".dockerconfigjson" = <<DOCKER
 {
   "auths": {
-    "nregner.ddns.net:31500": {
-      "auth": "${base64encode("nregner:${random_password.password.result}")}"
+    "${local.registry_host}:${local.registry_port}": {
+      "auth": "${base64encode("${local.registry_username}:${random_password.registry_password.result}")}"
     }
   }
 }
@@ -67,11 +84,21 @@ DOCKER
   type = "kubernetes.io/dockerconfigjson"
 }
 
+resource "kubernetes_default_service_account" "default" {
+  for_each = toset(data.kubernetes_all_namespaces.all.namespaces)
+  metadata {
+    namespace = each.value
+  }
+  image_pull_secret {
+    name = local.registry_secret
+  }
+}
+
 output "password" {
-  value     = random_password.password.result
+  value     = random_password.registry_password.result
   sensitive = true
 }
 
-output "secret" {
-  value = kubernetes_secret.regcred.id
+output "ns" {
+  value = data.kubernetes_all_namespaces.all.namespaces
 }

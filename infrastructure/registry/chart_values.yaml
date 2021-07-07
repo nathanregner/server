@@ -1,6 +1,2 @@
 # https://github.com/twuni/docker-registry.helm
 storage: filesystem
-
-service:
-  type: NodePort
-  nodePort: 31500
