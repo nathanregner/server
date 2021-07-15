@@ -21,7 +21,10 @@ locals {
     app = local.name
   }
 
-  registry_host     = "nregner.ddns.net"
+  registry_hosts = [
+    "nregner.ddns.net",
+    "10.0.1.1"
+  ]
   registry_port     = 31500
   registry_username = "nregner"
   registry_secret   = "regcred"
@@ -37,6 +40,7 @@ resource "random_password" "registry_password" {
   length = 30
 }
 
+// TODO: Need to mount a volume
 resource "helm_release" "registry" {
   name       = "registry"
   namespace  = local.namespace
@@ -71,15 +75,13 @@ resource "kubernetes_secret" "regcred" {
     namespace = each.value
   }
   data = {
-    ".dockerconfigjson" = <<DOCKER
-{
-  "auths": {
-    "${local.registry_host}:${local.registry_port}": {
-      "auth": "${base64encode("${local.registry_username}:${random_password.registry_password.result}")}"
-    }
-  }
-}
-DOCKER
+    ".dockerconfigjson" = jsonencode({
+      "auths" : { for host in local.registry_hosts :
+        "${host}:${local.registry_port}" => {
+          "auth" : base64encode("${local.registry_username}:${random_password.registry_password.result}")
+        }
+      }
+    })
   }
   type = "kubernetes.io/dockerconfigjson"
 }
