@@ -15,8 +15,7 @@ provider "helm" {
 }
 
 locals {
-  name      = "container-registry"
-  namespace = local.name
+  name = "container-registry"
   labels = {
     app = local.name
   }
@@ -27,58 +26,131 @@ locals {
   ]
   registry_port     = 31500
   registry_username = "nregner"
-  registry_secret   = "regcred"
+
+  volume_size = "20Gi"
 }
 
 resource "kubernetes_namespace" "registry" {
   metadata {
-    name = local.namespace
+    name = local.name
   }
 }
 
-resource "random_password" "registry_password" {
+resource "random_password" "password" {
   length = 30
 }
 
-// TODO: Need to mount a volume
-resource "helm_release" "registry" {
-  name       = "registry"
-  namespace  = local.namespace
-  repository = "https://helm.twun.io"
-  chart      = "docker-registry"
-
-  values = [file("chart_values.yaml")]
-  set {
-    name  = "service.type"
-    value = "NodePort"
+resource "kubernetes_secret" "htpasswd" {
+  metadata {
+    generate_name = "htpasswd"
+    namespace     = kubernetes_namespace.registry.metadata.0.name
   }
-  set {
-    name  = "service.nodePort"
-    value = local.registry_port
+  data = {
+    "htpasswd" = "${local.registry_username}:${bcrypt(random_password.password.result)}"
   }
+}
 
-  set {
-    name  = "secrets.htpasswd"
-    value = <<EOF
-${local.registry_username}:${bcrypt(random_password.registry_password.result)}
-EOF
+resource "kubernetes_deployment" "registry" {
+  metadata {
+    name      = local.name
+    namespace = kubernetes_namespace.registry.metadata.0.name
+  }
+  spec {
+    selector {
+      match_labels = local.labels
+    }
+    template {
+      metadata {
+        labels = local.labels
+      }
+      spec {
+        container {
+          name  = "registry"
+          image = "registry:2.7.1"
+          port {
+            container_port = 5000
+          }
+          readiness_probe {
+            http_get {
+              path   = "/"
+              port   = 5000
+              scheme = "HTTP"
+            }
+          }
+
+          env {
+            name  = "REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY"
+            value = "/var/lib/registry"
+          }
+          env {
+            name  = "REGISTRY_AUTH"
+            value = "htpasswd"
+          }
+          env {
+            name  = "REGISTRY_AUTH_HTPASSWD_REALM"
+            value = "Registry Realm"
+          }
+          env {
+            name  = "REGISTRY_AUTH_HTPASSWD_PATH"
+            value = "/auth/htpasswd"
+          }
+
+          volume_mount {
+            name       = "htpasswd"
+            mount_path = "/auth"
+          }
+          volume_mount {
+            name       = "data"
+            mount_path = "/var/lib/registry"
+          }
+        }
+        volume {
+          name = "htpasswd"
+          secret {
+            secret_name = kubernetes_secret.htpasswd.metadata.0.name
+          }
+        }
+        volume {
+          name = "data"
+          host_path {
+            path = "/var/lib/registry"
+            type = "DirectoryOrCreate"
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "registry" {
+  metadata {
+    name      = local.name
+    namespace = kubernetes_namespace.registry.metadata.0.name
+  }
+  spec {
+    selector = local.labels
+    type     = "NodePort"
+    port {
+      port      = 5000
+      node_port = 31500
+    }
   }
 }
 
 data "kubernetes_all_namespaces" "all" {
 }
 
-resource "kubernetes_secret" "regcred" {
+resource "kubernetes_secret" "login" {
   for_each = toset(data.kubernetes_all_namespaces.all.namespaces)
   metadata {
-    name      = local.registry_secret
-    namespace = each.value
+    generate_name = "regcred"
+    namespace     = each.value
   }
   data = {
     ".dockerconfigjson" = jsonencode({
       "auths" : { for host in local.registry_hosts :
         "${host}:${local.registry_port}" => {
-          "auth" : base64encode("${local.registry_username}:${random_password.registry_password.result}")
+          "auth" : base64encode("${local.registry_username}:${random_password.password.result}")
         }
       }
     })
@@ -92,15 +164,11 @@ resource "kubernetes_default_service_account" "default" {
     namespace = each.value
   }
   image_pull_secret {
-    name = local.registry_secret
+    name = kubernetes_secret.login[each.key].metadata.0.name
   }
 }
 
 output "password" {
-  value     = random_password.registry_password.result
+  value     = random_password.password.result
   sensitive = true
-}
-
-output "ns" {
-  value = data.kubernetes_all_namespaces.all.namespaces
 }
