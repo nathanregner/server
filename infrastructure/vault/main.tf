@@ -1,22 +1,7 @@
-terraform {
-  backend "kubernetes" {
-    secret_suffix    = "vault"
-    load_config_file = true
-  }
-}
-
 locals {
   port = 32082
 }
 
-provider "kubernetes" {
-  config_path = "~/.kube/config"
-}
-provider "helm" {
-  kubernetes {
-    config_path = "~/.kube/config"
-  }
-}
 provider "vault" {
   address = "http://nregner.ddns.net:${local.port}"
   token   = jsondecode(file("./cluster-keys.json"))["root_token"]

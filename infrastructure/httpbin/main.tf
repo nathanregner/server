@@ -1,14 +1,3 @@
-terraform {
-  backend "kubernetes" {
-    secret_suffix    = "httpbin"
-    load_config_file = true
-  }
-}
-
-provider "kubernetes" {
-  config_path = "~/.kube/config"
-}
-
 locals {
   name      = "httpbin"
   namespace = local.name

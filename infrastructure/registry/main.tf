@@ -1,19 +1,3 @@
-terraform {
-  backend "kubernetes" {
-    secret_suffix    = "registry"
-    load_config_file = true
-  }
-}
-
-provider "kubernetes" {
-  config_path = "~/.kube/config"
-}
-provider "helm" {
-  kubernetes {
-    config_path = "~/.kube/config"
-  }
-}
-
 locals {
   name = "container-registry"
   labels = {
