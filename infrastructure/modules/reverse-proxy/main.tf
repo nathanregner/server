@@ -4,17 +4,8 @@ locals {
   api_version = "networking.istio.io/v1beta1"
 }
 
-terraform {
-  required_providers {
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = "1.10.0"
-    }
-  }
-}
-
-resource "kubectl_manifest" "gateway" {
-  yaml_body = yamlencode({
+resource "kubernetes_manifest" "gateway" {
+  manifest = {
     "apiVersion" = local.api_version
     "kind"       = "Gateway"
     "metadata" = {
@@ -35,11 +26,11 @@ resource "kubectl_manifest" "gateway" {
         }
       }]
     }
-  })
+  }
 }
 
-resource "kubectl_manifest" "virtualservice" {
-  yaml_body = yamlencode({
+resource "kubernetes_manifest" "virtualservice" {
+  manifest = {
     "apiVersion" = local.api_version
     "kind"       = "VirtualService"
     "metadata" = {
@@ -67,7 +58,7 @@ resource "kubectl_manifest" "virtualservice" {
         }]
       }]
     }
-  })
+  }
 }
 
 variable "name" {

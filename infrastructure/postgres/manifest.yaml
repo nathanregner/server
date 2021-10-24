@@ -1,0 +1,22 @@
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: arbitrage-bot-cluster
+  namespace: arbitrage-bot
+spec:
+  teamId: "arbitrage-bot"
+  postgresql:
+    version: "13"
+  numberOfInstances: 1
+  volume:
+    size: 1Gi
+  users:
+    nregner: # database owner
+      - superuser
+      - createdb
+    arbitrage_bot: [ ] # application role
+  databases:
+    arbitrage_bot: nregner  # dbname: owner
+  preparedDatabases:
+    arbitrage_bot:
+      defaultUsers: true
