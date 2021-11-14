@@ -23,3 +23,8 @@ module "no_ip" { source = "./no-ip" }
 module "postgresql" { source = "./postgres" }
 module "registry" { source = "./registry" }
 #module "vault" { source = "./vault" }
+
+output "registry_password" {
+  value     = module.registry.password
+  sensitive = true
+}
