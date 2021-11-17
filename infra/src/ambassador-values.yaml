@@ -1,0 +1,39 @@
+authService:
+  create: false
+rateLimit:
+  create: false
+
+replicaCount: 1
+
+hostNetwork: true
+dnsPolicy: ClusterFirstWithHostNet
+service:
+  type: NodePort
+
+  # Note that target http ports need to match your ambassador configurations service_port
+  # https://www.getambassador.io/reference/modules/#the-ambassador-module
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 30080
+      protocol: TCP
+    - name: https
+      port: 8443
+      targetPort: 8443
+      nodePort: 30443
+      protocol: TCP
+
+#  # Note that target http ports need to match your ambassador configurations service_port
+#  # https://www.getambassador.io/reference/modules/#the-ambassador-module
+#  ports:
+#    - name: http
+#      port: 8080
+#      targetPort: 8080
+#      hostPort: 8080
+#      protocol: TCP
+#    - name: https
+#      port: 8443
+#      targetPort: 8443
+#      hostPort: 8443
+#      protocol: TCP

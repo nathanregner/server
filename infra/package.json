@@ -1,0 +1,42 @@
+{
+  "name": "infra",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MPL-2.0",
+  "main": "main.js",
+  "types": "main.ts",
+  "scripts": {
+    "build": "tsc",
+    "compile": "tsc --pretty",
+    "deploy2:watch": "tsc-watch --onSuccess \"node main.js && cd cdktf.out/stacks/infra && terraform apply -auto-approve\"",
+    "deploy:watch": "cdktf watch --auto-approve",
+    "format": "prettier --write **/*.{ts,json}",
+    "get": "cdktf get",
+    "synth": "cdktf synth",
+    "synth:watch": "tsc-watch --onSuccess \"node main.js\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "upgrade": "npm i cdktf@latest cdktf-cli@latest",
+    "upgrade:next": "npm i cdktf@next cdktf-cli@next",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@cdktf/provider-helm": "^0.0.80",
+    "@cdktf/provider-kubernetes": "^0.3.153",
+    "@cdktf/provider-null": "^0.2.178",
+    "cdktf": "^0.7.0",
+    "constructs": "^10.0.9"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.11.7",
+    "jest": "^27.3.1",
+    "prettier": "^2.4.1",
+    "ts-jest": "^27.0.7",
+    "tsc-watch": "^4.5.0",
+    "typescript": "^4.4.4"
+  },
+  "engines": {
+    "node": ">=10.12"
+  }
+}
