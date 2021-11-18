@@ -6,7 +6,8 @@ locals {
 
   registry_hosts = [
     "nregner.ddns.net",
-    "10.0.1.1"
+    "10.0.1.1",
+    "localhost"
   ]
   registry_port     = 31500
   registry_username = "nregner"

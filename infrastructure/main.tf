@@ -18,9 +18,9 @@ provider "helm" {
 }
 
 #module "gitlab-k8s" { source = "./gitlab-k8s" }
-module "httpbin" { source = "./httpbin" }
+#module "httpbin" { source = "./httpbin" }
 module "no_ip" { source = "./no-ip" }
-module "postgresql" { source = "./postgres" }
+#module "postgresql" { source = "./postgres" }
 module "registry" { source = "./registry" }
 #module "vault" { source = "./vault" }
 
