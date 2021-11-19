@@ -1,0 +1,329 @@
+{
+  "//": {
+    "metadata": {
+      "version": "0.7.0",
+      "stackName": "infra",
+      "backend": "kubernetes"
+    }
+  },
+  "terraform": {
+    "backend": {
+      "kubernetes": {
+        "secret_suffix": "infra",
+        "load_config_file": true
+      }
+    },
+    "required_providers": {
+      "kubernetes": {
+        "version": "~> 2.0",
+        "source": "kubernetes"
+      },
+      "helm": {
+        "version": "~> 2.3",
+        "source": "helm"
+      },
+      "kubectl": {
+        "version": "~> 1.13.1",
+        "source": "gavinbunney/kubectl"
+      }
+    }
+  },
+  "provider": {
+    "kubernetes": [
+      {
+        "config_path": "~/.kube/config"
+      }
+    ],
+    "helm": [
+      {
+        "kubernetes": {
+          "config_path": "~/.kube/config"
+        }
+      }
+    ],
+    "kubectl": [
+      {
+        "config_path": "~/.kube/config"
+      }
+    ]
+  },
+  "resource": {
+    "kubernetes_namespace": {
+      "infra_noip_16EE54E0": {
+        "metadata": {
+          "name": "no-ip"
+        },
+        "//": {
+          "metadata": {
+            "path": "infra/no-ip",
+            "uniqueId": "infra_noip_16EE54E0"
+          }
+        }
+      },
+      "infra_reverseproxy_ingress_3D5C3833": {
+        "metadata": {
+          "name": "ingress"
+        },
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/ingress",
+            "uniqueId": "infra_reverseproxy_ingress_3D5C3833"
+          }
+        }
+      }
+    },
+    "kubernetes_secret": {
+      "infra_nregnerddnsnet_login_49E69DC0": {
+        "data": {
+          "username": "nathanregner@gmail.com",
+          "password": "${file(\"../../../secrets/no-ip.password.secret\")}"
+        },
+        "type": "kubernetes.io/basic-auth",
+        "metadata": {
+          "generate_name": "nregner-ddns-net-",
+          "namespace": "${kubernetes_namespace.infra_noip_16EE54E0.metadata[0].name}"
+        },
+        "//": {
+          "metadata": {
+            "path": "infra/nregner-ddns-net/login",
+            "uniqueId": "infra_nregnerddnsnet_login_49E69DC0"
+          }
+        }
+      }
+    },
+    "kubernetes_cron_job": {
+      "infra_nregnerddnsnet_update_B01C3BF7": {
+        "metadata": {
+          "generate_name": "update-nregner-ddns-net-",
+          "namespace": "${kubernetes_namespace.infra_noip_16EE54E0.metadata[0].name}"
+        },
+        "spec": {
+          "concurrency_policy": "Forbid",
+          "failed_jobs_history_limit": 1,
+          "schedule": "*/15 * * * *",
+          "successful_jobs_history_limit": 1,
+          "job_template": {
+            "metadata": {
+              "generate_name": "update-nregner-ddns-net-"
+            },
+            "spec": {
+              "backoff_limit": 0,
+              "template": {
+                "metadata": {
+                  "generate_name": "update-nregner-ddns-net-"
+                },
+                "spec": {
+                  "restart_policy": "Never",
+                  "container": [
+                    {
+                      "command": [
+                        "/bin/sh",
+                        "-c",
+                        "curl --silent --show-error --fail            -u \"$NO_IP_USERNAME:$NO_IP_PASSWORD\"           \"https://dynupdate.no-ip.com/nic/update?hostname=$NO_IP_DOMAIN\""
+                      ],
+                      "image": "curlimages/curl",
+                      "name": "nregner-ddns-net",
+                      "env": [
+                        {
+                          "name": "NO_IP_DOMAIN",
+                          "value": "nregner.ddns.net"
+                        },
+                        {
+                          "name": "NO_IP_USERNAME",
+                          "value_from": {
+                            "secret_key_ref": {
+                              "key": "username",
+                              "name": "${kubernetes_secret.infra_nregnerddnsnet_login_49E69DC0.metadata[0].name}"
+                            }
+                          }
+                        },
+                        {
+                          "name": "NO_IP_PASSWORD",
+                          "value_from": {
+                            "secret_key_ref": {
+                              "key": "password",
+                              "name": "${kubernetes_secret.infra_nregnerddnsnet_login_49E69DC0.metadata[0].name}"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "//": {
+          "metadata": {
+            "path": "infra/nregner-ddns-net/update",
+            "uniqueId": "infra_nregnerddnsnet_update_B01C3BF7"
+          }
+        }
+      }
+    },
+    "helm_release": {
+      "infra_reverseproxy_emissaryingress_74B5BC42": {
+        "chart": "emissary-ingress",
+        "name": "emissary-ingress",
+        "namespace": "${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}",
+        "repository": "https://www.getambassador.io",
+        "values": [
+          "{\"adminService\":{\"create\":false},\"replicaCount\":1,\"service\":{\"type\":\"NodePort\",\"ports\":[{\"name\":\"http\",\"port\":80,\"targetPort\":8080,\"nodePort\":30080},{\"name\":\"https\",\"port\":443,\"targetPort\":8443,\"nodePort\":30443}]}}"
+        ],
+        "version": "7.1.10",
+        "wait": false,
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/emissary-ingress",
+            "uniqueId": "infra_reverseproxy_emissaryingress_74B5BC42"
+          }
+        }
+      },
+      "infra_reverseproxy_certmanager_08488C37": {
+        "chart": "cert-manager",
+        "name": "cert-manager",
+        "namespace": "${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}",
+        "repository": "https://charts.jetstack.io",
+        "values": [
+          "{\"installCRDs\":true}"
+        ],
+        "version": "1.6.1",
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/cert-manager",
+            "uniqueId": "infra_reverseproxy_certmanager_08488C37"
+          }
+        }
+      }
+    },
+    "kubectl_manifest": {
+      "infra_reverseproxy_httplistener_httplistenermanifest_8853EE4A": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Listener\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"http\"\n  },\n  \"spec\": {\n    \"port\": 8080,\n    \"protocol\": \"HTTPS\",\n    \"securityModel\": \"XFP\",\n    \"hostBinding\": {\n      \"namespace\": {\n        \"from\": \"SELF\"\n      }\n    }\n  }\n}",
+        "depends_on": [
+          "helm_release.infra_reverseproxy_emissaryingress_74B5BC42"
+        ],
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/http-listener/http-listener-manifest",
+            "uniqueId": "infra_reverseproxy_httplistener_httplistenermanifest_8853EE4A"
+          }
+        }
+      },
+      "infra_reverseproxy_httpslistener_httpslistenermanifest_0DA732BA": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Listener\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"https\"\n  },\n  \"spec\": {\n    \"port\": 8443,\n    \"protocol\": \"HTTPS\",\n    \"securityModel\": \"XFP\",\n    \"hostBinding\": {\n      \"namespace\": {\n        \"from\": \"SELF\"\n      }\n    }\n  }\n}",
+        "depends_on": [
+          "helm_release.infra_reverseproxy_emissaryingress_74B5BC42"
+        ],
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/https-listener/https-listener-manifest",
+            "uniqueId": "infra_reverseproxy_httpslistener_httpslistenermanifest_0DA732BA"
+          }
+        }
+      },
+      "infra_reverseproxy_host_hostmanifest_B3E30064": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Host\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"default-host\"\n  },\n  \"spec\": {\n    \"hostname\": \"nregner.ddns.net\",\n    \"tlsSecret\": {\n      \"name\": \"ambassador-certs\"\n    },\n    \"requestPolicy\": {\n      \"insecure\": {\n        \"action\": \"Redirect\"\n      }\n    }\n  }\n}",
+        "depends_on": [
+          "kubectl_manifest.infra_reverseproxy_httplistener_httplistenermanifest_8853EE4A",
+          "kubectl_manifest.infra_reverseproxy_httpslistener_httpslistenermanifest_0DA732BA"
+        ],
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/host/host-manifest",
+            "uniqueId": "infra_reverseproxy_host_hostmanifest_B3E30064"
+          }
+        }
+      },
+      "infra_reverseproxy_acmechallengemapping_acmechallengemappingmanifest_BC7B332F": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"acme-challenge\"\n  },\n  \"spec\": {\n    \"source\": \"*\",\n    \"hostname\": \"*\",\n    \"prefix\": \"/.well-known/acme-challenge/\",\n    \"rewrite\": \"\",\n    \"service\": \"${kubernetes_service.infra_reverseproxy_acmechallenge_835FF444.metadata[0].name}\"\n  }\n}",
+        "depends_on": [
+          "helm_release.infra_reverseproxy_emissaryingress_74B5BC42",
+          "kubernetes_service.infra_reverseproxy_acmechallenge_835FF444"
+        ],
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/acme-challenge-mapping/acme-challenge-mapping-manifest",
+            "uniqueId": "infra_reverseproxy_acmechallengemapping_acmechallengemappingmanifest_BC7B332F"
+          }
+        }
+      },
+      "infra_reverseproxy_issuer_issuermanifest_214B1C27": {
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"letsencrypt\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt.cert\"\n      },\n      \"solvers\": [\n        {\n          \"http01\": {\n            \"ingress\": {\n              \"class\": \"nginx\"\n            }\n          }\n        }\n      ]\n    }\n  }\n}",
+        "depends_on": [
+          "helm_release.infra_reverseproxy_certmanager_08488C37"
+        ],
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/issuer/issuer-manifest",
+            "uniqueId": "infra_reverseproxy_issuer_issuermanifest_214B1C27"
+          }
+        }
+      },
+      "infra_reverseproxy_cert_certmanifest_9A304444": {
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"Certificate\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"nregner.ddns.net\"\n  },\n  \"spec\": {\n    \"secretName\": \"ambassador-certs\",\n    \"issuerRef\": {\n      \"kind\": \"ClusterIssuer\",\n      \"name\": \"letsencrypt\"\n    },\n    \"commonName\": \"nregner.ddns.net\",\n    \"dnsNames\": [\n      \"nregner.ddns.net\"\n    ]\n  }\n}",
+        "depends_on": [
+          "helm_release.infra_reverseproxy_certmanager_08488C37"
+        ],
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/cert/cert-manifest",
+            "uniqueId": "infra_reverseproxy_cert_certmanifest_9A304444"
+          }
+        }
+      }
+    },
+    "kubernetes_service": {
+      "infra_reverseproxy_acmechallenge_835FF444": {
+        "metadata": {
+          "name": "acme-challenge",
+          "namespace": "${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}"
+        },
+        "spec": {
+          "selector": {
+            "acme.cert-manager.io/http01-solver": "true"
+          },
+          "port": [
+            {
+              "port": 80,
+              "target_port": "8089"
+            }
+          ]
+        },
+        "depends_on": [
+          "helm_release.infra_reverseproxy_certmanager_08488C37"
+        ],
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/acme-challenge",
+            "uniqueId": "infra_reverseproxy_acmechallenge_835FF444"
+          }
+        }
+      }
+    },
+    "kubernetes_manifest": {
+      "infra_reverseproxy_updatecoredns_3853FF20": {
+        "manifest": {
+          "apiVersion": "v1",
+          "kind": "ConfigMap",
+          "metadata": {
+            "name": "coredns",
+            "namespace": "kube-system"
+          },
+          "data": {
+            "Corefile": "\n            .:53 {\n              errors\n              health {\n               lameduck 5s\n              }\n              rewrite name nregner.ddns.net ${helm_release.infra_reverseproxy_emissaryingress_74B5BC42.name}.${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}.svc.cluster.local\n              ready\n              log . {\n               class error\n              }\n              kubernetes cluster.local in-addr.arpa ip6.arpa {\n               pods insecure\n               fallthrough in-addr.arpa ip6.arpa\n              }\n              prometheus :9153\n              forward . 8.8.8.8 8.8.4.4\n              cache 30\n              loop\n              reload\n              loadbalance\n            }\n          "
+          }
+        },
+        "lifecycle": {
+          "prevent_destroy": true
+        },
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/update-coredns",
+            "uniqueId": "infra_reverseproxy_updatecoredns_3853FF20"
+          }
+        }
+      }
+    }
+  }
+}

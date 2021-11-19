@@ -12,13 +12,16 @@ export interface ManifestConfig {
   };
 }
 
-export class Manifest extends Construct {
+export class Manifest extends Construct implements ITerraformDependable {
+  readonly fqn: string;
+
   constructor(scope: Construct, id: string, config: ManifestConfig) {
     super(scope, id);
     const { dependsOn, body } = config;
-    new kubectl.Manifest(this, `${id}-manifest`, {
+    const manifest = new kubectl.Manifest(this, `${id}-manifest`, {
       yamlBody: JSON.stringify(body, undefined, 2),
       dependsOn,
     });
+    this.fqn = manifest.fqn;
   }
 }

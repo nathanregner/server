@@ -2,7 +2,7 @@
 *.js
 node_modules
 cdktf.out/manifest.json
-cdktf.out/**/cdk.tf.json
+cdktf.out/**/plan
 cdktf.log
 *terraform.*.tfstate*
 .gen

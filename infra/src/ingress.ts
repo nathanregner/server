@@ -2,7 +2,6 @@ import { Construct } from "constructs";
 import * as helm from "@cdktf/provider-helm";
 import * as k8s from "@cdktf/provider-kubernetes";
 import { Manifest } from "./manifest";
-import { namespace } from "./k8s";
 
 export class ReverseProxy extends Construct {
   constructor(scope: Construct, domain: string) {
@@ -12,10 +11,17 @@ export class ReverseProxy extends Construct {
       metadata: { name: "ingress" },
     });
 
-    const issuer = {
+    // https://community.letsencrypt.org/t/how-to-switch-from-staging-to-production/79632
+    // https://www.ssllabs.com/ssltest/analyze.html?d=nregner.ddns.net&hideResults=on&latest
+    /* const issuer = {
       name: "letsencrypt-staging",
       server: "https://acme-staging-v02.api.letsencrypt.org/directory",
       secret: "letsencrypt-staging.cert",
+    }; */
+    const issuer = {
+      name: "letsencrypt",
+      server: "https://acme-v02.api.letsencrypt.org/directory",
+      secret: "letsencrypt.cert",
     };
 
     //////////////////
@@ -29,7 +35,8 @@ export class ReverseProxy extends Construct {
       version: "7.1.10",
       wait: false,
       values: values({
-        adminService: { create: true },
+        // https://nregner.ddns.net/ambassador/v0/diag
+        adminService: { create: false },
         replicaCount: 1,
         service: {
           type: "NodePort",
@@ -41,21 +48,9 @@ export class ReverseProxy extends Construct {
       }),
     });
 
-    new Manifest(this, "host", {
-      dependsOn: [emissary],
-      body: {
-        apiVersion: "getambassador.io/v3alpha1",
-        kind: "Host",
-        metadata: { name: "host", namespace: ns.metadata.name },
-        spec: {
-          hostname: domain,
-          acmeProvider: { authority: "none" },
-          tlsSecret: { name: issuer.secret },
-        },
-      },
-    });
+    // https://www.getambassador.io/docs/emissary/latest/howtos/configure-communications/#basic-http-and-https
 
-    new Manifest(this, "http-listener", {
+    const http = new Manifest(this, "http-listener", {
       dependsOn: [emissary],
       body: {
         apiVersion: "getambassador.io/v3alpha1",
@@ -63,14 +58,14 @@ export class ReverseProxy extends Construct {
         metadata: { namespace: ns.metadata.name, name: "http" },
         spec: {
           port: 8080,
-          protocol: "HTTP",
+          protocol: "HTTPS", // not a typo
           securityModel: "XFP",
-          hostBinding: { namespace: { from: "ALL" } },
+          hostBinding: { namespace: { from: "SELF" } },
         },
       },
     });
 
-    new Manifest(this, "https-listener", {
+    const https = new Manifest(this, "https-listener", {
       dependsOn: [emissary],
       body: {
         apiVersion: "getambassador.io/v3alpha1",
@@ -80,7 +75,28 @@ export class ReverseProxy extends Construct {
           port: 8443,
           protocol: "HTTPS",
           securityModel: "XFP",
-          hostBinding: { namespace: { from: "ALL" } },
+          hostBinding: { namespace: { from: "SELF" } },
+        },
+      },
+    });
+
+    new Manifest(this, "host", {
+      dependsOn: [http, https],
+      body: {
+        apiVersion: "getambassador.io/v3alpha1",
+        kind: "Host",
+        metadata: { namespace: ns.metadata.name, name: "default-host" },
+        spec: {
+          hostname: domain,
+          tlsSecret: {
+            name: "ambassador-certs",
+          },
+          requestPolicy: {
+            insecure: {
+              action: "Redirect",
+              // action: "Route",
+            },
+          },
         },
       },
     });
