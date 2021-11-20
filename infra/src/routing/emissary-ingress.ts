@@ -1,23 +1,32 @@
 import { Construct } from "constructs";
-import { LocalhostMapping, Manifest, Mapping } from "./constructs";
+import { Manifest } from "../common";
 import * as helm from "@cdktf/provider-helm";
 import * as k8s from "@cdktf/provider-kubernetes";
+import { ITerraformDependable } from "cdktf";
 
-export class ReverseProxy extends Construct {
-  constructor(scope: Construct, domain: string) {
-    super(scope, "reverse-proxy");
+interface EmissaryIngressOptions {
+  namespace: string;
+  domain: string;
+}
 
-    const ns = new k8s.Namespace(this, "ingress", {
-      metadata: { name: "ingress" },
-    });
+export class EmissaryIngress extends Construct implements ITerraformDependable {
+  readonly fqn: string;
+  readonly ingress: string;
+
+  constructor(scope: Construct, options: EmissaryIngressOptions) {
+    super(scope, "emissary-ingress");
+
+    const { namespace, domain } = options;
 
     // https://community.letsencrypt.org/t/how-to-switch-from-staging-to-production/79632
     // https://www.ssllabs.com/ssltest/analyze.html?d=nregner.ddns.net&hideResults=on&latest
-    /* const issuer = {
+    /*
+    const issuer = {
       name: "letsencrypt-staging",
       server: "https://acme-staging-v02.api.letsencrypt.org/directory",
       secret: "letsencrypt-staging.cert",
-    }; */
+    };
+    */
     const issuer = {
       name: "letsencrypt",
       server: "https://acme-v02.api.letsencrypt.org/directory",
@@ -28,15 +37,17 @@ export class ReverseProxy extends Construct {
     // Emissary Ingress
     //////////////////
     const emissary = new helm.Release(this, "emissary-ingress", {
-      namespace: ns.metadata.name,
+      namespace,
       name: "emissary-ingress",
       repository: "https://www.getambassador.io",
       chart: "emissary-ingress",
       version: "7.1.10",
       wait: false,
       values: values({
-        // https://nregner.ddns.net/ambassador/v0/diag
-        adminService: { create: false },
+        adminService: { create: false }, // https://nregner.ddns.net/ambassador/v0/diag
+        rbac: { create: false },
+        serviceAccount: { create: false },
+        // https://www.getambassador.io/docs/edge-stack/latest/topics/install/bare-metal/
         replicaCount: 1,
         service: {
           type: "NodePort",
@@ -47,6 +58,8 @@ export class ReverseProxy extends Construct {
         },
       }),
     });
+    this.ingress = emissary.name;
+    this.fqn = emissary.fqn;
 
     // https://www.getambassador.io/docs/emissary/latest/howtos/configure-communications/#basic-http-and-https
 
@@ -55,7 +68,7 @@ export class ReverseProxy extends Construct {
       body: {
         apiVersion: "getambassador.io/v3alpha1",
         kind: "Listener",
-        metadata: { namespace: ns.metadata.name, name: "http" },
+        metadata: { namespace, name: "http" },
         spec: {
           port: 8080,
           protocol: "HTTPS", // not a typo
@@ -70,7 +83,7 @@ export class ReverseProxy extends Construct {
       body: {
         apiVersion: "getambassador.io/v3alpha1",
         kind: "Listener",
-        metadata: { namespace: ns.metadata.name, name: "https" },
+        metadata: { namespace, name: "https" },
         spec: {
           port: 8443,
           protocol: "HTTPS",
@@ -85,16 +98,10 @@ export class ReverseProxy extends Construct {
       body: {
         apiVersion: "getambassador.io/v3alpha1",
         kind: "Host",
-        metadata: { namespace: ns.metadata.name, name: "default" },
+        metadata: { namespace, name: "default" },
         spec: {
-          tlsSecret: {
-            name: "ambassador-certs",
-          },
-          requestPolicy: {
-            insecure: {
-              action: "Redirect",
-            },
-          },
+          tlsSecret: { name: "ambassador-certs" },
+          requestPolicy: { insecure: { action: "Redirect" } },
         },
       },
     });
@@ -103,7 +110,7 @@ export class ReverseProxy extends Construct {
     // Cert Manager
     //////////////////
     const certManager = new helm.Release(this, "cert-manager", {
-      namespace: ns.metadata.name,
+      namespace,
       name: "cert-manager",
       repository: "https://charts.jetstack.io",
       chart: "cert-manager",
@@ -116,7 +123,7 @@ export class ReverseProxy extends Construct {
     // https://www.getambassador.io/docs/edge-stack/latest/howtos/cert-manager/
     const acmeChallenge = new k8s.Service(this, "acme-challenge", {
       dependsOn: [certManager],
-      metadata: { namespace: ns.metadata.name, name: "acme-challenge" },
+      metadata: { namespace, name: "acme-challenge" },
       spec: {
         port: [{ port: 80, targetPort: "8089" }],
         selector: { "acme.cert-manager.io/http01-solver": "true" },
@@ -129,8 +136,9 @@ export class ReverseProxy extends Construct {
       body: {
         apiVersion: "getambassador.io/v3alpha1",
         kind: "Mapping",
-        metadata: { namespace: ns.metadata.name, name: "acme-challenge" },
+        metadata: { namespace, name: "acme-challenge" },
         spec: {
+          source: "*",
           hostname: "*",
           prefix: "/.well-known/acme-challenge/",
           rewrite: "",
@@ -145,7 +153,7 @@ export class ReverseProxy extends Construct {
       body: {
         apiVersion: "cert-manager.io/v1",
         kind: "ClusterIssuer",
-        metadata: { namespace: ns.metadata.name, name: issuer.name },
+        metadata: { namespace, name: issuer.name },
         spec: {
           acme: {
             server: issuer.server,
@@ -164,7 +172,7 @@ export class ReverseProxy extends Construct {
       body: {
         apiVersion: "cert-manager.io/v1",
         kind: "Certificate",
-        metadata: { namespace: ns.metadata.name, name: domain },
+        metadata: { namespace, name: domain },
         spec: {
           secretName: "ambassador-certs",
           issuerRef: { kind: "ClusterIssuer", name: issuer.name },
@@ -172,98 +180,6 @@ export class ReverseProxy extends Construct {
           dnsNames: [domain],
         },
       },
-    });
-
-    //////////////////
-    // CoreDNS
-    //////////////////
-
-    // kubectl run scratch --image=curlimages/curl -it --rm -- /bin/sh
-    // curl http://nregner.ddns.net
-    new k8s.Manifest(this, "update-coredns", {
-      lifecycle: { preventDestroy: true },
-      manifest: {
-        apiVersion: "v1",
-        kind: "ConfigMap",
-        metadata: {
-          name: "coredns",
-          namespace: "kube-system",
-        },
-        data: {
-          Corefile: `
-            .:53 {
-              errors
-              health {
-               lameduck 5s
-              }
-              rewrite name ${domain} ${emissary.name}.${ns.metadata.name}.svc.cluster.local
-              ready
-              log . {
-               class error
-              }
-              kubernetes cluster.local in-addr.arpa ip6.arpa {
-               pods insecure
-               fallthrough in-addr.arpa ip6.arpa
-              }
-              prometheus :9153
-              forward . 8.8.8.8 8.8.4.4
-              cache 30
-              loop
-              reload
-              loadbalance
-            }
-          `,
-        },
-      },
-    });
-
-    this.httpbin(ns.metadata.name!!);
-
-    new LocalhostMapping(this, {
-      dependsOn: [emissary],
-      metadata: { namespace: ns.metadata.name!!, name: "craigslist-ui" },
-      spec: { prefix: "/craigslist", port: 8888 },
-    });
-
-    new LocalhostMapping(this, {
-      dependsOn: [emissary],
-      metadata: { namespace: ns.metadata.name!!, name: "craigslist-api" },
-      spec: { prefix: "/craigslist-api", port: 6000 },
-    });
-  }
-
-  httpbin(namespace: string) {
-    const labels = { app: "httpbin" };
-    new k8s.Deployment(this, "httpbin-deployment", {
-      metadata: { namespace, name: "httpbin" },
-      spec: {
-        replicas: "1",
-        selector: { matchLabels: labels },
-        template: {
-          metadata: { labels },
-          spec: {
-            container: [
-              {
-                name: "httpbin",
-                image: "docker.io/kennethreitz/httpbin",
-                port: [{ containerPort: 80 }],
-              },
-            ],
-          },
-        },
-      },
-    });
-    const service = new k8s.Service(this, "httpbin-service", {
-      metadata: { namespace, name: "httpbin", labels },
-      spec: {
-        selector: labels,
-        port: [{ name: "http", port: 80, targetPort: "80" }],
-      },
-    });
-
-    new Mapping(this, "httpbin-mapping", {
-      metadata: { namespace, name: "httpbin" },
-      spec: { prefix: "/httpbin", service },
     });
   }
 }

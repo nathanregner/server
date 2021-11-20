@@ -2,7 +2,7 @@ import { Construct } from "constructs";
 import { K8sBackend } from "./k8s-backend";
 import * as helm from "@cdktf/provider-helm";
 import * as k8s from "@cdktf/provider-kubernetes";
-import * as kubectl from "../.gen/providers/kubectl";
+import * as kubectl from "../../.gen/providers/kubectl";
 
 export const namespace = "arbitrage-bot";
 

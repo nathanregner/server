@@ -1,0 +1,494 @@
+{
+  "//": {
+    "metadata": {
+      "version": "0.7.0",
+      "stackName": "routing",
+      "backend": "kubernetes"
+    }
+  },
+  "terraform": {
+    "backend": {
+      "kubernetes": {
+        "secret_suffix": "routing",
+        "load_config_file": true
+      }
+    },
+    "required_providers": {
+      "kubernetes": {
+        "version": "~> 2.0",
+        "source": "kubernetes"
+      },
+      "helm": {
+        "version": "~> 2.3",
+        "source": "helm"
+      },
+      "kubectl": {
+        "version": "~> 1.13.1",
+        "source": "gavinbunney/kubectl"
+      }
+    }
+  },
+  "provider": {
+    "kubernetes": [
+      {
+        "config_path": "~/.kube/config"
+      }
+    ],
+    "helm": [
+      {
+        "kubernetes": {
+          "config_path": "~/.kube/config"
+        }
+      }
+    ],
+    "kubectl": [
+      {
+        "config_path": "~/.kube/config"
+      }
+    ]
+  },
+  "resource": {
+    "kubernetes_namespace": {
+      "routing_05673A23": {
+        "metadata": {
+          "name": "routing"
+        },
+        "//": {
+          "metadata": {
+            "path": "routing/routing",
+            "uniqueId": "routing_05673A23"
+          }
+        }
+      }
+    },
+    "helm_release": {
+      "routing_emissaryingress_E803CA23": {
+        "chart": "emissary-ingress",
+        "name": "emissary-ingress",
+        "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}",
+        "repository": "https://www.getambassador.io",
+        "values": [
+          "{\"adminService\":{\"create\":false},\"rbac\":{\"create\":false},\"serviceAccount\":{\"create\":false},\"replicaCount\":1,\"service\":{\"type\":\"NodePort\",\"ports\":[{\"name\":\"http\",\"port\":80,\"targetPort\":8080,\"nodePort\":30080},{\"name\":\"https\",\"port\":443,\"targetPort\":8443,\"nodePort\":30443}]}}"
+        ],
+        "version": "7.1.10",
+        "wait": false,
+        "//": {
+          "metadata": {
+            "path": "routing/emissary-ingress/emissary-ingress",
+            "uniqueId": "routing_emissaryingress_E803CA23"
+          }
+        }
+      },
+      "routing_emissaryingress_certmanager_01DB9895": {
+        "chart": "cert-manager",
+        "name": "cert-manager",
+        "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}",
+        "repository": "https://charts.jetstack.io",
+        "values": [
+          "{\"installCRDs\":true}"
+        ],
+        "version": "1.6.1",
+        "//": {
+          "metadata": {
+            "path": "routing/emissary-ingress/cert-manager",
+            "uniqueId": "routing_emissaryingress_certmanager_01DB9895"
+          }
+        }
+      }
+    },
+    "kubectl_manifest": {
+      "routing_emissaryingress_httplistener_httplistenermanifest_307BB75A": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Listener\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"http\"\n  },\n  \"spec\": {\n    \"port\": 8080,\n    \"protocol\": \"HTTPS\",\n    \"securityModel\": \"XFP\",\n    \"hostBinding\": {\n      \"namespace\": {\n        \"from\": \"SELF\"\n      }\n    }\n  }\n}",
+        "depends_on": [
+          "helm_release.routing_emissaryingress_E803CA23"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/emissary-ingress/http-listener/http-listener-manifest",
+            "uniqueId": "routing_emissaryingress_httplistener_httplistenermanifest_307BB75A"
+          }
+        }
+      },
+      "routing_emissaryingress_httpslistener_httpslistenermanifest_E619ED4A": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Listener\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"https\"\n  },\n  \"spec\": {\n    \"port\": 8443,\n    \"protocol\": \"HTTPS\",\n    \"securityModel\": \"XFP\",\n    \"hostBinding\": {\n      \"namespace\": {\n        \"from\": \"SELF\"\n      }\n    }\n  }\n}",
+        "depends_on": [
+          "helm_release.routing_emissaryingress_E803CA23"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/emissary-ingress/https-listener/https-listener-manifest",
+            "uniqueId": "routing_emissaryingress_httpslistener_httpslistenermanifest_E619ED4A"
+          }
+        }
+      },
+      "routing_emissaryingress_host_hostmanifest_8D72661D": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Host\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"default\"\n  },\n  \"spec\": {\n    \"tlsSecret\": {\n      \"name\": \"ambassador-certs\"\n    },\n    \"requestPolicy\": {\n      \"insecure\": {\n        \"action\": \"Redirect\"\n      }\n    }\n  }\n}",
+        "depends_on": [
+          "kubectl_manifest.routing_emissaryingress_httplistener_httplistenermanifest_307BB75A",
+          "kubectl_manifest.routing_emissaryingress_httpslistener_httpslistenermanifest_E619ED4A"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/emissary-ingress/host/host-manifest",
+            "uniqueId": "routing_emissaryingress_host_hostmanifest_8D72661D"
+          }
+        }
+      },
+      "routing_emissaryingress_acmechallengemapping_acmechallengemappingmanifest_CF072BA2": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"acme-challenge\"\n  },\n  \"spec\": {\n    \"source\": \"*\",\n    \"hostname\": \"*\",\n    \"prefix\": \"/.well-known/acme-challenge/\",\n    \"rewrite\": \"\",\n    \"service\": \"${kubernetes_service.routing_emissaryingress_acmechallenge_B44C1562.metadata[0].name}\"\n  }\n}",
+        "depends_on": [
+          "helm_release.routing_emissaryingress_E803CA23",
+          "kubernetes_service.routing_emissaryingress_acmechallenge_B44C1562"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/emissary-ingress/acme-challenge-mapping/acme-challenge-mapping-manifest",
+            "uniqueId": "routing_emissaryingress_acmechallengemapping_acmechallengemappingmanifest_CF072BA2"
+          }
+        }
+      },
+      "routing_emissaryingress_issuer_issuermanifest_A98B704C": {
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"letsencrypt\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt.cert\"\n      },\n      \"solvers\": [\n        {\n          \"http01\": {\n            \"ingress\": {\n              \"class\": \"nginx\"\n            }\n          }\n        }\n      ]\n    }\n  }\n}",
+        "depends_on": [
+          "helm_release.routing_emissaryingress_certmanager_01DB9895"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/emissary-ingress/issuer/issuer-manifest",
+            "uniqueId": "routing_emissaryingress_issuer_issuermanifest_A98B704C"
+          }
+        }
+      },
+      "routing_emissaryingress_cert_certmanifest_0C8E68FB": {
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"Certificate\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"nregner.ddns.net\"\n  },\n  \"spec\": {\n    \"secretName\": \"ambassador-certs\",\n    \"issuerRef\": {\n      \"kind\": \"ClusterIssuer\",\n      \"name\": \"letsencrypt\"\n    },\n    \"commonName\": \"nregner.ddns.net\",\n    \"dnsNames\": [\n      \"nregner.ddns.net\"\n    ]\n  }\n}",
+        "depends_on": [
+          "helm_release.routing_emissaryingress_certmanager_01DB9895"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/emissary-ingress/cert/cert-manifest",
+            "uniqueId": "routing_emissaryingress_cert_certmanifest_0C8E68FB"
+          }
+        }
+      },
+      "routing_craigslistui_mapping_mappingmapping_mappingmappingmanifest_14A57C7B": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"craigslist-ui\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/craigslist\",\n    \"service\": \"${kubernetes_service.routing_craigslistui_service_5992F6C5.metadata[0].name}:8888\"\n  }\n}",
+        "//": {
+          "metadata": {
+            "path": "routing/craigslist-ui/mapping/mapping-mapping/mapping-mapping-manifest",
+            "uniqueId": "routing_craigslistui_mapping_mappingmapping_mappingmappingmanifest_14A57C7B"
+          }
+        }
+      },
+      "routing_craigslistapi_mapping_mappingmapping_mappingmappingmanifest_72CDF30E": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"craigslist-api\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/craigslist-api/\",\n    \"service\": \"${kubernetes_service.routing_craigslistapi_service_5BD4035F.metadata[0].name}:6000\"\n  }\n}",
+        "//": {
+          "metadata": {
+            "path": "routing/craigslist-api/mapping/mapping-mapping/mapping-mapping-manifest",
+            "uniqueId": "routing_craigslistapi_mapping_mappingmapping_mappingmappingmanifest_72CDF30E"
+          }
+        }
+      },
+      "routing_nlp_mapping_mappingmapping_mappingmappingmanifest_B5133980": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"nlp\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/nlp/\",\n    \"service\": \"${kubernetes_service.routing_nlp_service_EEAEA8E5.metadata[0].name}:4000\"\n  }\n}",
+        "//": {
+          "metadata": {
+            "path": "routing/nlp/mapping/mapping-mapping/mapping-mapping-manifest",
+            "uniqueId": "routing_nlp_mapping_mappingmapping_mappingmappingmanifest_B5133980"
+          }
+        }
+      },
+      "routing_httpbinmapping_httpbinmappingmapping_httpbinmappingmappingmanifest_3852F3A5": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"httpbin\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/httpbin\",\n    \"service\": \"${kubernetes_service.routing_httpbinservice_71610A3F.metadata[0].name}.${kubernetes_service.routing_httpbinservice_71610A3F.metadata[0].namespace}\"\n  }\n}",
+        "//": {
+          "metadata": {
+            "path": "routing/httpbin-mapping/httpbin-mapping-mapping/httpbin-mapping-mapping-manifest",
+            "uniqueId": "routing_httpbinmapping_httpbinmappingmapping_httpbinmappingmappingmanifest_3852F3A5"
+          }
+        }
+      }
+    },
+    "kubernetes_service": {
+      "routing_emissaryingress_acmechallenge_B44C1562": {
+        "metadata": {
+          "name": "acme-challenge",
+          "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}"
+        },
+        "spec": {
+          "selector": {
+            "acme.cert-manager.io/http01-solver": "true"
+          },
+          "port": [
+            {
+              "port": 80,
+              "target_port": "8089"
+            }
+          ]
+        },
+        "depends_on": [
+          "helm_release.routing_emissaryingress_certmanager_01DB9895"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/emissary-ingress/acme-challenge",
+            "uniqueId": "routing_emissaryingress_acmechallenge_B44C1562"
+          }
+        }
+      },
+      "routing_craigslistui_service_5992F6C5": {
+        "metadata": {
+          "name": "craigslist-ui",
+          "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}"
+        },
+        "spec": {
+          "cluster_ip": "None",
+          "type": "ClusterIP",
+          "port": [
+            {
+              "port": 8888,
+              "protocol": "TCP"
+            }
+          ]
+        },
+        "depends_on": [
+          "helm_release.routing_emissaryingress_E803CA23"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/craigslist-ui/service",
+            "uniqueId": "routing_craigslistui_service_5992F6C5"
+          }
+        }
+      },
+      "routing_craigslistapi_service_5BD4035F": {
+        "metadata": {
+          "name": "craigslist-api",
+          "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}"
+        },
+        "spec": {
+          "cluster_ip": "None",
+          "type": "ClusterIP",
+          "port": [
+            {
+              "port": 6000,
+              "protocol": "TCP"
+            }
+          ]
+        },
+        "depends_on": [
+          "helm_release.routing_emissaryingress_E803CA23"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/craigslist-api/service",
+            "uniqueId": "routing_craigslistapi_service_5BD4035F"
+          }
+        }
+      },
+      "routing_nlp_service_EEAEA8E5": {
+        "metadata": {
+          "name": "nlp",
+          "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}"
+        },
+        "spec": {
+          "cluster_ip": "None",
+          "type": "ClusterIP",
+          "port": [
+            {
+              "port": 4000,
+              "protocol": "TCP"
+            }
+          ]
+        },
+        "depends_on": [
+          "helm_release.routing_emissaryingress_E803CA23"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/nlp/service",
+            "uniqueId": "routing_nlp_service_EEAEA8E5"
+          }
+        }
+      },
+      "routing_httpbinservice_71610A3F": {
+        "metadata": {
+          "labels": {
+            "app": "httpbin"
+          },
+          "name": "httpbin",
+          "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}"
+        },
+        "spec": {
+          "selector": {
+            "app": "httpbin"
+          },
+          "port": [
+            {
+              "name": "http",
+              "port": 80,
+              "target_port": "80"
+            }
+          ]
+        },
+        "//": {
+          "metadata": {
+            "path": "routing/httpbin-service",
+            "uniqueId": "routing_httpbinservice_71610A3F"
+          }
+        }
+      }
+    },
+    "kubernetes_manifest": {
+      "routing_updatecoredns_070B7E3C": {
+        "manifest": {
+          "apiVersion": "v1",
+          "kind": "ConfigMap",
+          "metadata": {
+            "name": "coredns",
+            "namespace": "kube-system"
+          },
+          "data": {
+            "Corefile": "\n            .:53 {\n              errors\n              health {\n               lameduck 5s\n              }\n              rewrite name nregner.ddns.net ${helm_release.routing_emissaryingress_E803CA23.name}.${kubernetes_namespace.routing_05673A23.metadata[0].name}.svc.cluster.local\n              ready\n              log . {\n               class error\n              }\n              kubernetes cluster.local in-addr.arpa ip6.arpa {\n               pods insecure\n               fallthrough in-addr.arpa ip6.arpa\n              }\n              prometheus :9153\n              forward . 8.8.8.8 8.8.4.4\n              cache 30\n              loop\n              reload\n              loadbalance\n            }\n          "
+          }
+        },
+        "//": {
+          "metadata": {
+            "path": "routing/update-coredns",
+            "uniqueId": "routing_updatecoredns_070B7E3C"
+          }
+        }
+      }
+    },
+    "kubernetes_endpoints": {
+      "routing_craigslistui_endpoint_E7B25962": {
+        "metadata": {
+          "name": "craigslist-ui",
+          "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}"
+        },
+        "subset": [
+          {
+            "address": [
+              {
+                "ip": "10.0.1.1"
+              }
+            ],
+            "port": [
+              {
+                "port": 8888
+              }
+            ]
+          }
+        ],
+        "depends_on": [
+          "helm_release.routing_emissaryingress_E803CA23"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/craigslist-ui/endpoint",
+            "uniqueId": "routing_craigslistui_endpoint_E7B25962"
+          }
+        }
+      },
+      "routing_craigslistapi_endpoint_B33A0987": {
+        "metadata": {
+          "name": "craigslist-api",
+          "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}"
+        },
+        "subset": [
+          {
+            "address": [
+              {
+                "ip": "10.0.1.1"
+              }
+            ],
+            "port": [
+              {
+                "port": 6000
+              }
+            ]
+          }
+        ],
+        "depends_on": [
+          "helm_release.routing_emissaryingress_E803CA23"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/craigslist-api/endpoint",
+            "uniqueId": "routing_craigslistapi_endpoint_B33A0987"
+          }
+        }
+      },
+      "routing_nlp_endpoint_3F67BB80": {
+        "metadata": {
+          "name": "nlp",
+          "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}"
+        },
+        "subset": [
+          {
+            "address": [
+              {
+                "ip": "10.0.1.1"
+              }
+            ],
+            "port": [
+              {
+                "port": 4000
+              }
+            ]
+          }
+        ],
+        "depends_on": [
+          "helm_release.routing_emissaryingress_E803CA23"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/nlp/endpoint",
+            "uniqueId": "routing_nlp_endpoint_3F67BB80"
+          }
+        }
+      }
+    },
+    "kubernetes_deployment": {
+      "routing_httpbindeployment_20AEA079": {
+        "metadata": {
+          "name": "httpbin",
+          "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}"
+        },
+        "spec": {
+          "replicas": "1",
+          "selector": {
+            "match_labels": {
+              "app": "httpbin"
+            }
+          },
+          "template": {
+            "metadata": {
+              "labels": {
+                "app": "httpbin"
+              }
+            },
+            "spec": {
+              "container": [
+                {
+                  "image": "docker.io/kennethreitz/httpbin",
+                  "name": "httpbin",
+                  "port": [
+                    {
+                      "container_port": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "//": {
+          "metadata": {
+            "path": "routing/httpbin-deployment",
+            "uniqueId": "routing_httpbindeployment_20AEA079"
+          }
+        }
+      }
+    }
+  }
+}

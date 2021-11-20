@@ -7,8 +7,9 @@ export interface LocalhostMappingOptions {
   dependsOn?: ITerraformDependable[];
   metadata: { namespace: string; name: string };
   spec: {
-    port: number;
     prefix: string;
+    rewrite?: string;
+    port: number;
   };
 }
 
@@ -39,6 +40,7 @@ export class LocalhostMapping extends Construct {
       metadata,
       spec: {
         prefix: spec.prefix,
+        rewrite: spec.rewrite,
         service: `${service.metadata.name}:${spec.port}`,
       },
     });

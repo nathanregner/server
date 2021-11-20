@@ -1,16 +1,38 @@
+import { Fn, TerraformStack } from "cdktf";
 import { Construct } from "constructs";
 import * as k8s from "@cdktf/provider-kubernetes";
 import { CronJobSpecJobTemplateSpecTemplateSpecContainer } from "@cdktf/provider-kubernetes/lib/cron-job";
+import { k8sBackend, k8sProvider } from "../common";
 
-interface NoIpDynamicDNSOptons {
+export class NoIpStack extends TerraformStack {
+  constructor(scope: Construct) {
+    super(scope, "no-ip");
+
+    k8sBackend(this, "no-ip");
+    k8sProvider(this);
+
+    const domain = "nregner.ddns.net";
+    const noIp = new k8s.Namespace(this, "no-ip", {
+      metadata: { name: "no-ip" },
+    });
+    new NoIpUpdate(this, {
+      namespace: noIp.metadata.name!!,
+      domain,
+      username: "nathanregner@gmail.com",
+      password: Fn.file("../../../secrets/no-ip.password.secret"),
+    });
+  }
+}
+
+interface Options {
   namespace: string;
   domain: string;
   username: string;
   password: string;
 }
 
-export class NoIp extends Construct {
-  constructor(scope: Construct, options: NoIpDynamicDNSOptons) {
+export class NoIpUpdate extends Construct {
+  constructor(scope: Construct, options: Options) {
     const { namespace, domain, username, password } = options;
     const id = domain.replace(/\./g, "-");
     super(scope, id);
