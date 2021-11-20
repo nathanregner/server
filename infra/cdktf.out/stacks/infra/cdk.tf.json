@@ -223,7 +223,7 @@
         }
       },
       "infra_reverseproxy_host_hostmanifest_B3E30064": {
-        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Host\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"default-host\"\n  },\n  \"spec\": {\n    \"hostname\": \"nregner.ddns.net\",\n    \"tlsSecret\": {\n      \"name\": \"ambassador-certs\"\n    },\n    \"requestPolicy\": {\n      \"insecure\": {\n        \"action\": \"Redirect\"\n      }\n    }\n  }\n}",
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Host\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"default\"\n  },\n  \"spec\": {\n    \"tlsSecret\": {\n      \"name\": \"ambassador-certs\"\n    },\n    \"requestPolicy\": {\n      \"insecure\": {\n        \"action\": \"Redirect\"\n      }\n    }\n  }\n}",
         "depends_on": [
           "kubectl_manifest.infra_reverseproxy_httplistener_httplistenermanifest_8853EE4A",
           "kubectl_manifest.infra_reverseproxy_httpslistener_httpslistenermanifest_0DA732BA"
@@ -236,7 +236,7 @@
         }
       },
       "infra_reverseproxy_acmechallengemapping_acmechallengemappingmanifest_BC7B332F": {
-        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"acme-challenge\"\n  },\n  \"spec\": {\n    \"source\": \"*\",\n    \"hostname\": \"*\",\n    \"prefix\": \"/.well-known/acme-challenge/\",\n    \"rewrite\": \"\",\n    \"service\": \"${kubernetes_service.infra_reverseproxy_acmechallenge_835FF444.metadata[0].name}\"\n  }\n}",
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"acme-challenge\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/.well-known/acme-challenge/\",\n    \"rewrite\": \"\",\n    \"service\": \"${kubernetes_service.infra_reverseproxy_acmechallenge_835FF444.metadata[0].name}\"\n  }\n}",
         "depends_on": [
           "helm_release.infra_reverseproxy_emissaryingress_74B5BC42",
           "kubernetes_service.infra_reverseproxy_acmechallenge_835FF444"
@@ -271,6 +271,33 @@
             "uniqueId": "infra_reverseproxy_cert_certmanifest_9A304444"
           }
         }
+      },
+      "infra_reverseproxy_httpbinmapping_httpbinmappingmapping_httpbinmappingmappingmanifest_13CE4FAB": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"httpbin\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/httpbin\",\n    \"service\": \"${kubernetes_service.infra_reverseproxy_httpbinservice_B342B5C0.metadata[0].name}.${kubernetes_service.infra_reverseproxy_httpbinservice_B342B5C0.metadata[0].namespace}\"\n  }\n}",
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/httpbin-mapping/httpbin-mapping-mapping/httpbin-mapping-mapping-manifest",
+            "uniqueId": "infra_reverseproxy_httpbinmapping_httpbinmappingmapping_httpbinmappingmappingmanifest_13CE4FAB"
+          }
+        }
+      },
+      "infra_reverseproxy_craigslistui_mapping_mappingmapping_mappingmappingmanifest_33EA0DCA": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"craigslist-ui\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/craigslist\",\n    \"service\": \"${kubernetes_service.infra_reverseproxy_craigslistui_service_956C7FC3.metadata[0].name}:8888\"\n  }\n}",
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/craigslist-ui/mapping/mapping-mapping/mapping-mapping-manifest",
+            "uniqueId": "infra_reverseproxy_craigslistui_mapping_mappingmapping_mappingmappingmanifest_33EA0DCA"
+          }
+        }
+      },
+      "infra_reverseproxy_craigslistapi_mapping_mappingmapping_mappingmappingmanifest_40350AC0": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}\",\n    \"name\": \"craigslist-api\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/craigslist-api\",\n    \"service\": \"${kubernetes_service.infra_reverseproxy_craigslistapi_service_855B9B85.metadata[0].name}:6000\"\n  }\n}",
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/craigslist-api/mapping/mapping-mapping/mapping-mapping-manifest",
+            "uniqueId": "infra_reverseproxy_craigslistapi_mapping_mappingmapping_mappingmappingmanifest_40350AC0"
+          }
+        }
       }
     },
     "kubernetes_service": {
@@ -299,6 +326,83 @@
             "uniqueId": "infra_reverseproxy_acmechallenge_835FF444"
           }
         }
+      },
+      "infra_reverseproxy_httpbinservice_B342B5C0": {
+        "metadata": {
+          "labels": {
+            "app": "httpbin"
+          },
+          "name": "httpbin",
+          "namespace": "${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}"
+        },
+        "spec": {
+          "selector": {
+            "app": "httpbin"
+          },
+          "port": [
+            {
+              "name": "http",
+              "port": 80,
+              "target_port": "80"
+            }
+          ]
+        },
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/httpbin-service",
+            "uniqueId": "infra_reverseproxy_httpbinservice_B342B5C0"
+          }
+        }
+      },
+      "infra_reverseproxy_craigslistui_service_956C7FC3": {
+        "metadata": {
+          "name": "craigslist-ui",
+          "namespace": "${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}"
+        },
+        "spec": {
+          "cluster_ip": "None",
+          "type": "ClusterIP",
+          "port": [
+            {
+              "port": 8888,
+              "protocol": "TCP"
+            }
+          ]
+        },
+        "depends_on": [
+          "helm_release.infra_reverseproxy_emissaryingress_74B5BC42"
+        ],
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/craigslist-ui/service",
+            "uniqueId": "infra_reverseproxy_craigslistui_service_956C7FC3"
+          }
+        }
+      },
+      "infra_reverseproxy_craigslistapi_service_855B9B85": {
+        "metadata": {
+          "name": "craigslist-api",
+          "namespace": "${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}"
+        },
+        "spec": {
+          "cluster_ip": "None",
+          "type": "ClusterIP",
+          "port": [
+            {
+              "port": 6000,
+              "protocol": "TCP"
+            }
+          ]
+        },
+        "depends_on": [
+          "helm_release.infra_reverseproxy_emissaryingress_74B5BC42"
+        ],
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/craigslist-api/service",
+            "uniqueId": "infra_reverseproxy_craigslistapi_service_855B9B85"
+          }
+        }
       }
     },
     "kubernetes_manifest": {
@@ -321,6 +425,108 @@
           "metadata": {
             "path": "infra/reverse-proxy/update-coredns",
             "uniqueId": "infra_reverseproxy_updatecoredns_3853FF20"
+          }
+        }
+      }
+    },
+    "kubernetes_deployment": {
+      "infra_reverseproxy_httpbindeployment_4D9DD6C7": {
+        "metadata": {
+          "name": "httpbin",
+          "namespace": "${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}"
+        },
+        "spec": {
+          "replicas": "1",
+          "selector": {
+            "match_labels": {
+              "app": "httpbin"
+            }
+          },
+          "template": {
+            "metadata": {
+              "labels": {
+                "app": "httpbin"
+              }
+            },
+            "spec": {
+              "container": [
+                {
+                  "image": "docker.io/kennethreitz/httpbin",
+                  "name": "httpbin",
+                  "port": [
+                    {
+                      "container_port": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/httpbin-deployment",
+            "uniqueId": "infra_reverseproxy_httpbindeployment_4D9DD6C7"
+          }
+        }
+      }
+    },
+    "kubernetes_endpoints": {
+      "infra_reverseproxy_craigslistui_endpoint_5E079A75": {
+        "metadata": {
+          "name": "craigslist-ui",
+          "namespace": "${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}"
+        },
+        "subset": [
+          {
+            "address": [
+              {
+                "ip": "10.0.1.1"
+              }
+            ],
+            "port": [
+              {
+                "port": 8888
+              }
+            ]
+          }
+        ],
+        "depends_on": [
+          "helm_release.infra_reverseproxy_emissaryingress_74B5BC42"
+        ],
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/craigslist-ui/endpoint",
+            "uniqueId": "infra_reverseproxy_craigslistui_endpoint_5E079A75"
+          }
+        }
+      },
+      "infra_reverseproxy_craigslistapi_endpoint_D0D82069": {
+        "metadata": {
+          "name": "craigslist-api",
+          "namespace": "${kubernetes_namespace.infra_reverseproxy_ingress_3D5C3833.metadata[0].name}"
+        },
+        "subset": [
+          {
+            "address": [
+              {
+                "ip": "10.0.1.1"
+              }
+            ],
+            "port": [
+              {
+                "port": 6000
+              }
+            ]
+          }
+        ],
+        "depends_on": [
+          "helm_release.infra_reverseproxy_emissaryingress_74B5BC42"
+        ],
+        "//": {
+          "metadata": {
+            "path": "infra/reverse-proxy/craigslist-api/endpoint",
+            "uniqueId": "infra_reverseproxy_craigslistapi_endpoint_D0D82069"
           }
         }
       }

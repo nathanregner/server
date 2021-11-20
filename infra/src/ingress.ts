@@ -1,7 +1,7 @@
 import { Construct } from "constructs";
+import { LocalhostMapping, Manifest, Mapping } from "./constructs";
 import * as helm from "@cdktf/provider-helm";
 import * as k8s from "@cdktf/provider-kubernetes";
-import { Manifest } from "./manifest";
 
 export class ReverseProxy extends Construct {
   constructor(scope: Construct, domain: string) {
@@ -85,16 +85,14 @@ export class ReverseProxy extends Construct {
       body: {
         apiVersion: "getambassador.io/v3alpha1",
         kind: "Host",
-        metadata: { namespace: ns.metadata.name, name: "default-host" },
+        metadata: { namespace: ns.metadata.name, name: "default" },
         spec: {
-          hostname: domain,
           tlsSecret: {
             name: "ambassador-certs",
           },
           requestPolicy: {
             insecure: {
               action: "Redirect",
-              // action: "Route",
             },
           },
         },
@@ -133,7 +131,6 @@ export class ReverseProxy extends Construct {
         kind: "Mapping",
         metadata: { namespace: ns.metadata.name, name: "acme-challenge" },
         spec: {
-          source: "*",
           hostname: "*",
           prefix: "/.well-known/acme-challenge/",
           rewrite: "",
@@ -218,6 +215,55 @@ export class ReverseProxy extends Construct {
           `,
         },
       },
+    });
+
+    this.httpbin(ns.metadata.name!!);
+
+    new LocalhostMapping(this, {
+      dependsOn: [emissary],
+      metadata: { namespace: ns.metadata.name!!, name: "craigslist-ui" },
+      spec: { prefix: "/craigslist", port: 8888 },
+    });
+
+    new LocalhostMapping(this, {
+      dependsOn: [emissary],
+      metadata: { namespace: ns.metadata.name!!, name: "craigslist-api" },
+      spec: { prefix: "/craigslist-api", port: 6000 },
+    });
+  }
+
+  httpbin(namespace: string) {
+    const labels = { app: "httpbin" };
+    new k8s.Deployment(this, "httpbin-deployment", {
+      metadata: { namespace, name: "httpbin" },
+      spec: {
+        replicas: "1",
+        selector: { matchLabels: labels },
+        template: {
+          metadata: { labels },
+          spec: {
+            container: [
+              {
+                name: "httpbin",
+                image: "docker.io/kennethreitz/httpbin",
+                port: [{ containerPort: 80 }],
+              },
+            ],
+          },
+        },
+      },
+    });
+    const service = new k8s.Service(this, "httpbin-service", {
+      metadata: { namespace, name: "httpbin", labels },
+      spec: {
+        selector: labels,
+        port: [{ name: "http", port: 80, targetPort: "80" }],
+      },
+    });
+
+    new Mapping(this, "httpbin-mapping", {
+      metadata: { namespace, name: "httpbin" },
+      spec: { prefix: "/httpbin", service },
     });
   }
 }

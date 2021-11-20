@@ -1,5 +1,5 @@
 import { Construct } from "constructs";
-import * as kubectl from "../.gen/providers/kubectl";
+import * as kubectl from "../../.gen/providers/kubectl";
 import { ITerraformDependable } from "cdktf";
 
 export interface ManifestConfig {
