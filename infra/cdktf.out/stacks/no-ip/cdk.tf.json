@@ -23,7 +23,7 @@
         "source": "helm"
       },
       "kubectl": {
-        "version": "~> 1.13.1",
+        "version": ">= 1.13.1",
         "source": "gavinbunney/kubectl"
       }
     }

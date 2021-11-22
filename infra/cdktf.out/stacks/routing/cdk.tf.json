@@ -23,7 +23,7 @@
         "source": "helm"
       },
       "kubectl": {
-        "version": "~> 1.13.1",
+        "version": ">= 1.13.1",
         "source": "gavinbunney/kubectl"
       }
     }
@@ -198,6 +198,15 @@
           }
         }
       },
+      "routing_kibana_mapping_mappingmapping_mappingmappingmanifest_1B49CB43": {
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"kibana\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/kibana/\",\n    \"service\": \"${kubernetes_service.routing_kibana_service_DEFEE493.metadata[0].name}:5601\"\n  }\n}",
+        "//": {
+          "metadata": {
+            "path": "routing/kibana/mapping/mapping-mapping/mapping-mapping-manifest",
+            "uniqueId": "routing_kibana_mapping_mappingmapping_mappingmappingmanifest_1B49CB43"
+          }
+        }
+      },
       "routing_httpbinmapping_httpbinmappingmapping_httpbinmappingmappingmanifest_3852F3A5": {
         "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"httpbin\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/httpbin\",\n    \"service\": \"${kubernetes_service.routing_httpbinservice_71610A3F.metadata[0].name}.${kubernetes_service.routing_httpbinservice_71610A3F.metadata[0].namespace}\"\n  }\n}",
         "//": {
@@ -307,6 +316,31 @@
           "metadata": {
             "path": "routing/nlp/service",
             "uniqueId": "routing_nlp_service_EEAEA8E5"
+          }
+        }
+      },
+      "routing_kibana_service_DEFEE493": {
+        "metadata": {
+          "name": "kibana",
+          "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}"
+        },
+        "spec": {
+          "cluster_ip": "None",
+          "type": "ClusterIP",
+          "port": [
+            {
+              "port": 5601,
+              "protocol": "TCP"
+            }
+          ]
+        },
+        "depends_on": [
+          "helm_release.routing_emissaryingress_E803CA23"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/kibana/service",
+            "uniqueId": "routing_kibana_service_DEFEE493"
           }
         }
       },
@@ -444,6 +478,35 @@
           "metadata": {
             "path": "routing/nlp/endpoint",
             "uniqueId": "routing_nlp_endpoint_3F67BB80"
+          }
+        }
+      },
+      "routing_kibana_endpoint_9B4D9A4E": {
+        "metadata": {
+          "name": "kibana",
+          "namespace": "${kubernetes_namespace.routing_05673A23.metadata[0].name}"
+        },
+        "subset": [
+          {
+            "address": [
+              {
+                "ip": "10.0.1.1"
+              }
+            ],
+            "port": [
+              {
+                "port": 5601
+              }
+            ]
+          }
+        ],
+        "depends_on": [
+          "helm_release.routing_emissaryingress_E803CA23"
+        ],
+        "//": {
+          "metadata": {
+            "path": "routing/kibana/endpoint",
+            "uniqueId": "routing_kibana_endpoint_9B4D9A4E"
           }
         }
       }

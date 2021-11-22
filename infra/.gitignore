@@ -5,7 +5,6 @@ cdktf.out/manifest.json
 cdktf.out/**/plan
 cdktf.log
 *terraform.*.tfstate*
-#.gen
 .terraform
 tsconfig.tsbuildinfo
 !jest.config.js

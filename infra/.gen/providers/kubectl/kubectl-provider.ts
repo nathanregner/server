@@ -231,7 +231,7 @@ export class KubectlProvider extends cdktf.TerraformProvider {
       terraformResourceType: 'kubectl',
       terraformGeneratorMetadata: {
         providerName: 'kubectl',
-        providerVersionConstraint: '~> 1.13.1'
+        providerVersionConstraint: '>= 1.13.1'
       },
       terraformProviderSource: 'gavinbunney/kubectl'
     });

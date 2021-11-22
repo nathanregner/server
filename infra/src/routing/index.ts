@@ -77,6 +77,11 @@ export class RoutingStack extends TerraformStack {
       metadata: { namespace: ns.metadata.name!!, name: "nlp" },
       spec: { prefix: "/nlp/", port: 4000 },
     });
+    new LocalhostMapping(this, {
+      dependsOn: [emissary],
+      metadata: { namespace: ns.metadata.name!!, name: "kibana" },
+      spec: { prefix: "/kibana/", port: 5601 },
+    });
 
     this.httpbin(ns.metadata.name!!);
   }
