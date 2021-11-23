@@ -3,6 +3,7 @@ import { Manifest } from "../common";
 import * as helm from "@cdktf/provider-helm";
 import * as k8s from "@cdktf/provider-kubernetes";
 import { ITerraformDependable } from "cdktf";
+import { values } from "../common/helm";
 
 interface EmissaryIngressOptions {
   namespace: string;
@@ -182,8 +183,4 @@ export class EmissaryIngress extends Construct implements ITerraformDependable {
       },
     });
   }
-}
-
-function values(values: {}) {
-  return [JSON.stringify(values)];
 }

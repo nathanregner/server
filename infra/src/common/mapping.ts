@@ -9,7 +9,8 @@ export interface MappingOptions {
   spec: {
     /** https://www.getambassador.io/docs/edge-stack/latest/topics/using/intro-mappings/#services */
     service: Service | string;
-    prefix: string;
+    host?: string;
+    prefix?: string;
     rewrite?: string;
   };
 }
@@ -30,7 +31,7 @@ export class Mapping extends Construct {
         kind: "Mapping",
         metadata,
         spec: {
-          hostname: "*",
+          prefix: "",
           ...spec,
         },
       },

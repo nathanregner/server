@@ -172,7 +172,7 @@
         }
       },
       "routing_craigslistui_mapping_mappingmapping_mappingmappingmanifest_14A57C7B": {
-        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"craigslist-ui\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/craigslist\",\n    \"service\": \"${kubernetes_service.routing_craigslistui_service_5992F6C5.metadata[0].name}:8888\"\n  }\n}",
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"craigslist-ui\"\n  },\n  \"spec\": {\n    \"prefix\": \"/craigslist\",\n    \"service\": \"${kubernetes_service.routing_craigslistui_service_5992F6C5.metadata[0].name}:8888\"\n  }\n}",
         "//": {
           "metadata": {
             "path": "routing/craigslist-ui/mapping/mapping-mapping/mapping-mapping-manifest",
@@ -181,7 +181,7 @@
         }
       },
       "routing_craigslistapi_mapping_mappingmapping_mappingmappingmanifest_72CDF30E": {
-        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"craigslist-api\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/craigslist-api/\",\n    \"service\": \"${kubernetes_service.routing_craigslistapi_service_5BD4035F.metadata[0].name}:6000\"\n  }\n}",
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"craigslist-api\"\n  },\n  \"spec\": {\n    \"prefix\": \"/craigslist-api/\",\n    \"service\": \"${kubernetes_service.routing_craigslistapi_service_5BD4035F.metadata[0].name}:6000\"\n  }\n}",
         "//": {
           "metadata": {
             "path": "routing/craigslist-api/mapping/mapping-mapping/mapping-mapping-manifest",
@@ -190,7 +190,7 @@
         }
       },
       "routing_nlp_mapping_mappingmapping_mappingmappingmanifest_B5133980": {
-        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"nlp\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/nlp/\",\n    \"service\": \"${kubernetes_service.routing_nlp_service_EEAEA8E5.metadata[0].name}:4000\"\n  }\n}",
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"nlp\"\n  },\n  \"spec\": {\n    \"prefix\": \"/nlp/\",\n    \"service\": \"${kubernetes_service.routing_nlp_service_EEAEA8E5.metadata[0].name}:4000\"\n  }\n}",
         "//": {
           "metadata": {
             "path": "routing/nlp/mapping/mapping-mapping/mapping-mapping-manifest",
@@ -199,7 +199,7 @@
         }
       },
       "routing_kibana_mapping_mappingmapping_mappingmappingmanifest_1B49CB43": {
-        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"kibana\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/kibana/\",\n    \"service\": \"${kubernetes_service.routing_kibana_service_DEFEE493.metadata[0].name}:5601\"\n  }\n}",
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"kibana\"\n  },\n  \"spec\": {\n    \"prefix\": \"/kibana/\",\n    \"service\": \"${kubernetes_service.routing_kibana_service_DEFEE493.metadata[0].name}:5601\"\n  }\n}",
         "//": {
           "metadata": {
             "path": "routing/kibana/mapping/mapping-mapping/mapping-mapping-manifest",
@@ -208,7 +208,7 @@
         }
       },
       "routing_httpbinmapping_httpbinmappingmapping_httpbinmappingmappingmanifest_3852F3A5": {
-        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"httpbin\"\n  },\n  \"spec\": {\n    \"hostname\": \"*\",\n    \"prefix\": \"/httpbin\",\n    \"service\": \"${kubernetes_service.routing_httpbinservice_71610A3F.metadata[0].name}.${kubernetes_service.routing_httpbinservice_71610A3F.metadata[0].namespace}\"\n  }\n}",
+        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"httpbin\"\n  },\n  \"spec\": {\n    \"prefix\": \"/httpbin\",\n    \"service\": \"${kubernetes_service.routing_httpbinservice_71610A3F.metadata[0].name}.${kubernetes_service.routing_httpbinservice_71610A3F.metadata[0].namespace}\"\n  }\n}",
         "//": {
           "metadata": {
             "path": "routing/httpbin-mapping/httpbin-mapping-mapping/httpbin-mapping-mapping-manifest",
