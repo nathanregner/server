@@ -2,14 +2,14 @@
   "//": {
     "metadata": {
       "version": "0.7.0",
-      "stackName": "no-ip",
+      "stackName": "dns",
       "backend": "kubernetes"
     }
   },
   "terraform": {
     "backend": {
       "kubernetes": {
-        "secret_suffix": "no-ip",
+        "secret_suffix": "dns",
         "load_config_file": true
       }
     },
@@ -49,42 +49,39 @@
   },
   "resource": {
     "kubernetes_namespace": {
-      "noip_88530D72": {
+      "dns_9A634489": {
         "metadata": {
-          "name": "no-ip"
+          "name": "dns"
         },
         "//": {
           "metadata": {
-            "path": "no-ip/no-ip",
-            "uniqueId": "noip_88530D72"
+            "path": "dns/dns",
+            "uniqueId": "dns_9A634489"
           }
         }
       }
     },
     "kubernetes_secret": {
-      "noip_nregnerddnsnet_login_0874B637": {
-        "data": {
-          "username": "duc#nathanregner@gmail.com",
-          "password": "${file(\"../../../src/no-ip/duc.password.secret\")}"
-        },
+      "dns_credentials_B89B2E14": {
+        "data": "${jsondecode(file(\"../../../src/dns/credentials.json\"))}",
         "type": "kubernetes.io/basic-auth",
         "metadata": {
-          "generate_name": "nregner-ddns-net-",
-          "namespace": "${kubernetes_namespace.noip_88530D72.metadata[0].name}"
+          "name": "credentials",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
         },
         "//": {
           "metadata": {
-            "path": "no-ip/nregner-ddns-net/login",
-            "uniqueId": "noip_nregnerddnsnet_login_0874B637"
+            "path": "dns/credentials",
+            "uniqueId": "dns_credentials_B89B2E14"
           }
         }
       }
     },
     "kubernetes_cron_job": {
-      "noip_nregnerddnsnet_update_451D8AF4": {
+      "dns_nregnernet_update_21DF92E7": {
         "metadata": {
-          "generate_name": "update-nregner-ddns-net-",
-          "namespace": "${kubernetes_namespace.noip_88530D72.metadata[0].name}"
+          "generate_name": "update-nregner-net-",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
         },
         "spec": {
           "concurrency_policy": "Forbid",
@@ -93,13 +90,13 @@
           "successful_jobs_history_limit": 1,
           "job_template": {
             "metadata": {
-              "generate_name": "update-nregner-ddns-net-"
+              "generate_name": "update-nregner-net-"
             },
             "spec": {
               "backoff_limit": 0,
               "template": {
                 "metadata": {
-                  "generate_name": "update-nregner-ddns-net-"
+                  "generate_name": "update-nregner-net-"
                 },
                 "spec": {
                   "restart_policy": "Never",
@@ -108,30 +105,30 @@
                       "command": [
                         "/bin/sh",
                         "-c",
-                        "curl --silent --show-error --fail            -u \"$NO_IP_USERNAME:$NO_IP_PASSWORD\"           \"https://dynupdate.no-ip.com/nic/update?hostname=$NO_IP_DOMAIN\""
+                        "curl --silent --show-error --fail                     -u \"$USERNAME:$PASSWORD\"                     \"https://domains.google.com/nic/update?hostname=$DOMAIN\""
                       ],
                       "image": "curlimages/curl",
-                      "name": "nregner-ddns-net",
+                      "name": "nregner-net",
                       "env": [
                         {
-                          "name": "NO_IP_DOMAIN",
-                          "value": "nregner.ddns.net"
+                          "name": "DOMAIN",
+                          "value": "nregner.net"
                         },
                         {
-                          "name": "NO_IP_USERNAME",
+                          "name": "USERNAME",
                           "value_from": {
                             "secret_key_ref": {
                               "key": "username",
-                              "name": "${kubernetes_secret.noip_nregnerddnsnet_login_0874B637.metadata[0].name}"
+                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
                             }
                           }
                         },
                         {
-                          "name": "NO_IP_PASSWORD",
+                          "name": "PASSWORD",
                           "value_from": {
                             "secret_key_ref": {
                               "key": "password",
-                              "name": "${kubernetes_secret.noip_nregnerddnsnet_login_0874B637.metadata[0].name}"
+                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
                             }
                           }
                         }
@@ -145,8 +142,8 @@
         },
         "//": {
           "metadata": {
-            "path": "no-ip/nregner-ddns-net/update",
-            "uniqueId": "noip_nregnerddnsnet_update_451D8AF4"
+            "path": "dns/nregner-net/update",
+            "uniqueId": "dns_nregnernet_update_21DF92E7"
           }
         }
       }

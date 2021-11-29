@@ -1,0 +1,1 @@
+https://support.google.com/domains/answer/6147083?hl=en#zippy=%2Cset-up-a-client-program-on-your-gateway-host-or-server%2Cuse-the-api-to-update-your-dynamic-dns-record

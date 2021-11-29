@@ -147,30 +147,6 @@
           }
         }
       },
-      "routing_emissaryingress_issuer_issuermanifest_A98B704C": {
-        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"letsencrypt\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt.cert\"\n      },\n      \"solvers\": [\n        {\n          \"http01\": {\n            \"ingress\": {\n              \"class\": \"nginx\"\n            }\n          }\n        }\n      ]\n    }\n  }\n}",
-        "depends_on": [
-          "helm_release.routing_emissaryingress_certmanager_01DB9895"
-        ],
-        "//": {
-          "metadata": {
-            "path": "routing/emissary-ingress/issuer/issuer-manifest",
-            "uniqueId": "routing_emissaryingress_issuer_issuermanifest_A98B704C"
-          }
-        }
-      },
-      "routing_emissaryingress_cert_certmanifest_0C8E68FB": {
-        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"Certificate\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"nregner.ddns.net\"\n  },\n  \"spec\": {\n    \"secretName\": \"ambassador-certs\",\n    \"issuerRef\": {\n      \"kind\": \"ClusterIssuer\",\n      \"name\": \"letsencrypt\"\n    },\n    \"commonName\": \"nregner.ddns.net\",\n    \"dnsNames\": [\n      \"nregner.ddns.net\"\n    ]\n  }\n}",
-        "depends_on": [
-          "helm_release.routing_emissaryingress_certmanager_01DB9895"
-        ],
-        "//": {
-          "metadata": {
-            "path": "routing/emissary-ingress/cert/cert-manifest",
-            "uniqueId": "routing_emissaryingress_cert_certmanifest_0C8E68FB"
-          }
-        }
-      },
       "routing_craigslistui_mapping_mappingmapping_mappingmappingmanifest_14A57C7B": {
         "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.routing_05673A23.metadata[0].name}\",\n    \"name\": \"craigslist-ui\"\n  },\n  \"spec\": {\n    \"prefix\": \"/craigslist\",\n    \"service\": \"${kubernetes_service.routing_craigslistui_service_5992F6C5.metadata[0].name}:8888\"\n  }\n}",
         "//": {

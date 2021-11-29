@@ -149,6 +149,7 @@ export class EmissaryIngress extends Construct implements ITerraformDependable {
       },
     });
 
+    /*
     new Manifest(this, "issuer", {
       dependsOn: [certManager],
       body: {
@@ -167,7 +168,9 @@ export class EmissaryIngress extends Construct implements ITerraformDependable {
         },
       },
     });
+*/
 
+    /*
     new Manifest(this, "cert", {
       dependsOn: [certManager],
       body: {
@@ -182,5 +185,6 @@ export class EmissaryIngress extends Construct implements ITerraformDependable {
         },
       },
     });
+*/
   }
 }
