@@ -64,8 +64,8 @@
     "kubernetes_secret": {
       "noip_nregnerddnsnet_login_0874B637": {
         "data": {
-          "username": "nathanregner@gmail.com",
-          "password": "${file(\"../../../secrets/no-ip.password.secret\")}"
+          "username": "duc#nathanregner@gmail.com",
+          "password": "${file(\"../../../src/no-ip/duc.password.secret\")}"
         },
         "type": "kubernetes.io/basic-auth",
         "metadata": {

@@ -18,8 +18,9 @@ export class NoIpStack extends TerraformStack {
     new NoIpUpdate(this, {
       namespace: noIp.metadata.name!!,
       domain,
-      username: "nathanregner@gmail.com",
-      password: Fn.file("../../../secrets/no-ip.password.secret"),
+      // https://community.ui.com/questions/Any-luck-with-no-ip-group-Update/e5195e2a-5319-4e24-8379-844e4b1a0797
+      username: "duc#nathanregner@gmail.com",
+      password: Fn.file("../../../src/no-ip/duc.password.secret"),
     });
   }
 }
