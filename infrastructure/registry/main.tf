@@ -1,15 +1,17 @@
 locals {
-  name = "container-registry"
+  name      = "container-registry"
+  namespace = local.name
   labels = {
     app = local.name
   }
 
+  registry_port      = 5000
+  registry_node_port = 31500
   registry_hosts = [
-    "nregner.ddns.net",
-    "10.0.1.1",
-    "localhost"
+    "nregner.ddns.net:${local.registry_node_port}",
+    "nregner.net:${local.registry_node_port}",
+    "${local.name}.${local.namespace}.svc.cluster.local:${local.registry_port}",
   ]
-  registry_port     = 31500
   registry_username = "nregner"
 
   volume_size = "20Gi"
@@ -17,7 +19,7 @@ locals {
 
 resource "kubernetes_namespace" "registry" {
   metadata {
-    name = local.name
+    name = local.namespace
   }
 }
 
@@ -107,7 +109,20 @@ resource "kubernetes_deployment" "registry" {
   }
 }
 
-resource "kubernetes_service" "registry" {
+resource "kubernetes_service" "node_port" {
+  metadata {
+    name      = "${local.name}-node-port"
+    namespace = kubernetes_namespace.registry.metadata.0.name
+  }
+  spec {
+    selector = local.labels
+    port {
+      port = 5000
+    }
+  }
+}
+
+resource "kubernetes_service" "cluster_ip" {
   metadata {
     name      = local.name
     namespace = kubernetes_namespace.registry.metadata.0.name
@@ -134,9 +149,7 @@ resource "kubernetes_secret" "login" {
   data = {
     ".dockerconfigjson" = jsonencode({
       "auths" : { for host in local.registry_hosts :
-        "${host}:${local.registry_port}" => {
-          "auth" : base64encode("${local.registry_username}:${random_password.password.result}")
-        }
+        host => { auth : base64encode("${local.registry_username}:${random_password.password.result}") }
       }
     })
   }
