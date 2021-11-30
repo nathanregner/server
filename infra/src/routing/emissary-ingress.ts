@@ -17,7 +17,7 @@ export class EmissaryIngress extends Construct implements ITerraformDependable {
   constructor(scope: Construct, options: EmissaryIngressOptions) {
     super(scope, "emissary-ingress");
 
-    const { namespace, domain } = options;
+    const { namespace } = options;
 
     // https://community.letsencrypt.org/t/how-to-switch-from-staging-to-production/79632
     // https://www.ssllabs.com/ssltest/analyze.html?d=nregner.ddns.net&hideResults=on&latest

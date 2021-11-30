@@ -11,7 +11,7 @@ export class RoutingStack extends TerraformStack {
     k8sBackend(this, "routing");
     k8sProvider(this);
 
-    const domain = "nregner.ddns.net";
+    const domain = "nregner.net";
 
     // ingress
     const ns = new k8s.Namespace(this, "routing", {
@@ -40,7 +40,8 @@ export class RoutingStack extends TerraformStack {
               health {
                lameduck 5s
               }
-              rewrite name ${domain} ${emissary.ingress}.${ns.metadata.name}.svc.cluster.local
+              rewrite name nregner.ddns.net ${emissary.ingress}.${ns.metadata.name}.svc.cluster.local
+              rewrite name nregner.net ${emissary.ingress}.${ns.metadata.name}.svc.cluster.local
               ready
               log . {
                class error
