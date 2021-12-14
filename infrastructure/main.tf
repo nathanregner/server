@@ -1,6 +1,6 @@
 terraform {
   backend "kubernetes" {
-    secret_suffix    = "infrastructure"
+    secret_suffix    = "registry"
     load_config_file = true
   }
 }

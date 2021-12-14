@@ -1,25 +1,34 @@
 locals {
   name      = "container-registry"
   namespace = local.name
-  labels = {
+  labels    = {
     app = local.name
   }
 
-  registry_port      = 5000
-  registry_node_port = 31500
-  registry_hosts = [
-    "nregner.ddns.net:${local.registry_node_port}",
-    "nregner.net:${local.registry_node_port}",
-    "${local.name}.${local.namespace}.svc.cluster.local:${local.registry_port}",
+  container_port    = 5000
+  node_port         = 31500
+  registry_hosts    = [
+    "nregner.ddns.net:${local.node_port}",
+    "nregner.net:${local.node_port}",
+    "${local.name}.${local.namespace}.svc.cluster.local:${local.container_port}",
+    "10.0.1.1:${local.node_port}",
   ]
   registry_username = "nregner"
 
-  volume_size = "20Gi"
+  volume_host_path = "/var/lib/registry"
 }
 
-resource "kubernetes_namespace" "registry" {
+
+resource "kubernetes_namespace" "container_registry" {
   metadata {
     name = local.namespace
+  }
+}
+
+resource "kubernetes_config_map" "config" {
+  metadata {
+    namespace = kubernetes_namespace.container_registry.metadata.0.name
+    generate_name = "config"
   }
 }
 
@@ -29,18 +38,18 @@ resource "random_password" "password" {
 
 resource "kubernetes_secret" "htpasswd" {
   metadata {
+    namespace     = kubernetes_namespace.container_registry.metadata.0.name
     generate_name = "htpasswd"
-    namespace     = kubernetes_namespace.registry.metadata.0.name
   }
   data = {
     "htpasswd" = "${local.registry_username}:${bcrypt(random_password.password.result)}"
   }
 }
 
-resource "kubernetes_deployment" "registry" {
+resource "kubernetes_deployment" "container_registry" {
   metadata {
     name      = local.name
-    namespace = kubernetes_namespace.registry.metadata.0.name
+    namespace = kubernetes_namespace.container_registry.metadata.0.name
   }
   spec {
     selector {
@@ -55,16 +64,24 @@ resource "kubernetes_deployment" "registry" {
           name  = "registry"
           image = "registry:2.7.1"
           port {
-            container_port = 5000
+            container_port = local.container_port
           }
           readiness_probe {
             http_get {
               path   = "/"
-              port   = 5000
+              port   = local.container_port
+              scheme = "HTTP"
+            }
+          }
+          liveness_probe {
+            http_get {
+              path   = "/"
+              port   = local.container_port
               scheme = "HTTP"
             }
           }
 
+          # https://docs.docker.com/registry/configuration/
           env {
             name  = "REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY"
             value = "/var/lib/registry"
@@ -81,6 +98,10 @@ resource "kubernetes_deployment" "registry" {
             name  = "REGISTRY_AUTH_HTPASSWD_PATH"
             value = "/auth/htpasswd"
           }
+          # env {
+          #   name  = "REGISTRY_PROXY_REMOTEURL"
+          #   value = "https://registry-1.docker.io"
+          # }
 
           volume_mount {
             name       = "htpasswd"
@@ -100,7 +121,7 @@ resource "kubernetes_deployment" "registry" {
         volume {
           name = "data"
           host_path {
-            path = "/var/lib/registry"
+            path = local.volume_host_path
             type = "DirectoryOrCreate"
           }
         }
@@ -109,64 +130,31 @@ resource "kubernetes_deployment" "registry" {
   }
 }
 
-resource "kubernetes_service" "node_port" {
+resource "kubernetes_service" "cluster_ip" {
   metadata {
-    name      = "${local.name}-node-port"
-    namespace = kubernetes_namespace.registry.metadata.0.name
+    name      = local.name
+    namespace = kubernetes_namespace.container_registry.metadata.0.name
   }
   spec {
     selector = local.labels
     port {
-      port = 5000
+      port = local.container_port
     }
   }
 }
 
-resource "kubernetes_service" "cluster_ip" {
+resource "kubernetes_service" "node_port" {
   metadata {
-    name      = local.name
-    namespace = kubernetes_namespace.registry.metadata.0.name
+    name      = "${local.name}-node-port"
+    namespace = kubernetes_namespace.container_registry.metadata.0.name
   }
   spec {
     selector = local.labels
     type     = "NodePort"
     port {
-      port      = 5000
-      node_port = 31500
+      port      = local.container_port
+      node_port = local.node_port
     }
   }
 }
 
-data "kubernetes_all_namespaces" "all" {
-}
-
-resource "kubernetes_secret" "login" {
-  for_each = toset(data.kubernetes_all_namespaces.all.namespaces)
-  metadata {
-    generate_name = "regcred"
-    namespace     = each.value
-  }
-  data = {
-    ".dockerconfigjson" = jsonencode({
-      "auths" : { for host in local.registry_hosts :
-        host => { auth : base64encode("${local.registry_username}:${random_password.password.result}") }
-      }
-    })
-  }
-  type = "kubernetes.io/dockerconfigjson"
-}
-
-resource "kubernetes_default_service_account" "default" {
-  for_each = toset(data.kubernetes_all_namespaces.all.namespaces)
-  metadata {
-    namespace = each.value
-  }
-  image_pull_secret {
-    name = kubernetes_secret.login[each.key].metadata.0.name
-  }
-}
-
-output "password" {
-  value     = random_password.password.result
-  sensitive = true
-}
