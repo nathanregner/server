@@ -173,7 +173,7 @@
     },
     "kubectl_manifest": {
       "dns_staging_issuer_issuermanifest_56310F35": {
-        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"letsencrypt-staging\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-staging-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt-staging\"\n      },\n      \"solvers\": [\n        {\n          \"dns01\": {\n            \"cloudDNS\": {\n              \"project\": \"copper-canyon-296719\",\n              \"serviceAccountSecretRef\": {\n                \"name\": \"${kubernetes_secret.dns_staging_dns01solversecret_463AF303.metadata[0].name}\",\n                \"key\": \"key.json\"\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}",
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"letsencrypt\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt\"\n      },\n      \"solvers\": [\n        {\n          \"dns01\": {\n            \"cloudDNS\": {\n              \"project\": \"copper-canyon-296719\",\n              \"serviceAccountSecretRef\": {\n                \"name\": \"${kubernetes_secret.dns_staging_dns01solversecret_463AF303.metadata[0].name}\",\n                \"key\": \"key.json\"\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}",
         "//": {
           "metadata": {
             "path": "dns/staging/issuer/issuer-manifest",
@@ -182,7 +182,7 @@
         }
       },
       "dns_staging_cert_certmanifest_E52A1ED4": {
-        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"Certificate\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"nregner.net\"\n  },\n  \"spec\": {\n    \"secretName\": \"letsencrypt-staging-cert\",\n    \"issuerRef\": {\n      \"kind\": \"ClusterIssuer\",\n      \"name\": \"letsencrypt-staging\"\n    },\n    \"commonName\": \"nregner.net\",\n    \"dnsNames\": [\n      \"nregner.net\",\n      \"*.nregner.net\"\n    ]\n  }\n}",
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"Certificate\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"nregner.net\"\n  },\n  \"spec\": {\n    \"secretName\": \"letsencrypt-cert\",\n    \"issuerRef\": {\n      \"kind\": \"ClusterIssuer\",\n      \"name\": \"letsencrypt\"\n    },\n    \"commonName\": \"nregner.net\",\n    \"dnsNames\": [\n      \"nregner.net\",\n      \"*.nregner.net\"\n    ]\n  }\n}",
         "//": {
           "metadata": {
             "path": "dns/staging/cert/cert-manifest",
@@ -260,26 +260,142 @@
             "uniqueId": "dns_nregnernet_update_21DF92E7"
           }
         }
-      }
-    },
-    "kubernetes_service": {
-      "dns_nginx_craigslist_1ECDDA5F": {
+      },
+      "dns_craigslistnregnernet_update_BE24F1D8": {
         "metadata": {
-          "name": "craigslist",
+          "generate_name": "update-craigslist-nregner-net-",
           "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
         },
         "spec": {
-          "cluster_ip": "None",
-          "port": [
-            {
-              "port": 6000
+          "concurrency_policy": "Forbid",
+          "failed_jobs_history_limit": 1,
+          "schedule": "*/15 * * * *",
+          "successful_jobs_history_limit": 1,
+          "job_template": {
+            "metadata": {
+              "generate_name": "update-craigslist-nregner-net-"
+            },
+            "spec": {
+              "backoff_limit": 0,
+              "template": {
+                "metadata": {
+                  "generate_name": "update-craigslist-nregner-net-"
+                },
+                "spec": {
+                  "restart_policy": "Never",
+                  "container": [
+                    {
+                      "command": [
+                        "/bin/sh",
+                        "-c",
+                        "curl --silent --show-error --fail                     -u \"$USERNAME:$PASSWORD\"                     \"https://domains.google.com/nic/update?hostname=$DOMAIN\""
+                      ],
+                      "image": "curlimages/curl",
+                      "name": "craigslist-nregner-net",
+                      "env": [
+                        {
+                          "name": "DOMAIN",
+                          "value": "craigslist.nregner.net"
+                        },
+                        {
+                          "name": "USERNAME",
+                          "value_from": {
+                            "secret_key_ref": {
+                              "key": "username",
+                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
+                            }
+                          }
+                        },
+                        {
+                          "name": "PASSWORD",
+                          "value_from": {
+                            "secret_key_ref": {
+                              "key": "password",
+                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
             }
-          ]
+          }
         },
         "//": {
           "metadata": {
-            "path": "dns/nginx/craigslist",
-            "uniqueId": "dns_nginx_craigslist_1ECDDA5F"
+            "path": "dns/craigslist-nregner-net/update",
+            "uniqueId": "dns_craigslistnregnernet_update_BE24F1D8"
+          }
+        }
+      },
+      "dns_craigslistapinregnernet_update_B38A7DEA": {
+        "metadata": {
+          "generate_name": "update-craigslist-api-nregner-net-",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "spec": {
+          "concurrency_policy": "Forbid",
+          "failed_jobs_history_limit": 1,
+          "schedule": "*/15 * * * *",
+          "successful_jobs_history_limit": 1,
+          "job_template": {
+            "metadata": {
+              "generate_name": "update-craigslist-api-nregner-net-"
+            },
+            "spec": {
+              "backoff_limit": 0,
+              "template": {
+                "metadata": {
+                  "generate_name": "update-craigslist-api-nregner-net-"
+                },
+                "spec": {
+                  "restart_policy": "Never",
+                  "container": [
+                    {
+                      "command": [
+                        "/bin/sh",
+                        "-c",
+                        "curl --silent --show-error --fail                     -u \"$USERNAME:$PASSWORD\"                     \"https://domains.google.com/nic/update?hostname=$DOMAIN\""
+                      ],
+                      "image": "curlimages/curl",
+                      "name": "craigslist-api-nregner-net",
+                      "env": [
+                        {
+                          "name": "DOMAIN",
+                          "value": "craigslist-api.nregner.net"
+                        },
+                        {
+                          "name": "USERNAME",
+                          "value_from": {
+                            "secret_key_ref": {
+                              "key": "username",
+                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
+                            }
+                          }
+                        },
+                        {
+                          "name": "PASSWORD",
+                          "value_from": {
+                            "secret_key_ref": {
+                              "key": "password",
+                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "//": {
+          "metadata": {
+            "path": "dns/craigslist-api-nregner-net/update",
+            "uniqueId": "dns_craigslistapinregnernet_update_B38A7DEA"
           }
         }
       }
@@ -288,7 +404,7 @@
       "dns_nginx_ingress_C0D35927": {
         "metadata": {
           "annotations": {
-            "cert-manager.io/issuer": "letsencrypt-staging"
+            "cert-manager.io/issuer": "letsencrypt"
           },
           "name": "nginx",
           "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
@@ -301,12 +417,23 @@
               "http": {
                 "path": [
                   {
+                    "path": "/craigslist",
+                    "backend": {
+                      "service": {
+                        "name": "craigslist-ui",
+                        "port": {
+                          "number": 80
+                        }
+                      }
+                    }
+                  },
+                  {
                     "path": "/",
                     "backend": {
                       "service": {
-                        "name": "craigslist",
+                        "name": "httpbin",
                         "port": {
-                          "number": 8080
+                          "number": 80
                         }
                       }
                     }
@@ -320,7 +447,7 @@
               "hosts": [
                 "nregner.net"
               ],
-              "secret_name": "letsencrypt-staging-cert"
+              "secret_name": "letsencrypt-cert"
             }
           ]
         },
@@ -328,6 +455,98 @@
           "metadata": {
             "path": "dns/nginx/ingress",
             "uniqueId": "dns_nginx_ingress_C0D35927"
+          }
+        }
+      }
+    },
+    "kubernetes_deployment": {
+      "dns_nginx_httpbindeployment_92AE16BD": {
+        "metadata": {
+          "name": "httpbin",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "spec": {
+          "replicas": "1",
+          "selector": {
+            "match_labels": {
+              "app": "httpbin"
+            }
+          },
+          "template": {
+            "metadata": {
+              "labels": {
+                "app": "httpbin"
+              }
+            },
+            "spec": {
+              "container": [
+                {
+                  "image": "kennethreitz/httpbin",
+                  "name": "httpbin",
+                  "port": [
+                    {
+                      "container_port": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/httpbin-deployment",
+            "uniqueId": "dns_nginx_httpbindeployment_92AE16BD"
+          }
+        }
+      }
+    },
+    "kubernetes_service": {
+      "dns_nginx_httpbinservice_F2B4D832": {
+        "metadata": {
+          "labels": {
+            "app": "httpbin"
+          },
+          "name": "httpbin",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "spec": {
+          "selector": {
+            "app": "httpbin"
+          },
+          "port": [
+            {
+              "name": "http",
+              "port": 80,
+              "target_port": "80"
+            }
+          ]
+        },
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/httpbin-service",
+            "uniqueId": "dns_nginx_httpbinservice_F2B4D832"
+          }
+        }
+      }
+    },
+    "kubernetes_manifest": {
+      "dns_updatecoredns_8AA5AA96": {
+        "manifest": {
+          "apiVersion": "v1",
+          "kind": "ConfigMap",
+          "metadata": {
+            "name": "coredns",
+            "namespace": "kube-system"
+          },
+          "data": {
+            "Corefile": "\n            .:53 {\n              errors\n              health {\n               lameduck 5s\n              }\n              ready\n              log . {\n               class error\n              }\n              kubernetes cluster.local in-addr.arpa ip6.arpa {\n               pods insecure\n               fallthrough in-addr.arpa ip6.arpa\n              }\n              prometheus :9153\n              forward . 8.8.8.8 8.8.4.4\n              cache 30\n              loop\n              reload\n              loadbalance\n              hosts {\n                10.0.1.1 local-node\n                fallthrough\n              }\n            }\n          "
+          }
+        },
+        "//": {
+          "metadata": {
+            "path": "dns/update-coredns",
+            "uniqueId": "dns_updatecoredns_8AA5AA96"
           }
         }
       }

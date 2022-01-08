@@ -44,17 +44,18 @@ export class DnsStack extends TerraformStack {
     };
 
     // https://community.letsencrypt.org/t/how-to-switch-from-staging-to-production/79632
-    // const productionCert = new CloudDnsCert(this, "staging", {
-    //   namespace: ns.metadata.name,
-    //   project,
-    //   domain,
-    //   issuer: {
-    //     name: "letsencrypt",
-    //     server: "https://acme-v02.api.letsencrypt.org/directory",
-    //   },
-    //   dependsOn: [certManager],
-    // });
+    const productionCert = new CloudDnsCert(this, "staging", {
+      namespace: ns.metadata.name,
+      project,
+      dns,
+      issuer: {
+        name: "letsencrypt",
+        server: "https://acme-v02.api.letsencrypt.org/directory",
+      },
+      dependsOn: [certManager],
+    });
 
+    /*
     const stagingCert = new CloudDnsCert(this, "staging", {
       namespace: ns.metadata.name,
       project,
@@ -65,27 +66,33 @@ export class DnsStack extends TerraformStack {
       },
       dependsOn: [certManager],
     });
+*/
 
     // TODO: Migrate this to CloudDNS once 60 day window is up
     // 1. gcloud dns record-sets list -z default
     // 2. manually copy to google domains custom record
     // 3. dig -t txt _acme-challenge.nregner.net +short
-    new GoogleDomainsDdns(this, {
-      namespace: ns.metadata.name!!,
-      domain,
-      credentials: new k8s.Secret(this, "credentials", {
-        metadata: { namespace: ns.metadata.name, name: "credentials" },
-        type: "kubernetes.io/basic-auth",
-        data: call("jsondecode", [
-          Fn.file("../../../src/dns/credentials.json"),
-        ]),
-      }),
+    const credentials = new k8s.Secret(this, "credentials", {
+      metadata: { namespace: ns.metadata.name, name: "credentials" },
+      type: "kubernetes.io/basic-auth",
+      data: call("jsondecode", [Fn.file("../../../src/dns/credentials.json")]),
     });
+    for (const subdomain of [
+      domain,
+      `craigslist.${domain}`,
+      `craigslist-api.${domain}`,
+    ]) {
+      new GoogleDomainsDdns(this, {
+        namespace: ns.metadata.name!!,
+        domain: subdomain,
+        credentials,
+      });
+    }
 
     new NginxIngress(this, "nginx", {
       namespace: ns.metadata.name!!,
       domain,
-      cert: stagingCert,
+      cert: productionCert,
     });
 
     // CoreDNS
@@ -115,15 +122,15 @@ export class DnsStack extends TerraformStack {
                fallthrough in-addr.arpa ip6.arpa
               }
               prometheus :9153
-              hosts custom.hosts docker.local {
-                10.0.1.1 docker.local
-                fallthrough
-              }
               forward . 8.8.8.8 8.8.4.4
               cache 30
               loop
               reload
               loadbalance
+              hosts {
+                10.0.1.1 local-node
+                fallthrough
+              }
             }
           `,
         },

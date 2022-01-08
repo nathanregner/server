@@ -38,14 +38,6 @@ export class NginxIngress extends Construct {
       }),
     });
 
-    new k8s.Service(this, "docker-local", {
-      metadata: { namespace, name: "docker-local" },
-      spec: {
-        clusterIp: "None",
-        port: [{ port: 6000 }],
-      },
-    });
-
     new k8s.IngressV1(this, "ingress", {
       metadata: {
         namespace,
@@ -62,9 +54,18 @@ export class NginxIngress extends Construct {
             http: {
               path: [
                 {
+                  path: "/craigslist",
+                  backend: {
+                    service: {
+                      name: "craigslist-ui",
+                      port: { number: 80 },
+                    },
+                  },
+                },
+                {
                   path: "/",
                   backend: {
-                    service: { name: "docker-local", port: { number: 8080 } },
+                    service: { name: "httpbin", port: { number: 80 } },
                   },
                 },
               ],
@@ -77,6 +78,38 @@ export class NginxIngress extends Construct {
             secretName: cert.secretName,
           },
         ],
+      },
+    });
+
+    this.httpbin(namespace);
+  }
+
+  httpbin(namespace: string) {
+    const labels = { app: "httpbin" };
+    new k8s.Deployment(this, "httpbin-deployment", {
+      metadata: { namespace, name: "httpbin" },
+      spec: {
+        replicas: "1",
+        selector: { matchLabels: labels },
+        template: {
+          metadata: { labels },
+          spec: {
+            container: [
+              {
+                name: "httpbin",
+                image: "kennethreitz/httpbin",
+                port: [{ containerPort: 80 }],
+              },
+            ],
+          },
+        },
+      },
+    });
+    new k8s.Service(this, "httpbin-service", {
+      metadata: { namespace, name: "httpbin", labels },
+      spec: {
+        selector: labels,
+        port: [{ name: "http", port: 80, targetPort: "80" }],
       },
     });
   }
