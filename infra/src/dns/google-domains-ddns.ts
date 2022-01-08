@@ -46,7 +46,7 @@ export class GoogleDomainsDdns extends Construct {
     new k8s.CronJob(this, "update", {
       metadata: { namespace, generateName: `update-${id}-` },
       spec: {
-        schedule: "*/15 * * * *",
+        schedule: "*/1 * * * *",
         concurrencyPolicy: "Forbid",
         successfulJobsHistoryLimit: 1,
         failedJobsHistoryLimit: 1,

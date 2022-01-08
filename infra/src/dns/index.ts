@@ -79,8 +79,8 @@ export class DnsStack extends TerraformStack {
     });
     for (const subdomain of [
       domain,
-      `craigslist.${domain}`,
-      `craigslist-api.${domain}`,
+      // `craigslist.${domain}`,
+      // `craigslist-api.${domain}`,
     ]) {
       new GoogleDomainsDdns(this, {
         namespace: ns.metadata.name!!,
