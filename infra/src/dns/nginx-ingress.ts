@@ -44,6 +44,8 @@ export class NginxIngress extends Construct {
         name: "nginx",
         annotations: {
           "cert-manager.io/issuer": cert.issuerName,
+          "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
+          "nginx.ingress.kubernetes.io/force-ssl-redirect": "true",
         },
       },
       spec: {
@@ -54,7 +56,8 @@ export class NginxIngress extends Construct {
             http: {
               path: [
                 {
-                  path: "/craigslist",
+                  path: "/craigslist(/|$)(.*)",
+                  pathType: "Prefix",
                   backend: {
                     service: {
                       name: "craigslist-ui",
@@ -63,9 +66,13 @@ export class NginxIngress extends Construct {
                   },
                 },
                 {
-                  path: "/",
+                  path: "/craigslist-api(/|$)(.*)",
+                  pathType: "Prefix",
                   backend: {
-                    service: { name: "httpbin", port: { number: 80 } },
+                    service: {
+                      name: "craigslist-api",
+                      port: { number: 80 },
+                    },
                   },
                 },
               ],
