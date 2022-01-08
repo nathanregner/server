@@ -1,7 +1,7 @@
 {
   "//": {
     "metadata": {
-      "version": "0.7.0",
+      "version": "0.8.5",
       "stackName": "dns",
       "backend": "kubernetes"
     }
@@ -25,6 +25,10 @@
       "kubectl": {
         "version": ">= 1.13.1",
         "source": "gavinbunney/kubectl"
+      },
+      "google": {
+        "version": "~> 3.0",
+        "source": "google"
       }
     }
   },
@@ -45,6 +49,11 @@
       {
         "config_path": "~/.kube/config"
       }
+    ],
+    "google": [
+      {
+        "project": "copper-canyon-296719"
+      }
     ]
   },
   "resource": {
@@ -61,7 +70,92 @@
         }
       }
     },
+    "helm_release": {
+      "dns_certmanager_AB955537": {
+        "chart": "cert-manager",
+        "name": "cert-manager",
+        "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}",
+        "repository": "https://charts.jetstack.io",
+        "values": [
+          "{\"installCRDs\":true}"
+        ],
+        "version": "1.6.1",
+        "//": {
+          "metadata": {
+            "path": "dns/cert-manager",
+            "uniqueId": "dns_certmanager_AB955537"
+          }
+        }
+      },
+      "dns_nginx_ingressnginx_1A428C9F": {
+        "chart": "ingress-nginx",
+        "name": "nginx",
+        "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}",
+        "repository": "https://kubernetes.github.io/ingress-nginx",
+        "values": [
+          "{\"controller\":{\"hostNetwork\":\"true\",\"service\":{\"type\":\"\"},\"kind\":\"DaemonSet\"}}"
+        ],
+        "version": "4.0.13",
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/ingress-nginx",
+            "uniqueId": "dns_nginx_ingressnginx_1A428C9F"
+          }
+        }
+      }
+    },
+    "google_service_account": {
+      "dns_staging_dns01solver_F973FCBF": {
+        "account_id": "dns01-solver",
+        "//": {
+          "metadata": {
+            "path": "dns/staging/dns01-solver",
+            "uniqueId": "dns_staging_dns01solver_F973FCBF"
+          }
+        }
+      }
+    },
+    "google_project_iam_binding": {
+      "dns_staging_dns01solverbinding_71C32B99": {
+        "members": [
+          "serviceAccount:${google_service_account.dns_staging_dns01solver_F973FCBF.email}"
+        ],
+        "role": "roles/dns.admin",
+        "//": {
+          "metadata": {
+            "path": "dns/staging/dns01-solver-binding",
+            "uniqueId": "dns_staging_dns01solverbinding_71C32B99"
+          }
+        }
+      }
+    },
+    "google_service_account_key": {
+      "dns_staging_dns01solverkey_031E84CE": {
+        "service_account_id": "${google_service_account.dns_staging_dns01solver_F973FCBF.name}",
+        "//": {
+          "metadata": {
+            "path": "dns/staging/dns01-solver-key",
+            "uniqueId": "dns_staging_dns01solverkey_031E84CE"
+          }
+        }
+      }
+    },
     "kubernetes_secret": {
+      "dns_staging_dns01solversecret_463AF303": {
+        "data": {
+          "key.json": "${base64decode(google_service_account_key.dns_staging_dns01solverkey_031E84CE.private_key)}"
+        },
+        "metadata": {
+          "name": "dns01-solver-svc-acct",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "//": {
+          "metadata": {
+            "path": "dns/staging/dns01-solver-secret",
+            "uniqueId": "dns_staging_dns01solversecret_463AF303"
+          }
+        }
+      },
       "dns_credentials_B89B2E14": {
         "data": "${jsondecode(file(\"../../../src/dns/credentials.json\"))}",
         "type": "kubernetes.io/basic-auth",
@@ -73,6 +167,26 @@
           "metadata": {
             "path": "dns/credentials",
             "uniqueId": "dns_credentials_B89B2E14"
+          }
+        }
+      }
+    },
+    "kubectl_manifest": {
+      "dns_staging_issuer_issuermanifest_56310F35": {
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"letsencrypt-staging\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-staging-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt-staging\"\n      },\n      \"solvers\": [\n        {\n          \"dns01\": {\n            \"cloudDNS\": {\n              \"project\": \"copper-canyon-296719\",\n              \"serviceAccountSecretRef\": {\n                \"name\": \"${kubernetes_secret.dns_staging_dns01solversecret_463AF303.metadata[0].name}\",\n                \"key\": \"key.json\"\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}",
+        "//": {
+          "metadata": {
+            "path": "dns/staging/issuer/issuer-manifest",
+            "uniqueId": "dns_staging_issuer_issuermanifest_56310F35"
+          }
+        }
+      },
+      "dns_staging_cert_certmanifest_E52A1ED4": {
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"Certificate\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"nregner.net\"\n  },\n  \"spec\": {\n    \"secretName\": \"letsencrypt-staging-cert\",\n    \"issuerRef\": {\n      \"kind\": \"ClusterIssuer\",\n      \"name\": \"letsencrypt-staging\"\n    },\n    \"commonName\": \"nregner.net\",\n    \"dnsNames\": [\n      \"nregner.net\",\n      \"*.nregner.net\"\n    ]\n  }\n}",
+        "//": {
+          "metadata": {
+            "path": "dns/staging/cert/cert-manifest",
+            "uniqueId": "dns_staging_cert_certmanifest_E52A1ED4"
           }
         }
       }
@@ -144,6 +258,76 @@
           "metadata": {
             "path": "dns/nregner-net/update",
             "uniqueId": "dns_nregnernet_update_21DF92E7"
+          }
+        }
+      }
+    },
+    "kubernetes_service": {
+      "dns_nginx_craigslist_1ECDDA5F": {
+        "metadata": {
+          "name": "craigslist",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "spec": {
+          "cluster_ip": "None",
+          "port": [
+            {
+              "port": 6000
+            }
+          ]
+        },
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/craigslist",
+            "uniqueId": "dns_nginx_craigslist_1ECDDA5F"
+          }
+        }
+      }
+    },
+    "kubernetes_ingress_v1": {
+      "dns_nginx_ingress_C0D35927": {
+        "metadata": {
+          "annotations": {
+            "cert-manager.io/issuer": "letsencrypt-staging"
+          },
+          "name": "nginx",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "spec": {
+          "ingress_class_name": "nginx",
+          "rule": [
+            {
+              "host": "nregner.net",
+              "http": {
+                "path": [
+                  {
+                    "path": "/",
+                    "backend": {
+                      "service": {
+                        "name": "craigslist",
+                        "port": {
+                          "number": 8080
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "tls": [
+            {
+              "hosts": [
+                "nregner.net"
+              ],
+              "secret_name": "letsencrypt-staging-cert"
+            }
+          ]
+        },
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/ingress",
+            "uniqueId": "dns_nginx_ingress_C0D35927"
           }
         }
       }

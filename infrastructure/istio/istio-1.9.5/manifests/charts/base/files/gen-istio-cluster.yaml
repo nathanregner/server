@@ -1961,7 +1961,7 @@ spec:
     openAPIV3Schema:
       properties:
         spec:
-          description: 'Configuration affecting label/content routing, sni routing,
+          description: 'Configuration affecting label/content ingress, sni ingress,
             etc. See more details at: https://istio.io/docs/reference/config/networking/virtual-service.html'
           properties:
             exportTo:
@@ -3577,7 +3577,7 @@ rules:
     resources: ["customresourcedefinitions"]
     verbs: ["get", "list", "watch"]
 
-  # discovery and routing
+  # discovery and ingress
   - apiGroups: [""]
     resources: ["pods", "nodes", "services", "namespaces", "endpoints"]
     verbs: ["get", "list", "watch"]

@@ -12,7 +12,7 @@ gateways:
       name: https
       targetPort: 8443
       protocol: TCP
-      # This is the port where sni routing happens
+      # This is the port where sni ingress happens
     - port: 15443
       targetPort: 15443
       name: tls
@@ -26,7 +26,7 @@ gateways:
     # Make sure you set suffix if deploying multiple egress gateways.
     zvpn:
       # Must be different for each egress namespace.
-      # Used to control the domain name suffix for zero vpn routing.
+      # Used to control the domain name suffix for zero vpn ingress.
       # Domain names ending with this suffix will be routed to this egress gateway
       # automatically.
       # This can be a real domain name ( istio.example.com )
@@ -81,7 +81,7 @@ gateways:
       # ISTIO_META_REQUESTED_NETWORK_VIEW: ""
       # A gateway with this mode ensures that pilot generates an additional
       # set of clusters for internal services but without Istio mTLS, to
-      # enable cross cluster routing.
+      # enable cross cluster ingress.
       ISTIO_META_ROUTER_MODE: "standard"
 
     nodeSelector: {}
