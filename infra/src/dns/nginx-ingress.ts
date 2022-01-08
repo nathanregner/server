@@ -38,6 +38,11 @@ export class NginxIngress extends Construct {
       }),
     });
 
+    const api = this.localService(namespace, {
+      name: "craigslist-api",
+      port: 6000,
+    });
+
     new k8s.IngressV1(this, "ingress", {
       metadata: {
         namespace,
@@ -70,8 +75,8 @@ export class NginxIngress extends Construct {
                   pathType: "Prefix",
                   backend: {
                     service: {
-                      name: "craigslist-api",
-                      port: { number: 80 },
+                      name: api.metadata.name,
+                      port: { number: 6000 },
                     },
                   },
                 },
@@ -89,6 +94,30 @@ export class NginxIngress extends Construct {
     });
 
     this.httpbin(namespace);
+  }
+
+  private localService(
+    namespace: string,
+    { name, port }: { name: string; port: number }
+  ) {
+    const service = new k8s.Service(this, name, {
+      metadata: { namespace, name },
+      spec: {
+        type: "ClusterIP",
+        clusterIp: "None",
+        port: [{ name: "app", port, protocol: "TCP", targetPort: `${port}` }],
+      },
+    });
+    new k8s.Endpoints(this, `${name}-endpoints`, {
+      metadata: { namespace, name },
+      subset: [
+        {
+          address: [{ ip: "10.0.1.1" }],
+          port: [{ name: "app", port: port, protocol: "TCP" }],
+        },
+      ],
+    });
+    return service;
   }
 
   httpbin(namespace: string) {

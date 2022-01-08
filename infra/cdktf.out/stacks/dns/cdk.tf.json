@@ -400,11 +400,96 @@
         }
       }
     },
+    "kubernetes_service": {
+      "dns_nginx_craigslistapi_17481855": {
+        "metadata": {
+          "name": "craigslist-api",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "spec": {
+          "cluster_ip": "None",
+          "type": "ClusterIP",
+          "port": [
+            {
+              "name": "app",
+              "port": 6000,
+              "protocol": "TCP",
+              "target_port": "6000"
+            }
+          ]
+        },
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/craigslist-api",
+            "uniqueId": "dns_nginx_craigslistapi_17481855"
+          }
+        }
+      },
+      "dns_nginx_httpbinservice_F2B4D832": {
+        "metadata": {
+          "labels": {
+            "app": "httpbin"
+          },
+          "name": "httpbin",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "spec": {
+          "selector": {
+            "app": "httpbin"
+          },
+          "port": [
+            {
+              "name": "http",
+              "port": 80,
+              "target_port": "80"
+            }
+          ]
+        },
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/httpbin-service",
+            "uniqueId": "dns_nginx_httpbinservice_F2B4D832"
+          }
+        }
+      }
+    },
+    "kubernetes_endpoints": {
+      "dns_nginx_craigslistapiendpoints_A76C3AFC": {
+        "metadata": {
+          "name": "craigslist-api",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "subset": [
+          {
+            "address": [
+              {
+                "ip": "10.0.1.1"
+              }
+            ],
+            "port": [
+              {
+                "name": "app",
+                "port": 6000,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ],
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/craigslist-api-endpoints",
+            "uniqueId": "dns_nginx_craigslistapiendpoints_A76C3AFC"
+          }
+        }
+      }
+    },
     "kubernetes_ingress_v1": {
       "dns_nginx_ingress_C0D35927": {
         "metadata": {
           "annotations": {
-            "cert-manager.io/issuer": "letsencrypt"
+            "cert-manager.io/issuer": "letsencrypt",
+            "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
+            "nginx.ingress.kubernetes.io/force-ssl-redirect": "true"
           },
           "name": "nginx",
           "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
@@ -417,7 +502,8 @@
               "http": {
                 "path": [
                   {
-                    "path": "/craigslist",
+                    "path": "/craigslist(/|$)(.*)",
+                    "path_type": "Prefix",
                     "backend": {
                       "service": {
                         "name": "craigslist-ui",
@@ -428,12 +514,13 @@
                     }
                   },
                   {
-                    "path": "/",
+                    "path": "/craigslist-api(/|$)(.*)",
+                    "path_type": "Prefix",
                     "backend": {
                       "service": {
-                        "name": "httpbin",
+                        "name": "${kubernetes_service.dns_nginx_craigslistapi_17481855.metadata[0].name}",
                         "port": {
-                          "number": 80
+                          "number": 6000
                         }
                       }
                     }
@@ -497,35 +584,6 @@
           "metadata": {
             "path": "dns/nginx/httpbin-deployment",
             "uniqueId": "dns_nginx_httpbindeployment_92AE16BD"
-          }
-        }
-      }
-    },
-    "kubernetes_service": {
-      "dns_nginx_httpbinservice_F2B4D832": {
-        "metadata": {
-          "labels": {
-            "app": "httpbin"
-          },
-          "name": "httpbin",
-          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
-        },
-        "spec": {
-          "selector": {
-            "app": "httpbin"
-          },
-          "port": [
-            {
-              "name": "http",
-              "port": 80,
-              "target_port": "80"
-            }
-          ]
-        },
-        "//": {
-          "metadata": {
-            "path": "dns/nginx/httpbin-service",
-            "uniqueId": "dns_nginx_httpbinservice_F2B4D832"
           }
         }
       }
