@@ -38,8 +38,8 @@ export class NginxIngress extends Construct {
       }),
     });
 
-    new k8s.Service(this, "craigslist", {
-      metadata: { namespace, name: "craigslist" },
+    new k8s.Service(this, "docker-local", {
+      metadata: { namespace, name: "docker-local" },
       spec: {
         clusterIp: "None",
         port: [{ port: 6000 }],
@@ -64,7 +64,7 @@ export class NginxIngress extends Construct {
                 {
                   path: "/",
                   backend: {
-                    service: { name: "craigslist", port: { number: 8080 } },
+                    service: { name: "docker-local", port: { number: 8080 } },
                   },
                 },
               ],

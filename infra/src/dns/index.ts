@@ -87,5 +87,47 @@ export class DnsStack extends TerraformStack {
       domain,
       cert: stagingCert,
     });
+
+    // CoreDNS
+    // kubectl run scratch --image=curlimages/curl -it --rm -- /bin/sh
+    // curl http://nregner.ddns.net
+    new k8s.Manifest(this, "update-coredns", {
+      manifest: {
+        apiVersion: "v1",
+        kind: "ConfigMap",
+        metadata: {
+          name: "coredns",
+          namespace: "kube-system",
+        },
+        data: {
+          Corefile: `
+            .:53 {
+              errors
+              health {
+               lameduck 5s
+              }
+              ready
+              log . {
+               class error
+              }
+              kubernetes cluster.local in-addr.arpa ip6.arpa {
+               pods insecure
+               fallthrough in-addr.arpa ip6.arpa
+              }
+              prometheus :9153
+              hosts custom.hosts docker.local {
+                10.0.1.1 docker.local
+                fallthrough
+              }
+              forward . 8.8.8.8 8.8.4.4
+              cache 30
+              loop
+              reload
+              loadbalance
+            }
+          `,
+        },
+      },
+    });
   }
 }
