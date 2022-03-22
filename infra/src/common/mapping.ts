@@ -26,7 +26,7 @@ export class Mapping extends Construct {
     }
 
     new Manifest(this, `${id}-mapping`, {
-      body: {
+      content: {
         apiVersion: "getambassador.io/v3alpha1",
         kind: "Mapping",
         metadata,

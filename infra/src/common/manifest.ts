@@ -2,24 +2,21 @@ import { Construct } from "constructs";
 import * as kubectl from "../../.gen/providers/kubectl";
 import { ITerraformDependable } from "cdktf";
 
-export interface ManifestConfig {
+export interface ManifestConfig<T> {
   dependsOn?: ITerraformDependable[];
-  body: {
-    apiVersion: string;
-    kind: string;
-    metadata: { namespace?: string; name?: string };
-    spec: { [key: string]: any };
+  content: T & {
+    metadata?: { namespace?: string; name?: string };
   };
 }
 
-export class Manifest extends Construct implements ITerraformDependable {
+export class Manifest<T> extends Construct implements ITerraformDependable {
   readonly fqn: string;
 
-  constructor(scope: Construct, id: string, config: ManifestConfig) {
+  constructor(scope: Construct, id: string, config: ManifestConfig<T>) {
     super(scope, id);
-    const { dependsOn, body } = config;
+    const { dependsOn, content } = config;
     const manifest = new kubectl.Manifest(this, `${id}-manifest`, {
-      yamlBody: JSON.stringify(body, undefined, 2),
+      yamlBody: JSON.stringify(content, undefined, 2),
       dependsOn,
     });
     this.fqn = manifest.fqn;

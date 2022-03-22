@@ -18,6 +18,7 @@
     "noUnusedParameters": false,
     "outDir": "target",
     "resolveJsonModule": true,
+    "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,

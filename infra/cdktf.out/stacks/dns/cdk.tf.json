@@ -1,7 +1,7 @@
 {
   "//": {
     "metadata": {
-      "version": "0.8.5",
+      "version": "0.8.6",
       "stackName": "dns",
       "backend": "kubernetes"
     }
@@ -200,7 +200,7 @@
         "spec": {
           "concurrency_policy": "Forbid",
           "failed_jobs_history_limit": 1,
-          "schedule": "*/15 * * * *",
+          "schedule": "*/1 * * * *",
           "successful_jobs_history_limit": 1,
           "job_template": {
             "metadata": {
@@ -258,144 +258,6 @@
           "metadata": {
             "path": "dns/nregner-net/update",
             "uniqueId": "dns_nregnernet_update_21DF92E7"
-          }
-        }
-      },
-      "dns_craigslistnregnernet_update_BE24F1D8": {
-        "metadata": {
-          "generate_name": "update-craigslist-nregner-net-",
-          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
-        },
-        "spec": {
-          "concurrency_policy": "Forbid",
-          "failed_jobs_history_limit": 1,
-          "schedule": "*/15 * * * *",
-          "successful_jobs_history_limit": 1,
-          "job_template": {
-            "metadata": {
-              "generate_name": "update-craigslist-nregner-net-"
-            },
-            "spec": {
-              "backoff_limit": 0,
-              "template": {
-                "metadata": {
-                  "generate_name": "update-craigslist-nregner-net-"
-                },
-                "spec": {
-                  "restart_policy": "Never",
-                  "container": [
-                    {
-                      "command": [
-                        "/bin/sh",
-                        "-c",
-                        "curl --silent --show-error --fail                     -u \"$USERNAME:$PASSWORD\"                     \"https://domains.google.com/nic/update?hostname=$DOMAIN\""
-                      ],
-                      "image": "curlimages/curl",
-                      "name": "craigslist-nregner-net",
-                      "env": [
-                        {
-                          "name": "DOMAIN",
-                          "value": "craigslist.nregner.net"
-                        },
-                        {
-                          "name": "USERNAME",
-                          "value_from": {
-                            "secret_key_ref": {
-                              "key": "username",
-                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
-                            }
-                          }
-                        },
-                        {
-                          "name": "PASSWORD",
-                          "value_from": {
-                            "secret_key_ref": {
-                              "key": "password",
-                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "//": {
-          "metadata": {
-            "path": "dns/craigslist-nregner-net/update",
-            "uniqueId": "dns_craigslistnregnernet_update_BE24F1D8"
-          }
-        }
-      },
-      "dns_craigslistapinregnernet_update_B38A7DEA": {
-        "metadata": {
-          "generate_name": "update-craigslist-api-nregner-net-",
-          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
-        },
-        "spec": {
-          "concurrency_policy": "Forbid",
-          "failed_jobs_history_limit": 1,
-          "schedule": "*/15 * * * *",
-          "successful_jobs_history_limit": 1,
-          "job_template": {
-            "metadata": {
-              "generate_name": "update-craigslist-api-nregner-net-"
-            },
-            "spec": {
-              "backoff_limit": 0,
-              "template": {
-                "metadata": {
-                  "generate_name": "update-craigslist-api-nregner-net-"
-                },
-                "spec": {
-                  "restart_policy": "Never",
-                  "container": [
-                    {
-                      "command": [
-                        "/bin/sh",
-                        "-c",
-                        "curl --silent --show-error --fail                     -u \"$USERNAME:$PASSWORD\"                     \"https://domains.google.com/nic/update?hostname=$DOMAIN\""
-                      ],
-                      "image": "curlimages/curl",
-                      "name": "craigslist-api-nregner-net",
-                      "env": [
-                        {
-                          "name": "DOMAIN",
-                          "value": "craigslist-api.nregner.net"
-                        },
-                        {
-                          "name": "USERNAME",
-                          "value_from": {
-                            "secret_key_ref": {
-                              "key": "username",
-                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
-                            }
-                          }
-                        },
-                        {
-                          "name": "PASSWORD",
-                          "value_from": {
-                            "secret_key_ref": {
-                              "key": "password",
-                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "//": {
-          "metadata": {
-            "path": "dns/craigslist-api-nregner-net/update",
-            "uniqueId": "dns_craigslistapinregnernet_update_B38A7DEA"
           }
         }
       }
