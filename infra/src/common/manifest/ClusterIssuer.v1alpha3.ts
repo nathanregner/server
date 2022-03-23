@@ -11,9 +11,7 @@
 export interface ClusterIssuer {
   apiVersion: "cert-manager.io/v1alpha3";
   kind: "ClusterIssuer";
-  metadata?: {
-    [k: string]: unknown;
-  };
+  metadata?: {};
   /**
    * Desired state of the ClusterIssuer resource.
    */
@@ -58,9 +56,7 @@ export interface ClusterIssuer {
            * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
            */
           name: string;
-          [k: string]: unknown;
         };
-        [k: string]: unknown;
       };
       /**
        * PreferredChain is the chain to use if the ACME server outputs multiple. PreferredChain is no guarantee that this one gets delivered by the ACME endpoint. For example, for Let's Encrypt's DST crosssign you would use: "DST Root CA X3" or "ISRG Root X1" for the newer Let's Encrypt root CA. This value picks the first certificate bundle in the ACME alternative chains that has a certificate with this value as its issuer's CN
@@ -78,7 +74,6 @@ export interface ClusterIssuer {
          * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
          */
         name: string;
-        [k: string]: unknown;
       };
       /**
        * Server is the URL used to access the ACME server's 'directory' endpoint. For example, for Let's Encrypt's staging endpoint, you would use: "https://acme-staging-v02.api.letsencrypt.org/directory". Only ACME v2 endpoints (i.e. RFC 8555) are supported.
@@ -112,10 +107,8 @@ export interface ClusterIssuer {
                * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                */
               name: string;
-              [k: string]: unknown;
             };
             host: string;
-            [k: string]: unknown;
           };
           /**
            * Use the Akamai DNS zone management API to manage DNS01 challenge records.
@@ -133,7 +126,6 @@ export interface ClusterIssuer {
                * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                */
               name: string;
-              [k: string]: unknown;
             };
             /**
              * A reference to a specific 'key' within a Secret resource. In some instances, `key` is a required field.
@@ -147,7 +139,6 @@ export interface ClusterIssuer {
                * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                */
               name: string;
-              [k: string]: unknown;
             };
             /**
              * A reference to a specific 'key' within a Secret resource. In some instances, `key` is a required field.
@@ -161,10 +152,8 @@ export interface ClusterIssuer {
                * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                */
               name: string;
-              [k: string]: unknown;
             };
             serviceConsumerDomain: string;
-            [k: string]: unknown;
           };
           /**
            * Use the Microsoft Azure DNS API to manage DNS01 challenge records.
@@ -186,12 +175,15 @@ export interface ClusterIssuer {
                * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                */
               name: string;
-              [k: string]: unknown;
             };
             /**
              * name of the Azure environment (default AzurePublicCloud)
              */
-            environment?: "AzurePublicCloud" | "AzureChinaCloud" | "AzureGermanCloud" | "AzureUSGovernmentCloud";
+            environment?:
+              | "AzurePublicCloud"
+              | "AzureChinaCloud"
+              | "AzureGermanCloud"
+              | "AzureUSGovernmentCloud";
             /**
              * name of the DNS zone that should be used
              */
@@ -208,7 +200,6 @@ export interface ClusterIssuer {
                * resource ID of the managed identity, can not be used at the same time as clientID
                */
               resourceID?: string;
-              [k: string]: unknown;
             };
             /**
              * resource group the DNS zone is located in
@@ -222,7 +213,6 @@ export interface ClusterIssuer {
              * when specifying ClientID and ClientSecret then this field is also needed
              */
             tenantID?: string;
-            [k: string]: unknown;
           };
           /**
            * Use the Google Cloud DNS API to manage DNS01 challenge records.
@@ -245,9 +235,7 @@ export interface ClusterIssuer {
                * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                */
               name: string;
-              [k: string]: unknown;
             };
-            [k: string]: unknown;
           };
           /**
            * Use the Cloudflare API to manage DNS01 challenge records.
@@ -265,7 +253,6 @@ export interface ClusterIssuer {
                * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                */
               name: string;
-              [k: string]: unknown;
             };
             /**
              * API token used to authenticate with Cloudflare.
@@ -279,13 +266,11 @@ export interface ClusterIssuer {
                * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                */
               name: string;
-              [k: string]: unknown;
             };
             /**
              * Email of the account, only required when using API key based authentication.
              */
             email?: string;
-            [k: string]: unknown;
           };
           /**
            * CNAMEStrategy configures how the DNS01 provider should handle CNAME records when found in DNS zones.
@@ -307,9 +292,7 @@ export interface ClusterIssuer {
                * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                */
               name: string;
-              [k: string]: unknown;
             };
-            [k: string]: unknown;
           };
           /**
            * Use RFC2136 ("Dynamic Updates in the Domain Name System") (https://datatracker.ietf.org/doc/rfc2136/) to manage DNS01 challenge records.
@@ -339,9 +322,7 @@ export interface ClusterIssuer {
                * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                */
               name: string;
-              [k: string]: unknown;
             };
-            [k: string]: unknown;
           };
           /**
            * Use the AWS Route53 API to manage DNS01 challenge records.
@@ -375,9 +356,7 @@ export interface ClusterIssuer {
                * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                */
               name: string;
-              [k: string]: unknown;
             };
-            [k: string]: unknown;
           };
           /**
            * Configure an external webhook based DNS01 challenge solver to manage DNS01 challenge records.
@@ -386,9 +365,7 @@ export interface ClusterIssuer {
             /**
              * Additional configuration that should be passed to the webhook apiserver when challenges are processed. This can contain arbitrary JSON data. Secret values should not be specified in this stanza. If secret values are needed (e.g. credentials for a DNS service), you should use a SecretKeySelector to reference a Secret resource. For details on the schema of this field, consult the webhook provider implementation's documentation.
              */
-            config?: {
-              [k: string]: unknown;
-            };
+            config?: {};
             /**
              * The API group name that should be used when POSTing ChallengePayload resources to the webhook apiserver. This should be the same as the GroupName specified in the webhook provider implementation.
              */
@@ -397,9 +374,7 @@ export interface ClusterIssuer {
              * The name of the solver to use, as defined in the webhook provider implementation. This will typically be the name of the provider, e.g. 'cloudflare'.
              */
             solverName: string;
-            [k: string]: unknown;
           };
-          [k: string]: unknown;
         };
         /**
          * Configures cert-manager to attempt to complete authorizations by performing the HTTP01 challenge flow. It is not possible to obtain certificates for wildcard domain names (e.g. `*.example.com`) using the HTTP01 challenge mechanism.
@@ -412,14 +387,11 @@ export interface ClusterIssuer {
             /**
              * The labels that cert-manager will use when creating the temporary HTTPRoute needed for solving the HTTP-01 challenge. These labels must match the label selector of at least one Gateway.
              */
-            labels?: {
-              [k: string]: string;
-            };
+            labels?: {};
             /**
              * Optional service type for Kubernetes solver service. Supported values are NodePort or ClusterIP. If unset, defaults to NodePort.
              */
             serviceType?: string;
-            [k: string]: unknown;
           };
           /**
            * The ingress based HTTP01 challenge solver will solve challenges by creating or modifying Ingress resources in order to route requests for '/.well-known/acme-challenge/XYZ' to 'challenge solver' pods that are provisioned by cert-manager for each Challenge to be completed.
@@ -440,18 +412,12 @@ export interface ClusterIssuer {
                 /**
                  * Annotations that should be added to the created ACME HTTP01 solver ingress.
                  */
-                annotations?: {
-                  [k: string]: string;
-                };
+                annotations?: {};
                 /**
                  * Labels that should be added to the created ACME HTTP01 solver ingress.
                  */
-                labels?: {
-                  [k: string]: string;
-                };
-                [k: string]: unknown;
+                labels?: {};
               };
-              [k: string]: unknown;
             };
             /**
              * The name of the ingress resource that should have ACME challenge solving routes inserted into it in order to solve HTTP01 challenges. This is typically used in conjunction with ingress controllers like ingress-gce, which maintains a 1:1 mapping between external IPs and ingress resources.
@@ -468,16 +434,11 @@ export interface ClusterIssuer {
                 /**
                  * Annotations that should be added to the create ACME HTTP01 solver pods.
                  */
-                annotations?: {
-                  [k: string]: string;
-                };
+                annotations?: {};
                 /**
                  * Labels that should be added to the created ACME HTTP01 solver pods.
                  */
-                labels?: {
-                  [k: string]: string;
-                };
-                [k: string]: unknown;
+                labels?: {};
               };
               /**
                * PodSpec defines overrides for the HTTP01 challenge solver pod. Only the 'priorityClassName', 'nodeSelector', 'affinity', 'serviceAccountName' and 'tolerations' fields are supported currently. All other fields will be ignored.
@@ -515,7 +476,6 @@ export interface ClusterIssuer {
                            * An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.
                            */
                           values?: string[];
-                          [k: string]: unknown;
                         }[];
                         /**
                          * A list of node selector requirements by node's fields.
@@ -533,15 +493,12 @@ export interface ClusterIssuer {
                            * An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.
                            */
                           values?: string[];
-                          [k: string]: unknown;
                         }[];
-                        [k: string]: unknown;
                       };
                       /**
                        * Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
                        */
                       weight: number;
-                      [k: string]: unknown;
                     }[];
                     /**
                      * If the affinity requirements specified by this field are not met at scheduling time, the pod will not be scheduled onto the node. If the affinity requirements specified by this field cease to be met at some point during pod execution (e.g. due to an update), the system may or may not try to eventually evict the pod from its node.
@@ -567,7 +524,6 @@ export interface ClusterIssuer {
                            * An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.
                            */
                           values?: string[];
-                          [k: string]: unknown;
                         }[];
                         /**
                          * A list of node selector requirements by node's fields.
@@ -585,13 +541,9 @@ export interface ClusterIssuer {
                            * An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.
                            */
                           values?: string[];
-                          [k: string]: unknown;
                         }[];
-                        [k: string]: unknown;
                       }[];
-                      [k: string]: unknown;
                     };
-                    [k: string]: unknown;
                   };
                   /**
                    * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
@@ -625,15 +577,11 @@ export interface ClusterIssuer {
                              * values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
                              */
                             values?: string[];
-                            [k: string]: unknown;
                           }[];
                           /**
                            * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                            */
-                          matchLabels?: {
-                            [k: string]: string;
-                          };
-                          [k: string]: unknown;
+                          matchLabels?: {};
                         };
                         /**
                          * A label query over the set of namespaces that the term applies to. The term is applied to the union of the namespaces selected by this field and the ones listed in the namespaces field. null selector and null or empty namespaces list means "this pod's namespace". An empty selector ({}) matches all namespaces. This field is beta-level and is only honored when PodAffinityNamespaceSelector feature is enabled.
@@ -655,15 +603,11 @@ export interface ClusterIssuer {
                              * values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
                              */
                             values?: string[];
-                            [k: string]: unknown;
                           }[];
                           /**
                            * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                            */
-                          matchLabels?: {
-                            [k: string]: string;
-                          };
-                          [k: string]: unknown;
+                          matchLabels?: {};
                         };
                         /**
                          * namespaces specifies a static list of namespace names that the term applies to. The term is applied to the union of the namespaces listed in this field and the ones selected by namespaceSelector. null or empty namespaces list and null namespaceSelector means "this pod's namespace"
@@ -673,13 +617,11 @@ export interface ClusterIssuer {
                          * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching the labelSelector in the specified namespaces, where co-located is defined as running on a node whose value of the label with key topologyKey matches that of any node on which any of the selected pods is running. Empty topologyKey is not allowed.
                          */
                         topologyKey: string;
-                        [k: string]: unknown;
                       };
                       /**
                        * weight associated with matching the corresponding podAffinityTerm, in the range 1-100.
                        */
                       weight: number;
-                      [k: string]: unknown;
                     }[];
                     /**
                      * If the affinity requirements specified by this field are not met at scheduling time, the pod will not be scheduled onto the node. If the affinity requirements specified by this field cease to be met at some point during pod execution (e.g. due to a pod label update), the system may or may not try to eventually evict the pod from its node. When there are multiple elements, the lists of nodes corresponding to each podAffinityTerm are intersected, i.e. all terms must be satisfied.
@@ -705,15 +647,11 @@ export interface ClusterIssuer {
                            * values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
                            */
                           values?: string[];
-                          [k: string]: unknown;
                         }[];
                         /**
                          * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                          */
-                        matchLabels?: {
-                          [k: string]: string;
-                        };
-                        [k: string]: unknown;
+                        matchLabels?: {};
                       };
                       /**
                        * A label query over the set of namespaces that the term applies to. The term is applied to the union of the namespaces selected by this field and the ones listed in the namespaces field. null selector and null or empty namespaces list means "this pod's namespace". An empty selector ({}) matches all namespaces. This field is beta-level and is only honored when PodAffinityNamespaceSelector feature is enabled.
@@ -735,15 +673,11 @@ export interface ClusterIssuer {
                            * values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
                            */
                           values?: string[];
-                          [k: string]: unknown;
                         }[];
                         /**
                          * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                          */
-                        matchLabels?: {
-                          [k: string]: string;
-                        };
-                        [k: string]: unknown;
+                        matchLabels?: {};
                       };
                       /**
                        * namespaces specifies a static list of namespace names that the term applies to. The term is applied to the union of the namespaces listed in this field and the ones selected by namespaceSelector. null or empty namespaces list and null namespaceSelector means "this pod's namespace"
@@ -753,9 +687,7 @@ export interface ClusterIssuer {
                        * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching the labelSelector in the specified namespaces, where co-located is defined as running on a node whose value of the label with key topologyKey matches that of any node on which any of the selected pods is running. Empty topologyKey is not allowed.
                        */
                       topologyKey: string;
-                      [k: string]: unknown;
                     }[];
-                    [k: string]: unknown;
                   };
                   /**
                    * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
@@ -789,15 +721,11 @@ export interface ClusterIssuer {
                              * values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
                              */
                             values?: string[];
-                            [k: string]: unknown;
                           }[];
                           /**
                            * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                            */
-                          matchLabels?: {
-                            [k: string]: string;
-                          };
-                          [k: string]: unknown;
+                          matchLabels?: {};
                         };
                         /**
                          * A label query over the set of namespaces that the term applies to. The term is applied to the union of the namespaces selected by this field and the ones listed in the namespaces field. null selector and null or empty namespaces list means "this pod's namespace". An empty selector ({}) matches all namespaces. This field is beta-level and is only honored when PodAffinityNamespaceSelector feature is enabled.
@@ -819,15 +747,11 @@ export interface ClusterIssuer {
                              * values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
                              */
                             values?: string[];
-                            [k: string]: unknown;
                           }[];
                           /**
                            * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                            */
-                          matchLabels?: {
-                            [k: string]: string;
-                          };
-                          [k: string]: unknown;
+                          matchLabels?: {};
                         };
                         /**
                          * namespaces specifies a static list of namespace names that the term applies to. The term is applied to the union of the namespaces listed in this field and the ones selected by namespaceSelector. null or empty namespaces list and null namespaceSelector means "this pod's namespace"
@@ -837,13 +761,11 @@ export interface ClusterIssuer {
                          * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching the labelSelector in the specified namespaces, where co-located is defined as running on a node whose value of the label with key topologyKey matches that of any node on which any of the selected pods is running. Empty topologyKey is not allowed.
                          */
                         topologyKey: string;
-                        [k: string]: unknown;
                       };
                       /**
                        * weight associated with matching the corresponding podAffinityTerm, in the range 1-100.
                        */
                       weight: number;
-                      [k: string]: unknown;
                     }[];
                     /**
                      * If the anti-affinity requirements specified by this field are not met at scheduling time, the pod will not be scheduled onto the node. If the anti-affinity requirements specified by this field cease to be met at some point during pod execution (e.g. due to a pod label update), the system may or may not try to eventually evict the pod from its node. When there are multiple elements, the lists of nodes corresponding to each podAffinityTerm are intersected, i.e. all terms must be satisfied.
@@ -869,15 +791,11 @@ export interface ClusterIssuer {
                            * values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
                            */
                           values?: string[];
-                          [k: string]: unknown;
                         }[];
                         /**
                          * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                          */
-                        matchLabels?: {
-                          [k: string]: string;
-                        };
-                        [k: string]: unknown;
+                        matchLabels?: {};
                       };
                       /**
                        * A label query over the set of namespaces that the term applies to. The term is applied to the union of the namespaces selected by this field and the ones listed in the namespaces field. null selector and null or empty namespaces list means "this pod's namespace". An empty selector ({}) matches all namespaces. This field is beta-level and is only honored when PodAffinityNamespaceSelector feature is enabled.
@@ -899,15 +817,11 @@ export interface ClusterIssuer {
                            * values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
                            */
                           values?: string[];
-                          [k: string]: unknown;
                         }[];
                         /**
                          * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                          */
-                        matchLabels?: {
-                          [k: string]: string;
-                        };
-                        [k: string]: unknown;
+                        matchLabels?: {};
                       };
                       /**
                        * namespaces specifies a static list of namespace names that the term applies to. The term is applied to the union of the namespaces listed in this field and the ones selected by namespaceSelector. null or empty namespaces list and null namespaceSelector means "this pod's namespace"
@@ -917,18 +831,13 @@ export interface ClusterIssuer {
                        * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching the labelSelector in the specified namespaces, where co-located is defined as running on a node whose value of the label with key topologyKey matches that of any node on which any of the selected pods is running. Empty topologyKey is not allowed.
                        */
                       topologyKey: string;
-                      [k: string]: unknown;
                     }[];
-                    [k: string]: unknown;
                   };
-                  [k: string]: unknown;
                 };
                 /**
                  * NodeSelector is a selector which must be true for the pod to fit on a node. Selector which must match a node's labels for the pod to be scheduled on that node. More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
                  */
-                nodeSelector?: {
-                  [k: string]: string;
-                };
+                nodeSelector?: {};
                 /**
                  * If specified, the pod's priorityClassName.
                  */
@@ -961,19 +870,14 @@ export interface ClusterIssuer {
                    * Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.
                    */
                   value?: string;
-                  [k: string]: unknown;
                 }[];
-                [k: string]: unknown;
               };
-              [k: string]: unknown;
             };
             /**
              * Optional service type for Kubernetes solver service. Supported values are NodePort or ClusterIP. If unset, defaults to NodePort.
              */
             serviceType?: string;
-            [k: string]: unknown;
           };
-          [k: string]: unknown;
         };
         /**
          * Selector selects a set of DNSNames on the Certificate resource that should be solved using this challenge solver. If not specified, the solver will be treated as the 'default' solver with the lowest priority, i.e. if any other solver has a more specific match, it will be used instead.
@@ -990,14 +894,9 @@ export interface ClusterIssuer {
           /**
            * A label selector that is used to refine the set of certificate's that this challenge solver will apply to.
            */
-          matchLabels?: {
-            [k: string]: string;
-          };
-          [k: string]: unknown;
+          matchLabels?: {};
         };
-        [k: string]: unknown;
       }[];
-      [k: string]: unknown;
     };
     /**
      * CA configures this issuer to sign certificates using a signing CA keypair stored in a Secret resource. This is used to build internal PKIs that are managed by cert-manager.
@@ -1015,7 +914,6 @@ export interface ClusterIssuer {
        * SecretName is the name of the secret used to sign Certificates issued by this Issuer.
        */
       secretName: string;
-      [k: string]: unknown;
     };
     /**
      * SelfSigned configures this issuer to 'self sign' certificates using the private key used to create the CertificateRequest object.
@@ -1025,7 +923,6 @@ export interface ClusterIssuer {
        * The CRL distribution points is an X.509 v3 certificate extension which identifies the location of the CRL from which the revocation of this certificate can be checked. If not set certificate will be issued without CDP. Values are strings.
        */
       crlDistributionPoints?: string[];
-      [k: string]: unknown;
     };
     /**
      * Vault configures this issuer to sign certificates using a HashiCorp Vault PKI backend.
@@ -1059,9 +956,7 @@ export interface ClusterIssuer {
              * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
              */
             name: string;
-            [k: string]: unknown;
           };
-          [k: string]: unknown;
         };
         /**
          * Kubernetes authenticates with Vault by passing the ServiceAccount token stored in the named Secret resource to the Vault server.
@@ -1087,9 +982,7 @@ export interface ClusterIssuer {
              * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
              */
             name: string;
-            [k: string]: unknown;
           };
-          [k: string]: unknown;
         };
         /**
          * TokenSecretRef authenticates with Vault by presenting a token.
@@ -1103,9 +996,7 @@ export interface ClusterIssuer {
            * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
            */
           name: string;
-          [k: string]: unknown;
         };
-        [k: string]: unknown;
       };
       /**
        * PEM-encoded CA bundle (base64-encoded) used to validate Vault server certificate. Only used if the Server URL is using HTTPS protocol. This parameter is ignored for plain HTTP protocol connection. If not set the system root certificates are used to validate the TLS connection.
@@ -1123,7 +1014,6 @@ export interface ClusterIssuer {
        * Server is the connection address for the Vault server, e.g: "https://vault.example.com:8200".
        */
       server: string;
-      [k: string]: unknown;
     };
     /**
      * Venafi configures this issuer to sign certificates using a Venafi TPP or Venafi Cloud policy zone.
@@ -1145,13 +1035,11 @@ export interface ClusterIssuer {
            * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
            */
           name: string;
-          [k: string]: unknown;
         };
         /**
          * URL is the base URL for Venafi Cloud. Defaults to "https://api.venafi.cloud/v1".
          */
         url?: string;
-        [k: string]: unknown;
       };
       /**
        * TPP specifies Trust Protection Platform configuration settings. Only one of TPP or Cloud may be specified.
@@ -1169,21 +1057,17 @@ export interface ClusterIssuer {
            * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
            */
           name: string;
-          [k: string]: unknown;
         };
         /**
          * URL is the base URL for the vedsdk endpoint of the Venafi TPP instance, for example: "https://tpp.example.com/vedsdk".
          */
         url: string;
-        [k: string]: unknown;
       };
       /**
        * Zone is the Venafi Policy Zone to use for this issuer. All requests made to the Venafi platform will be restricted by the named zone policy. This field is required.
        */
       zone: string;
-      [k: string]: unknown;
     };
-    [k: string]: unknown;
   };
   /**
    * Status of the ClusterIssuer. This is set and managed automatically.
@@ -1201,7 +1085,6 @@ export interface ClusterIssuer {
        * URI is the unique account identifier, which can also be used to retrieve account details from the CA
        */
       uri?: string;
-      [k: string]: unknown;
     };
     /**
      * List of status conditions to indicate the status of a CertificateRequest. Known condition types are `Ready`.
@@ -1231,9 +1114,6 @@ export interface ClusterIssuer {
        * Type of the condition, known values are (`Ready`).
        */
       type: string;
-      [k: string]: unknown;
     }[];
-    [k: string]: unknown;
   };
-  [k: string]: unknown;
 }

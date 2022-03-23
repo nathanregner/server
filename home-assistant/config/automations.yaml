@@ -1,0 +1,9 @@
+- id: '1647577419259'
+  alias: New Automation
+  description: ''
+  use_blueprint:
+    path: homeassistant/notify_leaving_zone.yaml
+    input:
+      person_entity: person.nregner
+      zone_entity: zone.home
+      notify_device: 4c91e386bd14c2ba679446ae808e8c53

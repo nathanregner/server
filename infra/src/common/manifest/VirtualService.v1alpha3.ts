@@ -59,7 +59,6 @@ export interface VirtualService {
         )[];
         exposeHeaders?: string[];
         maxAge?: string;
-        [k: string]: unknown;
       };
       delegate?: {
         /**
@@ -70,7 +69,6 @@ export interface VirtualService {
          * Namespace specifies the namespace where the delegate VirtualService resides.
          */
         namespace?: string;
-        [k: string]: unknown;
       };
       /**
        * Fault injection policy to apply on HTTP traffic at the client side.
@@ -99,30 +97,18 @@ export interface VirtualService {
           | {
               [k: string]: unknown;
             };
-        [k: string]: unknown;
       };
       headers?: {
         request?: {
-          add?: {
-            [k: string]: string;
-          };
+          add?: {};
           remove?: string[];
-          set?: {
-            [k: string]: string;
-          };
-          [k: string]: unknown;
+          set?: {};
         };
         response?: {
-          add?: {
-            [k: string]: string;
-          };
+          add?: {};
           remove?: string[];
-          set?: {
-            [k: string]: string;
-          };
-          [k: string]: unknown;
+          set?: {};
         };
-        [k: string]: unknown;
       };
       match?: {
         authority?:
@@ -142,21 +128,7 @@ export interface VirtualService {
          * Names of gateways where the rule should be applied.
          */
         gateways?: string[];
-        headers?: {
-          [k: string]:
-            | {
-                [k: string]: unknown;
-              }
-            | {
-                [k: string]: unknown;
-              }
-            | {
-                [k: string]: unknown;
-              }
-            | {
-                [k: string]: unknown;
-              };
-        };
+        headers?: {};
         /**
          * Flag to specify whether the URI matching should be case-insensitive.
          */
@@ -185,21 +157,7 @@ export interface VirtualService {
         /**
          * Query parameters for matching.
          */
-        queryParams?: {
-          [k: string]:
-            | {
-                [k: string]: unknown;
-              }
-            | {
-                [k: string]: unknown;
-              }
-            | {
-                [k: string]: unknown;
-              }
-            | {
-                [k: string]: unknown;
-              };
-        };
+        queryParams?: {};
         scheme?:
           | {
               [k: string]: unknown;
@@ -213,9 +171,7 @@ export interface VirtualService {
           | {
               [k: string]: unknown;
             };
-        sourceLabels?: {
-          [k: string]: string;
-        };
+        sourceLabels?: {};
         /**
          * Source namespace constraining the applicability of a rule to workloads in that namespace.
          */
@@ -236,22 +192,7 @@ export interface VirtualService {
         /**
          * withoutHeader has the same syntax with the header, but has opposite meaning.
          */
-        withoutHeaders?: {
-          [k: string]:
-            | {
-                [k: string]: unknown;
-              }
-            | {
-                [k: string]: unknown;
-              }
-            | {
-                [k: string]: unknown;
-              }
-            | {
-                [k: string]: unknown;
-              };
-        };
-        [k: string]: unknown;
+        withoutHeaders?: {};
       }[];
       mirror?: {
         /**
@@ -263,13 +204,11 @@ export interface VirtualService {
          */
         port?: {
           number?: number;
-          [k: string]: unknown;
         };
         /**
          * The name of a subset within the service.
          */
         subset?: string;
-        [k: string]: unknown;
       };
       /**
        * Percentage of the traffic to be mirrored by the `mirror` field.
@@ -280,7 +219,6 @@ export interface VirtualService {
        */
       mirrorPercentage?: {
         value?: number;
-        [k: string]: unknown;
       };
       /**
        * Percentage of the traffic to be mirrored by the `mirror` field.
@@ -297,7 +235,6 @@ export interface VirtualService {
         authority?: string;
         redirectCode?: number;
         uri?: string;
-        [k: string]: unknown;
       };
       /**
        * Retry policy for HTTP requests.
@@ -319,7 +256,6 @@ export interface VirtualService {
          * Flag to specify whether the retries should retry to other localities.
          */
         retryRemoteLocalities?: boolean;
-        [k: string]: unknown;
       };
       /**
        * Rewrite HTTP URIs and Authority headers.
@@ -330,7 +266,6 @@ export interface VirtualService {
          */
         authority?: string;
         uri?: string;
-        [k: string]: unknown;
       };
       /**
        * A HTTP rule can either redirect or forward (default) traffic.
@@ -346,45 +281,30 @@ export interface VirtualService {
            */
           port?: {
             number?: number;
-            [k: string]: unknown;
           };
           /**
            * The name of a subset within the service.
            */
           subset?: string;
-          [k: string]: unknown;
         };
         headers?: {
           request?: {
-            add?: {
-              [k: string]: string;
-            };
+            add?: {};
             remove?: string[];
-            set?: {
-              [k: string]: string;
-            };
-            [k: string]: unknown;
+            set?: {};
           };
           response?: {
-            add?: {
-              [k: string]: string;
-            };
+            add?: {};
             remove?: string[];
-            set?: {
-              [k: string]: string;
-            };
-            [k: string]: unknown;
+            set?: {};
           };
-          [k: string]: unknown;
         };
         weight?: number;
-        [k: string]: unknown;
       }[];
       /**
        * Timeout for HTTP requests, default is disabled.
        */
       timeout?: string;
-      [k: string]: unknown;
     }[];
     /**
      * An ordered list of route rules for opaque TCP traffic.
@@ -403,9 +323,7 @@ export interface VirtualService {
          * Specifies the port on the host that is being addressed.
          */
         port?: number;
-        sourceLabels?: {
-          [k: string]: string;
-        };
+        sourceLabels?: {};
         /**
          * Source namespace constraining the applicability of a rule to workloads in that namespace.
          */
@@ -414,7 +332,6 @@ export interface VirtualService {
          * IPv4 or IPv6 ip address of source with optional subnet.
          */
         sourceSubnet?: string;
-        [k: string]: unknown;
       }[];
       /**
        * The destination to which the connection should be forwarded to.
@@ -430,18 +347,14 @@ export interface VirtualService {
            */
           port?: {
             number?: number;
-            [k: string]: unknown;
           };
           /**
            * The name of a subset within the service.
            */
           subset?: string;
-          [k: string]: unknown;
         };
         weight?: number;
-        [k: string]: unknown;
       }[];
-      [k: string]: unknown;
     }[];
     tls?: {
       match?: {
@@ -461,14 +374,11 @@ export interface VirtualService {
          * SNI (server name indicator) to match on.
          */
         sniHosts?: string[];
-        sourceLabels?: {
-          [k: string]: string;
-        };
+        sourceLabels?: {};
         /**
          * Source namespace constraining the applicability of a rule to workloads in that namespace.
          */
         sourceNamespace?: string;
-        [k: string]: unknown;
       }[];
       /**
        * The destination to which the connection should be forwarded to.
@@ -484,25 +394,17 @@ export interface VirtualService {
            */
           port?: {
             number?: number;
-            [k: string]: unknown;
           };
           /**
            * The name of a subset within the service.
            */
           subset?: string;
-          [k: string]: unknown;
         };
         weight?: number;
-        [k: string]: unknown;
       }[];
-      [k: string]: unknown;
     }[];
-    [k: string]: unknown;
   };
-  status?: {
-    [k: string]: unknown;
-  };
+  status?: {};
   apiVersion: "networking.istio.io/v1alpha3";
   kind: "VirtualService";
-  [k: string]: unknown;
 }

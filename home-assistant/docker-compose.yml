@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  home-assistant:
+    image: homeassistant/home-assistant:2022.3
+    container_name: home-assistant
+    volumes:
+      - ./config:/config
+    ports:
+      - "8123:8123"

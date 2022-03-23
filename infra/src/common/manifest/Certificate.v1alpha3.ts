@@ -12,9 +12,7 @@
 export interface Certificate {
   apiVersion: "cert-manager.io/v1alpha3";
   kind: "Certificate";
-  metadata?: {
-    [k: string]: unknown;
-  };
+  metadata?: {};
   /**
    * Desired state of the Certificate resource.
    */
@@ -63,7 +61,6 @@ export interface Certificate {
        * Name of the resource being referred to.
        */
       name: string;
-      [k: string]: unknown;
     };
     /**
      * KeyAlgorithm is the private key algorithm of the corresponding private key for this certificate. If provided, allowed values are either `rsa` or `ecdsa` If `keyAlgorithm` is specified and `keySize` is not provided, key size of 256 will be used for `ecdsa` key algorithm and key size of 2048 will be used for `rsa` key algorithm.
@@ -101,9 +98,7 @@ export interface Certificate {
            * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
            */
           name: string;
-          [k: string]: unknown;
         };
-        [k: string]: unknown;
       };
       /**
        * PKCS12 configures options for storing a PKCS12 keystore in the `spec.secretName` Secret resource.
@@ -125,11 +120,8 @@ export interface Certificate {
            * Name of the resource being referred to. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
            */
           name: string;
-          [k: string]: unknown;
         };
-        [k: string]: unknown;
       };
-      [k: string]: unknown;
     };
     /**
      * Options to control private keys used for the Certificate.
@@ -139,7 +131,6 @@ export interface Certificate {
        * RotationPolicy controls how private keys should be regenerated when a re-issuance is being processed. If set to Never, a private key will only be generated if one does not already exist in the target `spec.secretName`. If one does exists but it does not have the correct algorithm or size, a warning will be raised to await user intervention. If set to Always, a private key matching the specified requirements will be generated whenever a re-issuance occurs. Default is 'Never' for backward compatibility.
        */
       rotationPolicy?: string;
-      [k: string]: unknown;
     };
     /**
      * How long before the currently issued certificate's expiry cert-manager should renew the certificate. The default is 2/3 of the issued certificate's duration. Minimum accepted value is 5 minutes. Value must be in units accepted by Go time.ParseDuration https://golang.org/pkg/time/#ParseDuration
@@ -160,16 +151,11 @@ export interface Certificate {
       /**
        * Annotations is a key value map to be copied to the target Kubernetes Secret.
        */
-      annotations?: {
-        [k: string]: string;
-      };
+      annotations?: {};
       /**
        * Labels is a key value map to be copied to the target Kubernetes Secret.
        */
-      labels?: {
-        [k: string]: string;
-      };
-      [k: string]: unknown;
+      labels?: {};
     };
     /**
      * Full X509 name specification (https://golang.org/pkg/crypto/x509/pkix/#Name).
@@ -207,7 +193,6 @@ export interface Certificate {
        * Street addresses to be used on the Certificate.
        */
       streetAddresses?: string[];
-      [k: string]: unknown;
     };
     /**
      * URISANs is a list of URI subjectAltNames to be set on the Certificate.
@@ -241,7 +226,6 @@ export interface Certificate {
       | "microsoft sgc"
       | "netscape sgc"
     )[];
-    [k: string]: unknown;
   };
   /**
    * Status of the Certificate. This is set and managed automatically.
@@ -275,7 +259,6 @@ export interface Certificate {
        * Type of the condition, known values are (`Ready`, `Issuing`).
        */
       type: string;
-      [k: string]: unknown;
     }[];
     /**
      * LastFailureTime is the time as recorded by the Certificate controller of the most recent failure to complete a CertificateRequest for this Certificate resource. If set, cert-manager will not re-request another Certificate until 1 hour has elapsed from this time.
@@ -304,7 +287,5 @@ export interface Certificate {
      *  Persisting the value on the CertificateRequest resource allows the certificates controller to know whether a request is part of an old issuance or if it is part of the ongoing revision's issuance by checking if the revision value in the annotation is greater than this field.
      */
     revision?: number;
-    [k: string]: unknown;
   };
-  [k: string]: unknown;
 }

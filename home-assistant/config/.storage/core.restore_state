@@ -1,0 +1,50 @@
+{
+    "version": 1,
+    "minor_version": 1,
+    "key": "core.restore_state",
+    "data": [
+        {
+            "state": {
+                "entity_id": "person.nregner",
+                "state": "unknown",
+                "attributes": {
+                    "editable": false,
+                    "id": "nregner",
+                    "user_id": "93c268995aa6431f9ba9acb5d2e2604a",
+                    "friendly_name": "nregner"
+                },
+                "last_changed": "2022-03-18T04:19:48.700510+00:00",
+                "last_updated": "2022-03-18T04:19:48.700510+00:00",
+                "context": {
+                    "id": "628fb06a1df3f221888a8d10ef3a829c",
+                    "parent_id": null,
+                    "user_id": null
+                }
+            },
+            "extra_data": null,
+            "last_seen": "2022-03-18T04:35:13.082832+00:00"
+        },
+        {
+            "state": {
+                "entity_id": "automation.new_automation",
+                "state": "on",
+                "attributes": {
+                    "last_triggered": null,
+                    "mode": "single",
+                    "current": 0,
+                    "id": "1647577419259",
+                    "friendly_name": "New Automation"
+                },
+                "last_changed": "2022-03-18T04:23:39.313200+00:00",
+                "last_updated": "2022-03-18T04:23:39.313200+00:00",
+                "context": {
+                    "id": "06e89b0a52b0eab7112c8193faaf8a2d",
+                    "parent_id": null,
+                    "user_id": null
+                }
+            },
+            "extra_data": null,
+            "last_seen": "2022-03-18T04:35:13.082832+00:00"
+        }
+    ]
+}

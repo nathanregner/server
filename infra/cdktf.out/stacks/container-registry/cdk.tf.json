@@ -1,0 +1,224 @@
+{
+  "//": {
+    "metadata": {
+      "version": "0.8.5",
+      "stackName": "container-registry",
+      "backend": "kubernetes"
+    }
+  },
+  "terraform": {
+    "required_providers": {
+      "random": {
+        "version": ">=3.1.0",
+        "source": "random"
+      },
+      "kubernetes": {
+        "version": "~> 2.0",
+        "source": "kubernetes"
+      },
+      "helm": {
+        "version": "~> 2.3",
+        "source": "helm"
+      },
+      "kubectl": {
+        "version": ">= 1.13.1",
+        "source": "gavinbunney/kubectl"
+      }
+    },
+    "backend": {
+      "kubernetes": {
+        "secret_suffix": "container-registry",
+        "load_config_file": true
+      }
+    }
+  },
+  "provider": {
+    "random": [
+      {}
+    ],
+    "kubernetes": [
+      {
+        "config_path": "~/.kube/config"
+      }
+    ],
+    "helm": [
+      {
+        "kubernetes": {
+          "config_path": "~/.kube/config"
+        }
+      }
+    ],
+    "kubectl": [
+      {
+        "config_path": "~/.kube/config"
+      }
+    ]
+  },
+  "resource": {
+    "kubernetes_namespace": {
+      "containerregistry_ns_05880381": {
+        "metadata": {
+          "name": "container-registry"
+        },
+        "//": {
+          "metadata": {
+            "path": "container-registry/ns",
+            "uniqueId": "containerregistry_ns_05880381"
+          }
+        }
+      }
+    },
+    "random_password": {
+      "containerregistry_password_1A758827": {
+        "length": 32,
+        "//": {
+          "metadata": {
+            "path": "container-registry/password",
+            "uniqueId": "containerregistry_password_1A758827"
+          }
+        }
+      }
+    },
+    "kubernetes_secret": {
+      "containerregistry_htpasswd_47962481": {
+        "data": {
+          "htpasswd": "nregner:${bcrypt(random_password.containerregistry_password_1A758827.result)}"
+        },
+        "metadata": {
+          "generate_name": "htpasswd",
+          "namespace": "${kubernetes_namespace.containerregistry_ns_05880381.metadata[0].name}"
+        },
+        "//": {
+          "metadata": {
+            "path": "container-registry/htpasswd",
+            "uniqueId": "containerregistry_htpasswd_47962481"
+          }
+        }
+      },
+      "containerregistry_regcred_A187ECD4": {
+        "data": {
+          ".dockerconfigjson": "${jsonencode({nregner.ddns.net:31500 = {auth = base64encode(\"nregner:${random_password.containerregistry_password_1A758827.result}\")}, nregner.net:31500 = {auth = base64encode(\"nregner:${random_password.containerregistry_password_1A758827.result}\")}, container-registry.${kubernetes_namespace.containerregistry_ns_05880381.metadata[0].name}.svc.cluster.local:5000 = undefined})}"
+        },
+        "type": "kubernetes.io/dockerconfigjson",
+        "metadata": {
+          "generate_name": "regcred",
+          "namespace": "${kubernetes_namespace.containerregistry_ns_05880381.metadata[0].name}"
+        },
+        "//": {
+          "metadata": {
+            "path": "container-registry/regcred",
+            "uniqueId": "containerregistry_regcred_A187ECD4"
+          }
+        }
+      }
+    },
+    "kubernetes_deployment": {
+      "containerregistry_containerregistrydeployment_0FDC7785": {
+        "metadata": {
+          "labels": {
+            "app": "container-registry"
+          },
+          "name": "container-registry",
+          "namespace": "${kubernetes_namespace.containerregistry_ns_05880381.metadata[0].name}"
+        },
+        "spec": {
+          "selector": {
+            "match_labels": {
+              "app": "container-registry"
+            }
+          },
+          "template": {
+            "metadata": {
+              "labels": {
+                "app": "container-registry"
+              },
+              "name": "container-registry",
+              "namespace": "${kubernetes_namespace.containerregistry_ns_05880381.metadata[0].name}"
+            },
+            "spec": {
+              "container": [
+                {
+                  "image": "registry:2.7.1",
+                  "name": "registry",
+                  "env": [
+                    {
+                      "name": "REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY",
+                      "value": "/var/lib/registry"
+                    },
+                    {
+                      "name": "REGISTRY_AUTH",
+                      "value": "htpasswd"
+                    },
+                    {
+                      "name": "REGISTRY_AUTH_HTPASSWD_REALM",
+                      "value": "Registry Realm"
+                    },
+                    {
+                      "name": "REGISTRY_AUTH_HTPASSWD_PATH",
+                      "value": "/auth/htpasswd"
+                    }
+                  ],
+                  "port": [
+                    {
+                      "container_port": 5000
+                    }
+                  ],
+                  "readiness_probe": {
+                    "http_get": {
+                      "path": "/",
+                      "port": "5000",
+                      "scheme": "HTTP"
+                    }
+                  },
+                  "volume_mount": [
+                    {
+                      "mount_path": "/auth",
+                      "name": "htpasswd"
+                    },
+                    {
+                      "mount_path": "/var/lib/registry",
+                      "name": "data"
+                    }
+                  ]
+                }
+              ],
+              "volume": [
+                {
+                  "name": "htpassws",
+                  "secret": {
+                    "secret_name": "${kubernetes_secret.containerregistry_htpasswd_47962481.metadata[0].name}"
+                  }
+                },
+                {
+                  "name": "data",
+                  "host_path": {
+                    "path": "/var/lib/registry",
+                    "type": "DirectoryOrCreate"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "//": {
+          "metadata": {
+            "path": "container-registry/container-registry-deployment",
+            "uniqueId": "containerregistry_containerregistrydeployment_0FDC7785"
+          }
+        }
+      }
+    }
+  },
+  "data": {
+    "kubernetes_all_namespaces": {
+      "containerregistry_allns_82EC9810": {
+        "//": {
+          "metadata": {
+            "path": "container-registry/all-ns",
+            "uniqueId": "containerregistry_allns_82EC9810"
+          }
+        }
+      }
+    }
+  }
+}

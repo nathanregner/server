@@ -1,10 +1,11 @@
 import * as k8s from "@kubernetes/client-node";
-import { compile } from "json-schema-to-typescript";
-import * as fs from "fs";
 import {
   V1CustomResourceDefinitionSpec,
   V1CustomResourceDefinitionVersion,
 } from "@kubernetes/client-node";
+import { compile } from "json-schema-to-typescript";
+import * as fs from "fs";
+import { V1JSONSchemaProps } from "@kubernetes/client-node/dist/gen/model/v1JSONSchemaProps";
 
 async function generateSchema(name: string) {
   const {
@@ -12,14 +13,39 @@ async function generateSchema(name: string) {
   } = await api.readCustomResourceDefinition(name);
   return Promise.all(
     spec.versions.map(async (version) => {
-      const schema = extendSchema(version, spec);
-      const normalizedSchema = JSON.parse(JSON.stringify(schema)); // strip nulls/undefined
+      const schema = normalizeSchema(closeSchema(extendSchema(version, spec)));
       return await writeSchema(
         `${spec.names.kind}.${version.name}`,
-        await compile(normalizedSchema, spec.names.kind, {})
+        await compile(schema, spec.names.kind)
       );
     })
   );
+}
+
+// strip nulls/undefined
+function normalizeSchema(schema: V1JSONSchemaProps) {
+  return JSON.parse(JSON.stringify(schema));
+}
+
+// disallow extra properties
+function closeSchema(schema: V1JSONSchemaProps): V1JSONSchemaProps {
+  const newSchema = {
+    ...schema,
+    additionalProperties: false as any,
+  };
+  if (schema.properties) {
+    newSchema.properties = Object.entries(schema.properties).reduce(
+      (acc, [name, prop]) => {
+        acc[name] = closeSchema(prop);
+        return acc;
+      },
+      {} as NonNullable<V1JSONSchemaProps["properties"]>
+    );
+  }
+  if (schema.items) {
+    newSchema.items = closeSchema(schema.items);
+  }
+  return newSchema;
 }
 
 function extendSchema(
