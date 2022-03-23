@@ -75,7 +75,9 @@ export class DnsStack extends TerraformStack {
     const credentials = new k8s.Secret(this, "credentials", {
       metadata: { namespace: ns.metadata.name, name: "credentials" },
       type: "kubernetes.io/basic-auth",
-      data: call("jsondecode", [Fn.file("../../../src/dns/credentials.json")]),
+      data: call("jsondecode", [
+        Fn.file("../../../src/dns/credentials.json"),
+      ]) as any,
     });
     for (const subdomain of [
       domain,
