@@ -20,6 +20,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
+    "@cdktf/provider-aws": "^5.0.52",
     "@cdktf/provider-google": "^0.6.53",
     "@cdktf/provider-helm": "^0.3.52",
     "@cdktf/provider-kubernetes": "^0.6.53",

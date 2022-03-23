@@ -2,12 +2,13 @@ import { call, Fn, TerraformStack } from "cdktf";
 import { Construct } from "constructs";
 import * as k8s from "@cdktf/provider-kubernetes";
 import { k8sBackend, k8sProvider } from "../common";
-import { GoogleDomainsDdns } from "./google-domains-ddns";
 import * as helm from "@cdktf/provider-helm";
 import { values } from "../common/helm";
 import { CloudDnsCert } from "./cloud-dns-cert";
 import * as gcp from "@cdktf/provider-google";
 import { NginxIngress } from "./nginx-ingress";
+import { Route53DDNS } from "./route53-ddns";
+import { AwsProvider } from "@cdktf/provider-aws";
 
 const project = "copper-canyon-296719";
 const domain = "nregner.net";
@@ -19,6 +20,10 @@ export class DnsStack extends TerraformStack {
 
     k8sBackend(this, "dns");
     k8sProvider(this);
+    new AwsProvider(this, "aws", {
+      region: "us-west-2",
+      defaultTags: { tags: { project: "server/infra/dns" } },
+    });
     new gcp.GoogleProvider(this, "gcp", {
       project,
     });
@@ -68,28 +73,10 @@ export class DnsStack extends TerraformStack {
     });
 */
 
-    // TODO: Migrate this to CloudDNS once 60 day window is up
-    // 1. gcloud dns record-sets list -z default
-    // 2. manually copy to google domains custom record
-    // 3. dig -t txt _acme-challenge.nregner.net +short
-    const credentials = new k8s.Secret(this, "credentials", {
-      metadata: { namespace: ns.metadata.name, name: "credentials" },
-      type: "kubernetes.io/basic-auth",
-      data: call("jsondecode", [
-        Fn.file("../../../src/dns/credentials.json"),
-      ]) as any,
+    new Route53DDNS(this, "route-53", {
+      namespace: ns.metadata.name!!,
+      region: "us-west-2",
     });
-    for (const subdomain of [
-      domain,
-      // `craigslist.${domain}`,
-      // `craigslist-api.${domain}`,
-    ]) {
-      new GoogleDomainsDdns(this, {
-        namespace: ns.metadata.name!!,
-        domain: subdomain,
-        credentials,
-      });
-    }
 
     new NginxIngress(this, "nginx", {
       namespace: ns.metadata.name!!,
