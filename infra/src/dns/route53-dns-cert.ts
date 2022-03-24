@@ -5,26 +5,26 @@ import { Fn, ITerraformDependable } from "cdktf";
 import { Manifest } from "../common";
 import { Certificate } from "../common/manifest/Certificate.v1";
 import { ClusterIssuer } from "../common/manifest/ClusterIssuer.v1";
+import { iam } from "@cdktf/provider-aws";
+import { Route53Zone } from "@cdktf/provider-aws/lib/route53";
 
 interface Config {
   namespace: string;
-  dns: {
-    domain: string;
-    wildcards: string[];
-  };
-  project: string;
+  region: string;
+  zone: Route53Zone;
   issuer: { name: string; server: string };
+  dns: { domain: string; wildcards: string[] };
   dependsOn: ITerraformDependable[];
 }
 
-export class CloudDnsCert extends Construct {
+export class Route53DNSCert extends Construct {
   readonly issuerName: string;
   readonly secretName: string;
 
   constructor(
     scope: Construct,
     id: string,
-    { namespace, dns, project, issuer, dependsOn }: Config
+    { namespace, region, zone, issuer, dns, dependsOn }: Config
   ) {
     super(scope, id);
 
@@ -33,25 +33,46 @@ export class CloudDnsCert extends Construct {
 
     this.node.addDependency(...dependsOn);
 
-    // https://cert-manager.io/docs/configuration/acme/dns01/google/
-    const sa = new gcp.ServiceAccount(this, "dns01-solver", {
-      accountId: "dns01-solver",
+    const user = new iam.IamUser(this, "cert-manager", {
+      name: "cert-manager",
     });
-    new gcp.ProjectIamBinding(this, "dns01-solver-binding", {
-      members: [`serviceAccount:${sa.email}`],
-      role: "roles/dns.admin",
+    const key = new iam.IamAccessKey(this, "cert-manager-key", {
+      user: user.name,
     });
-    const key = new gcp.ServiceAccountKey(this, "dns01-solver-key", {
-      serviceAccountId: sa.name,
+    const policy = new iam.IamPolicy(this, "cert-manager-policy", {
+      name: "cert-manager",
+      policy: JSON.stringify({
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Effect: "Allow",
+            Action: "route53:GetChange",
+            Resource: "arn:aws:route53:::change/*",
+          },
+          {
+            Effect: "Allow",
+            Action: [
+              "route53:ChangeResourceRecordSets",
+              "route53:ListResourceRecordSets",
+            ],
+            Resource: zone.arn,
+          },
+          {
+            Effect: "Allow",
+            Action: "route53:ListHostedZonesByName",
+            Resource: "*",
+          },
+        ],
+      }),
+    });
+    new iam.IamUserPolicyAttachment(this, "cert-manager-attachment", {
+      user: user.name,
+      policyArn: policy.arn,
     });
 
-    // https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/google_service_account_key#example-usage-save-key-in-kubernetes-secret---deprecated
-    const secretKey = "key.json";
-    const secret = new k8s.Secret(this, "dns01-solver-secret", {
-      metadata: { namespace, name: "dns01-solver-svc-acct" },
-      data: {
-        [secretKey]: Fn.base64decode(key.privateKey),
-      },
+    const keySecret = new k8s.Secret(this, "cert-manager-access-key", {
+      metadata: { namespace, name: "cert-manager-access-key" },
+      data: { secret: key.secret },
     });
 
     new Manifest<ClusterIssuer>(this, "issuer", {
@@ -68,11 +89,13 @@ export class CloudDnsCert extends Construct {
               {
                 // https://cert-manager.io/docs/configuration/acme/dns01/google/
                 dns01: {
-                  cloudDNS: {
-                    project,
-                    serviceAccountSecretRef: {
-                      name: secret.metadata.name,
-                      key: secretKey,
+                  route53: {
+                    region,
+                    hostedZoneID: zone.id,
+                    accessKeyID: key.id,
+                    secretAccessKeySecretRef: {
+                      name: keySecret.metadata.name,
+                      key: "secret",
                     },
                   },
                 },
@@ -83,6 +106,7 @@ export class CloudDnsCert extends Construct {
       },
     });
 
+    // TODO: This should live elsewhere
     new Manifest<Certificate>(this, "cert", {
       content: {
         apiVersion: "cert-manager.io/v1",

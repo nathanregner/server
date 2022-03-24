@@ -3,21 +3,21 @@ import { iam, route53 } from "@cdktf/provider-aws";
 import { Fn } from "cdktf";
 import { CronJobSpecJobTemplate } from "@cdktf/provider-kubernetes/lib/cron-job";
 import * as k8s from "@cdktf/provider-kubernetes";
+import { Route53Zone } from "@cdktf/provider-aws/lib/route53";
 
 export interface Route53DDNSConfig {
   namespace: string;
   region: string;
+  zone: Route53Zone;
 }
 
 export class Route53DDNS extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { namespace, region }: Route53DDNSConfig
+    { namespace, region, zone }: Route53DDNSConfig
   ) {
     super(scope, id);
-
-    const zone = new route53.Route53Zone(this, "zone", { name: "nregner.net" });
 
     const user = new iam.IamUser(this, "ddns", { name: "ddns" });
     const key = new iam.IamAccessKey(this, "ddns-access-key", {
@@ -53,9 +53,9 @@ export class Route53DDNS extends Construct {
           metadata: { generateName: `update-${id}-` },
           spec: {
             restartPolicy: "Never",
-            container: [
-              {
-                name: id,
+            container: ["nregner.net." /*"*.nregner.net."*/].map(
+              (name, index) => ({
+                name: `${id}-${index}`,
                 image: "amazon/aws-cli:2.4.27",
                 command: [
                   "/bin/bash",
@@ -66,11 +66,11 @@ export class Route53DDNS extends Construct {
                   { name: "AWS_ACCESS_KEY_ID", value: key.id },
                   { name: "AWS_SECRET_ACCESS_KEY", value: key.secret },
                   { name: "AWS_DEFAULT_REGION", value: region },
-                  { name: "NAME", value: "nregner.net." },
+                  { name: "NAME", value: name },
                   { name: "HOSTED_ZONE_ID", value: zone.id },
                 ],
-              },
-            ],
+              })
+            ),
           },
         },
       },

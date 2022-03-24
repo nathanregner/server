@@ -1,16 +1,14 @@
-import { call, Fn, TerraformStack } from "cdktf";
+import { TerraformStack } from "cdktf";
 import { Construct } from "constructs";
 import * as k8s from "@cdktf/provider-kubernetes";
 import { k8sBackend, k8sProvider } from "../common";
 import * as helm from "@cdktf/provider-helm";
 import { values } from "../common/helm";
-import { CloudDnsCert } from "./cloud-dns-cert";
-import * as gcp from "@cdktf/provider-google";
 import { NginxIngress } from "./nginx-ingress";
 import { Route53DDNS } from "./route53-ddns";
-import { AwsProvider } from "@cdktf/provider-aws";
+import { AwsProvider, route53 } from "@cdktf/provider-aws";
+import { Route53DNSCert } from "./route53-dns-cert";
 
-const project = "copper-canyon-296719";
 const domain = "nregner.net";
 
 // https://www.ssllabs.com/ssltest/analyze.html?viaform=on&d=nregner.net&hideResults=on
@@ -20,12 +18,10 @@ export class DnsStack extends TerraformStack {
 
     k8sBackend(this, "dns");
     k8sProvider(this);
+    const region = "us-west-2";
     new AwsProvider(this, "aws", {
-      region: "us-west-2",
+      region: region,
       defaultTags: { tags: { project: "server/infra/dns" } },
-    });
-    new gcp.GoogleProvider(this, "gcp", {
-      project,
     });
 
     const ns = new k8s.Namespace(this, "dns", {
@@ -48,6 +44,7 @@ export class DnsStack extends TerraformStack {
       wildcards: [`*.${domain}`],
     };
 
+    /*
     // https://community.letsencrypt.org/t/how-to-switch-from-staging-to-production/79632
     const productionCert = new CloudDnsCert(this, "staging", {
       namespace: ns.metadata.name,
@@ -59,29 +56,38 @@ export class DnsStack extends TerraformStack {
       },
       dependsOn: [certManager],
     });
+*/
 
-    /*
-    const stagingCert = new CloudDnsCert(this, "staging", {
+    const zone = new route53.Route53Zone(this, "zone", { name: "nregner.net" });
+
+    const cert = new Route53DNSCert(this, "wildcard-staging", {
       namespace: ns.metadata.name,
-      project,
-      dns,
+      region,
+      zone,
+      dependsOn: [certManager],
+      /*
       issuer: {
         name: "letsencrypt-staging",
         server: "https://acme-staging-v02.api.letsencrypt.org/directory",
       },
-      dependsOn: [certManager],
+      */
+      issuer: {
+        name: "letsencrypt",
+        server: "https://acme-v02.api.letsencrypt.org/directory",
+      },
+      dns,
     });
-*/
 
     new Route53DDNS(this, "route-53", {
       namespace: ns.metadata.name!!,
-      region: "us-west-2",
+      region,
+      zone,
     });
 
     new NginxIngress(this, "nginx", {
       namespace: ns.metadata.name!!,
       domain,
-      cert: productionCert,
+      cert: cert,
     });
 
     // CoreDNS

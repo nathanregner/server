@@ -7,5 +7,7 @@ cdktf.log
 *terraform.*.tfstate*
 .terraform
 tsconfig.tsbuildinfo
+.parcel-cache
+dist
 !jest.config.js
 !setup.js

@@ -9,9 +9,14 @@
     }
   },
   "provider": {
-    "google": [
+    "aws": [
       {
-        "project": "copper-canyon-296719"
+        "default_tags": {
+          "tags": {
+            "project": "server/infra/dns"
+          }
+        },
+        "region": "us-west-2"
       }
     ],
     "helm": [
@@ -33,40 +38,99 @@
     ]
   },
   "resource": {
-    "google_project_iam_binding": {
-      "dns_staging_dns01solverbinding_71C32B99": {
+    "aws_iam_access_key": {
+      "dns_route53_ddnsaccesskey_AFB46BAD": {
         "//": {
           "metadata": {
-            "path": "dns/staging/dns01-solver-binding",
-            "uniqueId": "dns_staging_dns01solverbinding_71C32B99"
+            "path": "dns/route-53/ddns-access-key",
+            "uniqueId": "dns_route53_ddnsaccesskey_AFB46BAD"
           }
         },
-        "members": [
-          "serviceAccount:${google_service_account.dns_staging_dns01solver_F973FCBF.email}"
-        ],
-        "role": "roles/dns.admin"
+        "user": "${aws_iam_user.dns_route53_ddns_F6DBD01D.name}"
+      },
+      "dns_wildcardstaging_certmanagerkey_984E230E": {
+        "//": {
+          "metadata": {
+            "path": "dns/wildcard-staging/cert-manager-key",
+            "uniqueId": "dns_wildcardstaging_certmanagerkey_984E230E"
+          }
+        },
+        "user": "${aws_iam_user.dns_wildcardstaging_certmanager_FDD523B0.name}"
       }
     },
-    "google_service_account": {
-      "dns_staging_dns01solver_F973FCBF": {
+    "aws_iam_policy": {
+      "dns_route53_ddnsupdate_FDF3B6D1": {
         "//": {
           "metadata": {
-            "path": "dns/staging/dns01-solver",
-            "uniqueId": "dns_staging_dns01solver_F973FCBF"
+            "path": "dns/route-53/ddns-update",
+            "uniqueId": "dns_route53_ddnsupdate_FDF3B6D1"
           }
         },
-        "account_id": "dns01-solver"
+        "name": "ddns-update",
+        "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DDNSUpdate\",\"Effect\":\"Allow\",\"Action\":[\"route53:ChangeResourceRecordSets\",\"route53:ListResourceRecordSets\"],\"Resource\":\"${aws_route53_zone.dns_zone_2E2729FB.arn}\"}]}"
+      },
+      "dns_wildcardstaging_certmanagerpolicy_FC78ABE1": {
+        "//": {
+          "metadata": {
+            "path": "dns/wildcard-staging/cert-manager-policy",
+            "uniqueId": "dns_wildcardstaging_certmanagerpolicy_FC78ABE1"
+          }
+        },
+        "name": "cert-manager",
+        "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"route53:GetChange\",\"Resource\":\"arn:aws:route53:::change/*\"},{\"Effect\":\"Allow\",\"Action\":[\"route53:ChangeResourceRecordSets\",\"route53:ListResourceRecordSets\"],\"Resource\":\"${aws_route53_zone.dns_zone_2E2729FB.arn}\"},{\"Effect\":\"Allow\",\"Action\":\"route53:ListHostedZonesByName\",\"Resource\":\"*\"}]}"
       }
     },
-    "google_service_account_key": {
-      "dns_staging_dns01solverkey_031E84CE": {
+    "aws_iam_user": {
+      "dns_route53_ddns_F6DBD01D": {
         "//": {
           "metadata": {
-            "path": "dns/staging/dns01-solver-key",
-            "uniqueId": "dns_staging_dns01solverkey_031E84CE"
+            "path": "dns/route-53/ddns",
+            "uniqueId": "dns_route53_ddns_F6DBD01D"
           }
         },
-        "service_account_id": "${google_service_account.dns_staging_dns01solver_F973FCBF.name}"
+        "name": "ddns"
+      },
+      "dns_wildcardstaging_certmanager_FDD523B0": {
+        "//": {
+          "metadata": {
+            "path": "dns/wildcard-staging/cert-manager",
+            "uniqueId": "dns_wildcardstaging_certmanager_FDD523B0"
+          }
+        },
+        "name": "cert-manager"
+      }
+    },
+    "aws_iam_user_policy_attachment": {
+      "dns_route53_ddnsattachment_7EEFB914": {
+        "//": {
+          "metadata": {
+            "path": "dns/route-53/ddns-attachment",
+            "uniqueId": "dns_route53_ddnsattachment_7EEFB914"
+          }
+        },
+        "policy_arn": "${aws_iam_policy.dns_route53_ddnsupdate_FDF3B6D1.arn}",
+        "user": "${aws_iam_user.dns_route53_ddns_F6DBD01D.name}"
+      },
+      "dns_wildcardstaging_certmanagerattachment_F70C105E": {
+        "//": {
+          "metadata": {
+            "path": "dns/wildcard-staging/cert-manager-attachment",
+            "uniqueId": "dns_wildcardstaging_certmanagerattachment_F70C105E"
+          }
+        },
+        "policy_arn": "${aws_iam_policy.dns_wildcardstaging_certmanagerpolicy_FC78ABE1.arn}",
+        "user": "${aws_iam_user.dns_wildcardstaging_certmanager_FDD523B0.name}"
+      }
+    },
+    "aws_route53_zone": {
+      "dns_zone_2E2729FB": {
+        "//": {
+          "metadata": {
+            "path": "dns/zone",
+            "uniqueId": "dns_zone_2E2729FB"
+          }
+        },
+        "name": "nregner.net"
       }
     },
     "helm_release": {
@@ -104,35 +168,35 @@
       }
     },
     "kubectl_manifest": {
-      "dns_staging_cert_certmanifest_E52A1ED4": {
+      "dns_wildcardstaging_cert_certmanifest_B5911B79": {
         "//": {
           "metadata": {
-            "path": "dns/staging/cert/cert-manifest",
-            "uniqueId": "dns_staging_cert_certmanifest_E52A1ED4"
+            "path": "dns/wildcard-staging/cert/cert-manifest",
+            "uniqueId": "dns_wildcardstaging_cert_certmanifest_B5911B79"
           }
         },
         "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"Certificate\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"nregner.net\"\n  },\n  \"spec\": {\n    \"secretName\": \"letsencrypt-cert\",\n    \"issuerRef\": {\n      \"kind\": \"ClusterIssuer\",\n      \"name\": \"letsencrypt\"\n    },\n    \"commonName\": \"nregner.net\",\n    \"dnsNames\": [\n      \"nregner.net\",\n      \"*.nregner.net\"\n    ]\n  }\n}"
       },
-      "dns_staging_issuer_issuermanifest_56310F35": {
+      "dns_wildcardstaging_issuer_issuermanifest_F4704418": {
         "//": {
           "metadata": {
-            "path": "dns/staging/issuer/issuer-manifest",
-            "uniqueId": "dns_staging_issuer_issuermanifest_56310F35"
+            "path": "dns/wildcard-staging/issuer/issuer-manifest",
+            "uniqueId": "dns_wildcardstaging_issuer_issuermanifest_F4704418"
           }
         },
-        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"letsencrypt\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt\"\n      },\n      \"solvers\": [\n        {\n          \"dns01\": {\n            \"cloudDNS\": {\n              \"project\": \"copper-canyon-296719\",\n              \"serviceAccountSecretRef\": {\n                \"name\": \"${kubernetes_secret.dns_staging_dns01solversecret_463AF303.metadata[0].name}\",\n                \"key\": \"key.json\"\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}"
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"letsencrypt\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt\"\n      },\n      \"solvers\": [\n        {\n          \"dns01\": {\n            \"route53\": {\n              \"region\": \"us-west-2\",\n              \"hostedZoneID\": \"${aws_route53_zone.dns_zone_2E2729FB.id}\",\n              \"accessKeyID\": \"${aws_iam_access_key.dns_wildcardstaging_certmanagerkey_984E230E.id}\",\n              \"secretAccessKeySecretRef\": {\n                \"name\": \"${kubernetes_secret.dns_wildcardstaging_certmanageraccesskey_F9E8476B.metadata[0].name}\",\n                \"key\": \"secret\"\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}"
       }
     },
     "kubernetes_cron_job": {
-      "dns_nregnernet_update_21DF92E7": {
+      "dns_route53_update_60C50A01": {
         "//": {
           "metadata": {
-            "path": "dns/nregner-net/update",
-            "uniqueId": "dns_nregnernet_update_21DF92E7"
+            "path": "dns/route-53/update",
+            "uniqueId": "dns_route53_update_60C50A01"
           }
         },
         "metadata": {
-          "generate_name": "update-nregner-net-",
+          "generate_name": "update-route-53-",
           "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
         },
         "spec": {
@@ -140,48 +204,46 @@
           "failed_jobs_history_limit": 1,
           "job_template": {
             "metadata": {
-              "generate_name": "update-nregner-net-"
+              "generate_name": "update-route-53-"
             },
             "spec": {
               "backoff_limit": 0,
               "template": {
                 "metadata": {
-                  "generate_name": "update-nregner-net-"
+                  "generate_name": "update-route-53-"
                 },
                 "spec": {
                   "container": [
                     {
                       "command": [
-                        "/bin/sh",
+                        "/bin/bash",
                         "-c",
-                        "curl --silent --show-error --fail                     -u \"$USERNAME:$PASSWORD\"                     \"https://domains.google.com/nic/update?hostname=$DOMAIN\""
+                        "${file(\"../../../src/dns/route53-ddns.sh\")}"
                       ],
                       "env": [
                         {
-                          "name": "DOMAIN",
-                          "value": "nregner.net"
+                          "name": "AWS_ACCESS_KEY_ID",
+                          "value": "${aws_iam_access_key.dns_route53_ddnsaccesskey_AFB46BAD.id}"
                         },
                         {
-                          "name": "USERNAME",
-                          "value_from": {
-                            "secret_key_ref": {
-                              "key": "username",
-                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
-                            }
-                          }
+                          "name": "AWS_SECRET_ACCESS_KEY",
+                          "value": "${aws_iam_access_key.dns_route53_ddnsaccesskey_AFB46BAD.secret}"
                         },
                         {
-                          "name": "PASSWORD",
-                          "value_from": {
-                            "secret_key_ref": {
-                              "key": "password",
-                              "name": "${kubernetes_secret.dns_credentials_B89B2E14.metadata[0].name}"
-                            }
-                          }
+                          "name": "AWS_DEFAULT_REGION",
+                          "value": "us-west-2"
+                        },
+                        {
+                          "name": "NAME",
+                          "value": "nregner.net."
+                        },
+                        {
+                          "name": "HOSTED_ZONE_ID",
+                          "value": "${aws_route53_zone.dns_zone_2E2729FB.id}"
                         }
                       ],
-                      "image": "curlimages/curl",
-                      "name": "nregner-net"
+                      "image": "amazon/aws-cli:2.4.27",
+                      "name": "route-53-0"
                     }
                   ],
                   "restart_policy": "Never"
@@ -364,32 +426,18 @@
       }
     },
     "kubernetes_secret": {
-      "dns_credentials_B89B2E14": {
+      "dns_wildcardstaging_certmanageraccesskey_F9E8476B": {
         "//": {
           "metadata": {
-            "path": "dns/credentials",
-            "uniqueId": "dns_credentials_B89B2E14"
-          }
-        },
-        "data": "${jsondecode(file(\"../../../src/dns/credentials.json\"))}",
-        "metadata": {
-          "name": "credentials",
-          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
-        },
-        "type": "kubernetes.io/basic-auth"
-      },
-      "dns_staging_dns01solversecret_463AF303": {
-        "//": {
-          "metadata": {
-            "path": "dns/staging/dns01-solver-secret",
-            "uniqueId": "dns_staging_dns01solversecret_463AF303"
+            "path": "dns/wildcard-staging/cert-manager-access-key",
+            "uniqueId": "dns_wildcardstaging_certmanageraccesskey_F9E8476B"
           }
         },
         "data": {
-          "key.json": "${base64decode(google_service_account_key.dns_staging_dns01solverkey_031E84CE.private_key)}"
+          "secret": "${aws_iam_access_key.dns_wildcardstaging_certmanagerkey_984E230E.secret}"
         },
         "metadata": {
-          "name": "dns01-solver-svc-acct",
+          "name": "cert-manager-access-key",
           "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
         }
       }
@@ -456,8 +504,8 @@
       }
     },
     "required_providers": {
-      "google": {
-        "source": "google",
+      "aws": {
+        "source": "aws",
         "version": "~> 3.0"
       },
       "helm": {
