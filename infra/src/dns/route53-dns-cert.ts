@@ -1,7 +1,6 @@
 import { Construct } from "constructs";
 import * as k8s from "@cdktf/provider-kubernetes";
-import * as gcp from "@cdktf/provider-google";
-import { Fn, ITerraformDependable } from "cdktf";
+import { ITerraformDependable } from "cdktf";
 import { Manifest } from "../common";
 import { Certificate } from "../common/manifest/Certificate.v1";
 import { ClusterIssuer } from "../common/manifest/ClusterIssuer.v1";
