@@ -1,4 +1,4 @@
-import { TerraformStack } from "cdktf";
+import { Fn, TerraformStack } from "cdktf";
 import { Construct } from "constructs";
 import * as k8s from "@cdktf/provider-kubernetes";
 import { k8sBackend, k8sProvider } from "../common";
@@ -6,7 +6,7 @@ import * as helm from "@cdktf/provider-helm";
 import { values } from "../common/helm";
 import { NginxIngress } from "./nginx-ingress";
 import { Route53DDNS } from "./route53-ddns";
-import { AwsProvider, route53 } from "@cdktf/provider-aws";
+import { AwsProvider, route53 } from "../../.gen/providers/aws/";
 import { Route53DNSCert } from "./route53-dns-cert";
 
 const domain = "nregner.net";
@@ -58,7 +58,14 @@ export class DnsStack extends TerraformStack {
     });
 */
 
-    const zone = new route53.Route53Zone(this, "zone", { name: "nregner.net" });
+    const zone = new route53.Route53Zone(this, "zone", { name: domain });
+    new route53.Route53DomainsRegisteredDomain(this, "nregner-net", {
+      domainName: domain,
+      // hack until cdktf supports loops...
+      nameServer: [0, 1, 2, 3].map((index) => ({
+        name: Fn.element(zone.nameServers, index),
+      })),
+    });
 
     const cert = new Route53DNSCert(this, "wildcard-staging", {
       namespace: ns.metadata.name,

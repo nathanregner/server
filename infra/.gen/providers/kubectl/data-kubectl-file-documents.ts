@@ -1,4 +1,4 @@
-// https://www.terraform.io/docs/providers/kubectl/d/file_documents.html
+// https://www.terraform.io/docs/providers/kubectl/d/file_documents
 // generated from terraform resource schema
 
 import { Construct } from 'constructs';
@@ -8,13 +8,13 @@ import * as cdktf from 'cdktf';
 
 export interface DataKubectlFileDocumentsConfig extends cdktf.TerraformMetaArguments {
   /**
-  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/file_documents.html#content DataKubectlFileDocuments#content}
+  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/file_documents#content DataKubectlFileDocuments#content}
   */
   readonly content: string;
 }
 
 /**
-* Represents a {@link https://www.terraform.io/docs/providers/kubectl/d/file_documents.html kubectl_file_documents}
+* Represents a {@link https://www.terraform.io/docs/providers/kubectl/d/file_documents kubectl_file_documents}
 */
 export class DataKubectlFileDocuments extends cdktf.TerraformDataSource {
 
@@ -28,7 +28,7 @@ export class DataKubectlFileDocuments extends cdktf.TerraformDataSource {
   // ===========
 
   /**
-  * Create a new {@link https://www.terraform.io/docs/providers/kubectl/d/file_documents.html kubectl_file_documents} Data Source
+  * Create a new {@link https://www.terraform.io/docs/providers/kubectl/d/file_documents kubectl_file_documents} Data Source
   *
   * @param scope The scope in which to define this construct
   * @param id The scoped construct ID. Must be unique amongst siblings in the same scope
@@ -62,7 +62,7 @@ export class DataKubectlFileDocuments extends cdktf.TerraformDataSource {
   }
   // Temporarily expose input value. Use with caution.
   public get contentInput() {
-    return this._content
+    return this._content;
   }
 
   // documents - computed: true, optional: false, required: false
@@ -76,7 +76,7 @@ export class DataKubectlFileDocuments extends cdktf.TerraformDataSource {
   }
 
   // manifests - computed: true, optional: false, required: false
-  public manifests(key: string): string {
+  public manifests(key: string): string | cdktf.IResolvable {
     return new cdktf.StringMap(this, 'manifests').lookup(key);
   }
 

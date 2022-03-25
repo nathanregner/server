@@ -1,4 +1,4 @@
-// https://www.terraform.io/docs/providers/kubectl/d/filename_list.html
+// https://www.terraform.io/docs/providers/kubectl/d/filename_list
 // generated from terraform resource schema
 
 import { Construct } from 'constructs';
@@ -8,13 +8,13 @@ import * as cdktf from 'cdktf';
 
 export interface DataKubectlFilenameListConfig extends cdktf.TerraformMetaArguments {
   /**
-  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/filename_list.html#pattern DataKubectlFilenameList#pattern}
+  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/filename_list#pattern DataKubectlFilenameList#pattern}
   */
   readonly pattern: string;
 }
 
 /**
-* Represents a {@link https://www.terraform.io/docs/providers/kubectl/d/filename_list.html kubectl_filename_list}
+* Represents a {@link https://www.terraform.io/docs/providers/kubectl/d/filename_list kubectl_filename_list}
 */
 export class DataKubectlFilenameList extends cdktf.TerraformDataSource {
 
@@ -28,7 +28,7 @@ export class DataKubectlFilenameList extends cdktf.TerraformDataSource {
   // ===========
 
   /**
-  * Create a new {@link https://www.terraform.io/docs/providers/kubectl/d/filename_list.html kubectl_filename_list} Data Source
+  * Create a new {@link https://www.terraform.io/docs/providers/kubectl/d/filename_list kubectl_filename_list} Data Source
   *
   * @param scope The scope in which to define this construct
   * @param id The scoped construct ID. Must be unique amongst siblings in the same scope
@@ -77,7 +77,7 @@ export class DataKubectlFilenameList extends cdktf.TerraformDataSource {
   }
   // Temporarily expose input value. Use with caution.
   public get patternInput() {
-    return this._pattern
+    return this._pattern;
   }
 
   // =========

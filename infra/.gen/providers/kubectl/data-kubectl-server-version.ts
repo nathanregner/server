@@ -1,4 +1,4 @@
-// https://www.terraform.io/docs/providers/kubectl/d/server_version.html
+// https://www.terraform.io/docs/providers/kubectl/d/server_version
 // generated from terraform resource schema
 
 import { Construct } from 'constructs';
@@ -10,7 +10,7 @@ export interface DataKubectlServerVersionConfig extends cdktf.TerraformMetaArgum
 }
 
 /**
-* Represents a {@link https://www.terraform.io/docs/providers/kubectl/d/server_version.html kubectl_server_version}
+* Represents a {@link https://www.terraform.io/docs/providers/kubectl/d/server_version kubectl_server_version}
 */
 export class DataKubectlServerVersion extends cdktf.TerraformDataSource {
 
@@ -24,7 +24,7 @@ export class DataKubectlServerVersion extends cdktf.TerraformDataSource {
   // ===========
 
   /**
-  * Create a new {@link https://www.terraform.io/docs/providers/kubectl/d/server_version.html kubectl_server_version} Data Source
+  * Create a new {@link https://www.terraform.io/docs/providers/kubectl/d/server_version kubectl_server_version} Data Source
   *
   * @param scope The scope in which to define this construct
   * @param id The scoped construct ID. Must be unique amongst siblings in the same scope

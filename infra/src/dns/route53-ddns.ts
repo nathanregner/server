@@ -1,14 +1,13 @@
 import { Construct } from "constructs";
-import { iam, route53 } from "@cdktf/provider-aws";
 import { Fn } from "cdktf";
 import { CronJobSpecJobTemplate } from "@cdktf/provider-kubernetes/lib/cron-job";
 import * as k8s from "@cdktf/provider-kubernetes";
-import { Route53Zone } from "@cdktf/provider-aws/lib/route53";
+import { iam, route53 } from "../../.gen/providers/aws";
 
 export interface Route53DDNSConfig {
   namespace: string;
   region: string;
-  zone: Route53Zone;
+  zone: route53.Route53Zone;
 }
 
 export class Route53DDNS extends Construct {

@@ -1,4 +1,4 @@
-// https://www.terraform.io/docs/providers/kubectl/r/server_version.html
+// https://www.terraform.io/docs/providers/kubectl/r/server_version
 // generated from terraform resource schema
 
 import { Construct } from 'constructs';
@@ -8,13 +8,13 @@ import * as cdktf from 'cdktf';
 
 export interface ServerVersionConfig extends cdktf.TerraformMetaArguments {
   /**
-  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/r/server_version.html#triggers ServerVersion#triggers}
+  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/r/server_version#triggers ServerVersion#triggers}
   */
-  readonly triggers?: { [key: string]: string } | cdktf.IResolvable;
+  readonly triggers?: { [key: string]: string };
 }
 
 /**
-* Represents a {@link https://www.terraform.io/docs/providers/kubectl/r/server_version.html kubectl_server_version}
+* Represents a {@link https://www.terraform.io/docs/providers/kubectl/r/server_version kubectl_server_version}
 */
 export class ServerVersion extends cdktf.TerraformResource {
 
@@ -28,7 +28,7 @@ export class ServerVersion extends cdktf.TerraformResource {
   // ===========
 
   /**
-  * Create a new {@link https://www.terraform.io/docs/providers/kubectl/r/server_version.html kubectl_server_version} Resource
+  * Create a new {@link https://www.terraform.io/docs/providers/kubectl/r/server_version kubectl_server_version} Resource
   *
   * @param scope The scope in which to define this construct
   * @param id The scoped construct ID. Must be unique amongst siblings in the same scope
@@ -93,12 +93,11 @@ export class ServerVersion extends cdktf.TerraformResource {
   }
 
   // triggers - computed: false, optional: true, required: false
-  private _triggers?: { [key: string]: string } | cdktf.IResolvable | undefined; 
+  private _triggers?: { [key: string]: string }; 
   public get triggers() {
-    // Getting the computed value is not yet implemented
-    return this.interpolationForAttribute('triggers') as any;
+    return this.getStringMapAttribute('triggers');
   }
-  public set triggers(value: { [key: string]: string } | cdktf.IResolvable | undefined) {
+  public set triggers(value: { [key: string]: string }) {
     this._triggers = value;
   }
   public resetTriggers() {
@@ -106,7 +105,7 @@ export class ServerVersion extends cdktf.TerraformResource {
   }
   // Temporarily expose input value. Use with caution.
   public get triggersInput() {
-    return this._triggers
+    return this._triggers;
   }
 
   // version - computed: true, optional: false, required: false
@@ -120,7 +119,7 @@ export class ServerVersion extends cdktf.TerraformResource {
 
   protected synthesizeAttributes(): { [name: string]: any } {
     return {
-      triggers: cdktf.hashMapper(cdktf.anyToTerraform)(this._triggers),
+      triggers: cdktf.hashMapper(cdktf.stringToTerraform)(this._triggers),
     };
   }
 }

@@ -4,13 +4,12 @@ import { ITerraformDependable } from "cdktf";
 import { Manifest } from "../common";
 import { Certificate } from "../common/manifest/Certificate.v1";
 import { ClusterIssuer } from "../common/manifest/ClusterIssuer.v1";
-import { iam } from "@cdktf/provider-aws";
-import { Route53Zone } from "@cdktf/provider-aws/lib/route53";
+import { iam, route53 } from "../../.gen/providers/aws";
 
 interface Config {
   namespace: string;
   region: string;
-  zone: Route53Zone;
+  zone: route53.Route53Zone;
   issuer: { name: string; server: string };
   dns: { domain: string; wildcards: string[] };
   dependsOn: ITerraformDependable[];

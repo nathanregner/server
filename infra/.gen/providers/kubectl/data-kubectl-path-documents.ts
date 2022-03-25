@@ -1,4 +1,4 @@
-// https://www.terraform.io/docs/providers/kubectl/d/path_documents.html
+// https://www.terraform.io/docs/providers/kubectl/d/path_documents
 // generated from terraform resource schema
 
 import { Construct } from 'constructs';
@@ -10,29 +10,29 @@ export interface DataKubectlPathDocumentsConfig extends cdktf.TerraformMetaArgum
   /**
   * Flag to disable template parsing of the loaded documents
   * 
-  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents.html#disable_template DataKubectlPathDocuments#disable_template}
+  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents#disable_template DataKubectlPathDocuments#disable_template}
   */
   readonly disableTemplate?: boolean | cdktf.IResolvable;
   /**
-  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents.html#pattern DataKubectlPathDocuments#pattern}
+  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents#pattern DataKubectlPathDocuments#pattern}
   */
   readonly pattern: string;
   /**
   * Sensitive variables to substitute, allowing for hiding sensitive variables in terraform output
   * 
-  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents.html#sensitive_vars DataKubectlPathDocuments#sensitive_vars}
+  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents#sensitive_vars DataKubectlPathDocuments#sensitive_vars}
   */
-  readonly sensitiveVars?: { [key: string]: string } | cdktf.IResolvable;
+  readonly sensitiveVars?: { [key: string]: string };
   /**
   * Variables to substitute
   * 
-  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents.html#vars DataKubectlPathDocuments#vars}
+  * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents#vars DataKubectlPathDocuments#vars}
   */
-  readonly vars?: { [key: string]: string } | cdktf.IResolvable;
+  readonly vars?: { [key: string]: string };
 }
 
 /**
-* Represents a {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents.html kubectl_path_documents}
+* Represents a {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents kubectl_path_documents}
 */
 export class DataKubectlPathDocuments extends cdktf.TerraformDataSource {
 
@@ -46,7 +46,7 @@ export class DataKubectlPathDocuments extends cdktf.TerraformDataSource {
   // ===========
 
   /**
-  * Create a new {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents.html kubectl_path_documents} Data Source
+  * Create a new {@link https://www.terraform.io/docs/providers/kubectl/d/path_documents kubectl_path_documents} Data Source
   *
   * @param scope The scope in which to define this construct
   * @param id The scoped construct ID. Must be unique amongst siblings in the same scope
@@ -74,11 +74,11 @@ export class DataKubectlPathDocuments extends cdktf.TerraformDataSource {
   // ==========
 
   // disable_template - computed: false, optional: true, required: false
-  private _disableTemplate?: boolean | cdktf.IResolvable | undefined; 
+  private _disableTemplate?: boolean | cdktf.IResolvable; 
   public get disableTemplate() {
-    return this.getBooleanAttribute('disable_template') as any;
+    return this.getBooleanAttribute('disable_template');
   }
-  public set disableTemplate(value: boolean | cdktf.IResolvable | undefined) {
+  public set disableTemplate(value: boolean | cdktf.IResolvable) {
     this._disableTemplate = value;
   }
   public resetDisableTemplate() {
@@ -86,7 +86,7 @@ export class DataKubectlPathDocuments extends cdktf.TerraformDataSource {
   }
   // Temporarily expose input value. Use with caution.
   public get disableTemplateInput() {
-    return this._disableTemplate
+    return this._disableTemplate;
   }
 
   // documents - computed: true, optional: false, required: false
@@ -100,7 +100,7 @@ export class DataKubectlPathDocuments extends cdktf.TerraformDataSource {
   }
 
   // manifests - computed: true, optional: false, required: false
-  public manifests(key: string): string {
+  public manifests(key: string): string | cdktf.IResolvable {
     return new cdktf.StringMap(this, 'manifests').lookup(key);
   }
 
@@ -114,16 +114,15 @@ export class DataKubectlPathDocuments extends cdktf.TerraformDataSource {
   }
   // Temporarily expose input value. Use with caution.
   public get patternInput() {
-    return this._pattern
+    return this._pattern;
   }
 
   // sensitive_vars - computed: false, optional: true, required: false
-  private _sensitiveVars?: { [key: string]: string } | cdktf.IResolvable | undefined; 
+  private _sensitiveVars?: { [key: string]: string }; 
   public get sensitiveVars() {
-    // Getting the computed value is not yet implemented
-    return this.interpolationForAttribute('sensitive_vars') as any;
+    return this.getStringMapAttribute('sensitive_vars');
   }
-  public set sensitiveVars(value: { [key: string]: string } | cdktf.IResolvable | undefined) {
+  public set sensitiveVars(value: { [key: string]: string }) {
     this._sensitiveVars = value;
   }
   public resetSensitiveVars() {
@@ -131,16 +130,15 @@ export class DataKubectlPathDocuments extends cdktf.TerraformDataSource {
   }
   // Temporarily expose input value. Use with caution.
   public get sensitiveVarsInput() {
-    return this._sensitiveVars
+    return this._sensitiveVars;
   }
 
   // vars - computed: false, optional: true, required: false
-  private _vars?: { [key: string]: string } | cdktf.IResolvable | undefined; 
+  private _vars?: { [key: string]: string }; 
   public get vars() {
-    // Getting the computed value is not yet implemented
-    return this.interpolationForAttribute('vars') as any;
+    return this.getStringMapAttribute('vars');
   }
-  public set vars(value: { [key: string]: string } | cdktf.IResolvable | undefined) {
+  public set vars(value: { [key: string]: string }) {
     this._vars = value;
   }
   public resetVars() {
@@ -148,7 +146,7 @@ export class DataKubectlPathDocuments extends cdktf.TerraformDataSource {
   }
   // Temporarily expose input value. Use with caution.
   public get varsInput() {
-    return this._vars
+    return this._vars;
   }
 
   // =========
@@ -159,8 +157,8 @@ export class DataKubectlPathDocuments extends cdktf.TerraformDataSource {
     return {
       disable_template: cdktf.booleanToTerraform(this._disableTemplate),
       pattern: cdktf.stringToTerraform(this._pattern),
-      sensitive_vars: cdktf.hashMapper(cdktf.anyToTerraform)(this._sensitiveVars),
-      vars: cdktf.hashMapper(cdktf.anyToTerraform)(this._vars),
+      sensitive_vars: cdktf.hashMapper(cdktf.stringToTerraform)(this._sensitiveVars),
+      vars: cdktf.hashMapper(cdktf.stringToTerraform)(this._vars),
     };
   }
 }

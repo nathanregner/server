@@ -133,6 +133,31 @@
         "name": "nregner.net"
       }
     },
+    "aws_route53domains_registered_domain": {
+      "dns_nregnernet_A7DDF9C9": {
+        "//": {
+          "metadata": {
+            "path": "dns/nregner-net",
+            "uniqueId": "dns_nregnernet_A7DDF9C9"
+          }
+        },
+        "domain_name": "nregner.net",
+        "name_server": [
+          {
+            "name": "${element(aws_route53_zone.dns_zone_2E2729FB.name_servers, 0)}"
+          },
+          {
+            "name": "${element(aws_route53_zone.dns_zone_2E2729FB.name_servers, 1)}"
+          },
+          {
+            "name": "${element(aws_route53_zone.dns_zone_2E2729FB.name_servers, 2)}"
+          },
+          {
+            "name": "${element(aws_route53_zone.dns_zone_2E2729FB.name_servers, 3)}"
+          }
+        ]
+      }
+    },
     "helm_release": {
       "dns_certmanager_AB955537": {
         "//": {
@@ -146,7 +171,7 @@
         "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}",
         "repository": "https://charts.jetstack.io",
         "values": [
-          "{\"installCRDs\":true}"
+          "{\"installCRDs\":true,\"replicaCount\":0}"
         ],
         "version": "1.6.1"
       },
@@ -506,7 +531,7 @@
     "required_providers": {
       "aws": {
         "source": "aws",
-        "version": "~> 3.0"
+        "version": ">=4.6.0"
       },
       "helm": {
         "source": "helm",

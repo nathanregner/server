@@ -120,11 +120,11 @@ export interface KubectlProviderExec {
   /**
   * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/kubectl#env KubectlProvider#env}
   */
-  readonly env?: { [key: string]: string } | cdktf.IResolvable;
+  readonly env?: { [key: string]: string };
 }
 
-function kubectlProviderExecToTerraform(struct?: KubectlProviderExecOutputReference | KubectlProviderExec): any {
-  if (!cdktf.canInspect(struct)) { return struct; }
+export function kubectlProviderExecToTerraform(struct?: KubectlProviderExec): any {
+  if (!cdktf.canInspect(struct) || cdktf.Tokenization.isResolvable(struct)) { return struct; }
   if (cdktf.isComplexElement(struct)) {
     throw new Error("A complex element was used as configuration, this is not supported: https://cdk.tf/complex-object-as-configuration");
   }
@@ -132,78 +132,10 @@ function kubectlProviderExecToTerraform(struct?: KubectlProviderExecOutputRefere
     api_version: cdktf.stringToTerraform(struct!.apiVersion),
     args: cdktf.listMapper(cdktf.stringToTerraform)(struct!.args),
     command: cdktf.stringToTerraform(struct!.command),
-    env: cdktf.hashMapper(cdktf.anyToTerraform)(struct!.env),
+    env: cdktf.hashMapper(cdktf.stringToTerraform)(struct!.env),
   }
 }
 
-export class KubectlProviderExecOutputReference extends cdktf.ComplexObject {
-  /**
-  * @param terraformResource The parent resource
-  * @param terraformAttribute The attribute on the parent resource this class is referencing
-  * @param isSingleItem True if this is a block, false if it's a list
-  */
-  public constructor(terraformResource: cdktf.ITerraformResource, terraformAttribute: string, isSingleItem: boolean) {
-    super(terraformResource, terraformAttribute, isSingleItem);
-  }
-
-  // api_version - computed: false, optional: false, required: true
-  private _apiVersion?: string; 
-  public get apiVersion() {
-    return this._apiVersion;
-  }
-  public set apiVersion(value: string| undefined) {
-    this._apiVersion = value;
-  }
-  // Temporarily expose input value. Use with caution.
-  public get apiVersionInput() {
-    return this._apiVersion
-  }
-
-  // args - computed: false, optional: true, required: false
-  private _args?: string[] | undefined; 
-  public get args() {
-    return this._args;
-  }
-  public set args(value: string[] | undefined| undefined) {
-    this._args = value;
-  }
-  public resetArgs() {
-    this._args = undefined;
-  }
-  // Temporarily expose input value. Use with caution.
-  public get argsInput() {
-    return this._args
-  }
-
-  // command - computed: false, optional: false, required: true
-  private _command?: string; 
-  public get command() {
-    return this._command;
-  }
-  public set command(value: string| undefined) {
-    this._command = value;
-  }
-  // Temporarily expose input value. Use with caution.
-  public get commandInput() {
-    return this._command
-  }
-
-  // env - computed: false, optional: true, required: false
-  private _env?: { [key: string]: string } | cdktf.IResolvable | undefined; 
-  public get env() {
-    return this._env;
-  }
-  public set env(value: { [key: string]: string } | cdktf.IResolvable | undefined| undefined) {
-    this._env = value;
-  }
-  public resetEnv() {
-    this._env = undefined;
-  }
-  // Temporarily expose input value. Use with caution.
-  public get envInput() {
-    return this._env
-  }
-}
 
 /**
 * Represents a {@link https://www.terraform.io/docs/providers/kubectl kubectl}
@@ -259,11 +191,11 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   // ==========
 
   // apply_retry_count - computed: false, optional: true, required: false
-  private _applyRetryCount?: number | undefined; 
+  private _applyRetryCount?: number; 
   public get applyRetryCount() {
     return this._applyRetryCount;
   }
-  public set applyRetryCount(value: number | undefined| undefined) {
+  public set applyRetryCount(value: number | undefined) {
     this._applyRetryCount = value;
   }
   public resetApplyRetryCount() {
@@ -271,15 +203,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get applyRetryCountInput() {
-    return this._applyRetryCount
+    return this._applyRetryCount;
   }
 
   // client_certificate - computed: false, optional: true, required: false
-  private _clientCertificate?: string | undefined; 
+  private _clientCertificate?: string; 
   public get clientCertificate() {
     return this._clientCertificate;
   }
-  public set clientCertificate(value: string | undefined| undefined) {
+  public set clientCertificate(value: string | undefined) {
     this._clientCertificate = value;
   }
   public resetClientCertificate() {
@@ -287,15 +219,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get clientCertificateInput() {
-    return this._clientCertificate
+    return this._clientCertificate;
   }
 
   // client_key - computed: false, optional: true, required: false
-  private _clientKey?: string | undefined; 
+  private _clientKey?: string; 
   public get clientKey() {
     return this._clientKey;
   }
-  public set clientKey(value: string | undefined| undefined) {
+  public set clientKey(value: string | undefined) {
     this._clientKey = value;
   }
   public resetClientKey() {
@@ -303,15 +235,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get clientKeyInput() {
-    return this._clientKey
+    return this._clientKey;
   }
 
   // cluster_ca_certificate - computed: false, optional: true, required: false
-  private _clusterCaCertificate?: string | undefined; 
+  private _clusterCaCertificate?: string; 
   public get clusterCaCertificate() {
     return this._clusterCaCertificate;
   }
-  public set clusterCaCertificate(value: string | undefined| undefined) {
+  public set clusterCaCertificate(value: string | undefined) {
     this._clusterCaCertificate = value;
   }
   public resetClusterCaCertificate() {
@@ -319,15 +251,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get clusterCaCertificateInput() {
-    return this._clusterCaCertificate
+    return this._clusterCaCertificate;
   }
 
   // config_context - computed: false, optional: true, required: false
-  private _configContext?: string | undefined; 
+  private _configContext?: string; 
   public get configContext() {
     return this._configContext;
   }
-  public set configContext(value: string | undefined| undefined) {
+  public set configContext(value: string | undefined) {
     this._configContext = value;
   }
   public resetConfigContext() {
@@ -335,15 +267,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get configContextInput() {
-    return this._configContext
+    return this._configContext;
   }
 
   // config_context_auth_info - computed: false, optional: true, required: false
-  private _configContextAuthInfo?: string | undefined; 
+  private _configContextAuthInfo?: string; 
   public get configContextAuthInfo() {
     return this._configContextAuthInfo;
   }
-  public set configContextAuthInfo(value: string | undefined| undefined) {
+  public set configContextAuthInfo(value: string | undefined) {
     this._configContextAuthInfo = value;
   }
   public resetConfigContextAuthInfo() {
@@ -351,15 +283,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get configContextAuthInfoInput() {
-    return this._configContextAuthInfo
+    return this._configContextAuthInfo;
   }
 
   // config_context_cluster - computed: false, optional: true, required: false
-  private _configContextCluster?: string | undefined; 
+  private _configContextCluster?: string; 
   public get configContextCluster() {
     return this._configContextCluster;
   }
-  public set configContextCluster(value: string | undefined| undefined) {
+  public set configContextCluster(value: string | undefined) {
     this._configContextCluster = value;
   }
   public resetConfigContextCluster() {
@@ -367,15 +299,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get configContextClusterInput() {
-    return this._configContextCluster
+    return this._configContextCluster;
   }
 
   // config_path - computed: false, optional: true, required: false
-  private _configPath?: string | undefined; 
+  private _configPath?: string; 
   public get configPath() {
     return this._configPath;
   }
-  public set configPath(value: string | undefined| undefined) {
+  public set configPath(value: string | undefined) {
     this._configPath = value;
   }
   public resetConfigPath() {
@@ -383,15 +315,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get configPathInput() {
-    return this._configPath
+    return this._configPath;
   }
 
   // config_paths - computed: false, optional: true, required: false
-  private _configPaths?: string[] | undefined; 
+  private _configPaths?: string[]; 
   public get configPaths() {
     return this._configPaths;
   }
-  public set configPaths(value: string[] | undefined| undefined) {
+  public set configPaths(value: string[] | undefined) {
     this._configPaths = value;
   }
   public resetConfigPaths() {
@@ -399,15 +331,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get configPathsInput() {
-    return this._configPaths
+    return this._configPaths;
   }
 
   // host - computed: false, optional: true, required: false
-  private _host?: string | undefined; 
+  private _host?: string; 
   public get host() {
     return this._host;
   }
-  public set host(value: string | undefined| undefined) {
+  public set host(value: string | undefined) {
     this._host = value;
   }
   public resetHost() {
@@ -415,15 +347,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get hostInput() {
-    return this._host
+    return this._host;
   }
 
   // insecure - computed: false, optional: true, required: false
-  private _insecure?: boolean | cdktf.IResolvable | undefined; 
+  private _insecure?: boolean | cdktf.IResolvable; 
   public get insecure() {
     return this._insecure;
   }
-  public set insecure(value: boolean | cdktf.IResolvable | undefined| undefined) {
+  public set insecure(value: boolean | cdktf.IResolvable | undefined) {
     this._insecure = value;
   }
   public resetInsecure() {
@@ -431,15 +363,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get insecureInput() {
-    return this._insecure
+    return this._insecure;
   }
 
   // load_config_file - computed: false, optional: true, required: false
-  private _loadConfigFile?: boolean | cdktf.IResolvable | undefined; 
+  private _loadConfigFile?: boolean | cdktf.IResolvable; 
   public get loadConfigFile() {
     return this._loadConfigFile;
   }
-  public set loadConfigFile(value: boolean | cdktf.IResolvable | undefined| undefined) {
+  public set loadConfigFile(value: boolean | cdktf.IResolvable | undefined) {
     this._loadConfigFile = value;
   }
   public resetLoadConfigFile() {
@@ -447,15 +379,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get loadConfigFileInput() {
-    return this._loadConfigFile
+    return this._loadConfigFile;
   }
 
   // password - computed: false, optional: true, required: false
-  private _password?: string | undefined; 
+  private _password?: string; 
   public get password() {
     return this._password;
   }
-  public set password(value: string | undefined| undefined) {
+  public set password(value: string | undefined) {
     this._password = value;
   }
   public resetPassword() {
@@ -463,15 +395,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get passwordInput() {
-    return this._password
+    return this._password;
   }
 
   // token - computed: false, optional: true, required: false
-  private _token?: string | undefined; 
+  private _token?: string; 
   public get token() {
     return this._token;
   }
-  public set token(value: string | undefined| undefined) {
+  public set token(value: string | undefined) {
     this._token = value;
   }
   public resetToken() {
@@ -479,15 +411,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get tokenInput() {
-    return this._token
+    return this._token;
   }
 
   // username - computed: false, optional: true, required: false
-  private _username?: string | undefined; 
+  private _username?: string; 
   public get username() {
     return this._username;
   }
-  public set username(value: string | undefined| undefined) {
+  public set username(value: string | undefined) {
     this._username = value;
   }
   public resetUsername() {
@@ -495,15 +427,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get usernameInput() {
-    return this._username
+    return this._username;
   }
 
   // alias - computed: false, optional: true, required: false
-  private _alias?: string | undefined; 
+  private _alias?: string; 
   public get alias() {
     return this._alias;
   }
-  public set alias(value: string | undefined| undefined) {
+  public set alias(value: string | undefined) {
     this._alias = value;
   }
   public resetAlias() {
@@ -511,15 +443,15 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get aliasInput() {
-    return this._alias
+    return this._alias;
   }
 
   // exec - computed: false, optional: true, required: false
-  private _exec?: KubectlProviderExec | undefined; 
+  private _exec?: KubectlProviderExec; 
   public get exec() {
     return this._exec;
   }
-  public set exec(value: KubectlProviderExec | undefined| undefined) {
+  public set exec(value: KubectlProviderExec | undefined) {
     this._exec = value;
   }
   public resetExec() {
@@ -527,7 +459,7 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   }
   // Temporarily expose input value. Use with caution.
   public get execInput() {
-    return this._exec
+    return this._exec;
   }
 
   // =========
