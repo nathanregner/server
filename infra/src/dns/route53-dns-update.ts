@@ -4,26 +4,27 @@ import { CronJobSpecJobTemplate } from "@cdktf/provider-kubernetes/lib/cron-job"
 import * as k8s from "@cdktf/provider-kubernetes";
 import { iam, route53 } from "../../.gen/providers/aws";
 
-export interface Route53DDNSConfig {
+export interface Route53DnsUpdateConfig {
   namespace: string;
   region: string;
   zone: route53.Route53Zone;
+  domains: string[];
 }
 
-export class Route53DDNS extends Construct {
+export class Route53DnsUpdate extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { namespace, region, zone }: Route53DDNSConfig
+    { namespace, region, zone, domains }: Route53DnsUpdateConfig
   ) {
     super(scope, id);
 
-    const user = new iam.IamUser(this, "ddns", { name: "ddns" });
-    const key = new iam.IamAccessKey(this, "ddns-access-key", {
+    const user = new iam.IamUser(this, "dns-update", { name: "dns-update" });
+    const key = new iam.IamAccessKey(this, "dns-update-access-key", {
       user: user.name,
     });
-    const policy = new iam.IamPolicy(this, "ddns-update", {
-      name: "ddns-update",
+    const policy = new iam.IamPolicy(this, "dns-update-policy", {
+      name: "dns-update",
       policy: JSON.stringify({
         Version: "2012-10-17",
         Statement: [
@@ -39,7 +40,7 @@ export class Route53DDNS extends Construct {
         ],
       }),
     });
-    new iam.IamUserPolicyAttachment(this, "ddns-attachment", {
+    new iam.IamUserPolicyAttachment(this, "dns-update-policy-attachment", {
       user: user.name,
       policyArn: policy.arn,
     });
@@ -52,24 +53,22 @@ export class Route53DDNS extends Construct {
           metadata: { generateName: `update-${id}-` },
           spec: {
             restartPolicy: "Never",
-            container: ["nregner.net." /*"*.nregner.net."*/].map(
-              (name, index) => ({
-                name: `${id}-${index}`,
-                image: "amazon/aws-cli:2.4.27",
-                command: [
-                  "/bin/bash",
-                  "-c",
-                  Fn.file("../../../src/dns/route53-ddns.sh"),
-                ],
-                env: [
-                  { name: "AWS_ACCESS_KEY_ID", value: key.id },
-                  { name: "AWS_SECRET_ACCESS_KEY", value: key.secret },
-                  { name: "AWS_DEFAULT_REGION", value: region },
-                  { name: "NAME", value: name },
-                  { name: "HOSTED_ZONE_ID", value: zone.id },
-                ],
-              })
-            ),
+            container: domains.map((name, index) => ({
+              name: `${id}-${index}`,
+              image: "amazon/aws-cli:2.4.27",
+              command: [
+                "/bin/bash",
+                "-c",
+                Fn.file("../../../src/dns/route53-dns-update.sh"),
+              ],
+              env: [
+                { name: "AWS_ACCESS_KEY_ID", value: key.id },
+                { name: "AWS_SECRET_ACCESS_KEY", value: key.secret },
+                { name: "AWS_DEFAULT_REGION", value: region },
+                { name: "NAME", value: `${name}.` },
+                { name: "HOSTED_ZONE_ID", value: zone.zoneId },
+              ],
+            })),
           },
         },
       },

@@ -2,14 +2,11 @@ import { Construct } from "constructs";
 import * as helm from "@cdktf/provider-helm";
 import * as k8s from "@cdktf/provider-kubernetes";
 import { values } from "../common/helm";
+import { Certificate } from "./certificate";
 
 export interface NginxIngressConfig {
   namespace: string;
-  domain: string;
-  cert: {
-    issuerName: string;
-    secretName: string;
-  };
+  certificate: Certificate;
 }
 
 export class NginxIngress extends Construct {
@@ -18,7 +15,7 @@ export class NginxIngress extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { namespace, domain, cert }: NginxIngressConfig
+    { namespace, certificate }: NginxIngressConfig
   ) {
     super(scope, id);
 
@@ -48,7 +45,7 @@ export class NginxIngress extends Construct {
         namespace,
         name: "nginx",
         annotations: {
-          "cert-manager.io/issuer": cert.issuerName,
+          "cert-manager.io/issuer": certificate.issuer.name,
           "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
           "nginx.ingress.kubernetes.io/force-ssl-redirect": "true",
         },
@@ -57,7 +54,7 @@ export class NginxIngress extends Construct {
         ingressClassName: "nginx",
         rule: [
           {
-            host: domain,
+            host: certificate.domain.commonName,
             http: {
               path: [
                 {
@@ -86,8 +83,8 @@ export class NginxIngress extends Construct {
         ],
         tls: [
           {
-            hosts: [domain],
-            secretName: cert.secretName,
+            hosts: [certificate.domain.commonName],
+            secretName: certificate.secretName,
           },
         ],
       },

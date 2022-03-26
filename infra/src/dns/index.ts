@@ -5,28 +5,53 @@ import { k8sBackend, k8sProvider } from "../common";
 import * as helm from "@cdktf/provider-helm";
 import { values } from "../common/helm";
 import { NginxIngress } from "./nginx-ingress";
-import { Route53DDNS } from "./route53-ddns";
+import { Route53DnsUpdate } from "./route53-dns-update";
 import { AwsProvider, route53 } from "../../.gen/providers/aws/";
-import { Route53DNSCert } from "./route53-dns-cert";
-
-const domain = "nregner.net";
+import { Route53CertificateIssuer } from "./route53-certificate-issuer";
+import { Certificate } from "./certificate";
 
 // https://www.ssllabs.com/ssltest/analyze.html?viaform=on&d=nregner.net&hideResults=on
 export class DnsStack extends TerraformStack {
   constructor(scope: Construct) {
     super(scope, "dns");
 
+    // providers
     k8sBackend(this, "dns");
     k8sProvider(this);
-    const region = "us-west-2";
-    new AwsProvider(this, "aws", {
-      region: region,
+    const aws = new AwsProvider(this, "aws", {
+      region: "us-west-2",
       defaultTags: { tags: { project: "server/infra/dns" } },
     });
 
+    const domain = { commonName: "nregner.net", names: [`*.nregner.net`] };
     const ns = new k8s.Namespace(this, "dns", {
       metadata: { name: "dns" },
     });
+
+    //
+    // Route53 Domain
+    //
+
+    const zone = new route53.Route53Zone(this, "zone", {
+      name: domain.commonName,
+    });
+    new route53.Route53DomainsRegisteredDomain(this, "nregner-net", {
+      domainName: domain.commonName,
+      // hack until cdktf supports loops...
+      nameServer: [0, 1, 2, 3].map((index) => ({
+        name: Fn.element(zone.nameServers, index),
+      })),
+    });
+    new Route53DnsUpdate(this, "route53-dns-update", {
+      namespace: ns.metadata.name!!,
+      region: aws.region!!,
+      zone,
+      domains: [domain.commonName, ...domain.names],
+    });
+
+    //
+    // Certificate
+    //
 
     const certManager = new helm.Release(this, "cert-manager", {
       namespace: ns.metadata.name,
@@ -39,65 +64,33 @@ export class DnsStack extends TerraformStack {
       }),
     });
 
-    const dns = {
+    const issuer = new Route53CertificateIssuer(this, "route53-issuer", {
+      namespace: ns.metadata.name,
+      region: aws.region!!,
+      zone,
+    });
+    issuer.node.addDependency(certManager);
+
+    const certificate = new Certificate(this, {
+      namespace: ns.metadata.name,
       domain,
-      wildcards: [`*.${domain}`],
-    };
-
-    /*
-    // https://community.letsencrypt.org/t/how-to-switch-from-staging-to-production/79632
-    const productionCert = new CloudDnsCert(this, "staging", {
-      namespace: ns.metadata.name,
-      project,
-      dns,
-      issuer: {
-        name: "letsencrypt",
-        server: "https://acme-v02.api.letsencrypt.org/directory",
-      },
-      dependsOn: [certManager],
+      issuer: issuer.production,
     });
-*/
+    certificate.node.addDependency(certManager);
 
-    const zone = new route53.Route53Zone(this, "zone", { name: domain });
-    new route53.Route53DomainsRegisteredDomain(this, "nregner-net", {
-      domainName: domain,
-      // hack until cdktf supports loops...
-      nameServer: [0, 1, 2, 3].map((index) => ({
-        name: Fn.element(zone.nameServers, index),
-      })),
-    });
-
-    const cert = new Route53DNSCert(this, "wildcard-staging", {
-      namespace: ns.metadata.name,
-      region,
-      zone,
-      dependsOn: [certManager],
-      /*
-      issuer: {
-        name: "letsencrypt-staging",
-        server: "https://acme-staging-v02.api.letsencrypt.org/directory",
-      },
-      */
-      issuer: {
-        name: "letsencrypt",
-        server: "https://acme-v02.api.letsencrypt.org/directory",
-      },
-      dns,
-    });
-
-    new Route53DDNS(this, "route-53", {
-      namespace: ns.metadata.name!!,
-      region,
-      zone,
-    });
+    //
+    // Ingress
+    //
 
     new NginxIngress(this, "nginx", {
       namespace: ns.metadata.name!!,
-      domain,
-      cert: cert,
+      certificate,
     });
 
+    //
     // CoreDNS
+    //
+
     // kubectl run scratch --image=curlimages/curl -it --rm -- /bin/sh
     // curl http://nregner.ddns.net
     new k8s.Manifest(this, "update-coredns", {
@@ -109,32 +102,7 @@ export class DnsStack extends TerraformStack {
           namespace: "kube-system",
         },
         data: {
-          Corefile: `
-            .:53 {
-              errors
-              health {
-               lameduck 5s
-              }
-              ready
-              log . {
-               class error
-              }
-              kubernetes cluster.local in-addr.arpa ip6.arpa {
-               pods insecure
-               fallthrough in-addr.arpa ip6.arpa
-              }
-              prometheus :9153
-              forward . 8.8.8.8 8.8.4.4
-              cache 30
-              loop
-              reload
-              loadbalance
-              hosts {
-                10.0.1.1 local-node
-                fallthrough
-              }
-            }
-          `,
+          Corefile: Fn.file("../../../src/dns/Corefile"),
         },
       },
     });

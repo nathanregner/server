@@ -2,10 +2,16 @@ import { Construct } from "constructs";
 import * as kubectl from "../../.gen/providers/kubectl";
 import { ITerraformDependable } from "cdktf";
 
+export interface ManifestMetadata {
+  namespace?: string;
+  name?: string;
+  labels?: Record<string, string>;
+}
+
 export interface ManifestConfig<T> {
   dependsOn?: ITerraformDependable[];
   content: T & {
-    metadata?: { namespace?: string; name?: string };
+    metadata?: ManifestMetadata;
   };
 }
 

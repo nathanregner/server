@@ -39,41 +39,41 @@
   },
   "resource": {
     "aws_iam_access_key": {
-      "dns_route53_ddnsaccesskey_AFB46BAD": {
+      "dns_route53dnsupdate_dnsupdateaccesskey_0221C0D9": {
         "//": {
           "metadata": {
-            "path": "dns/route-53/ddns-access-key",
-            "uniqueId": "dns_route53_ddnsaccesskey_AFB46BAD"
+            "path": "dns/route53-dns-update/dns-update-access-key",
+            "uniqueId": "dns_route53dnsupdate_dnsupdateaccesskey_0221C0D9"
           }
         },
-        "user": "${aws_iam_user.dns_route53_ddns_F6DBD01D.name}"
+        "user": "${aws_iam_user.dns_route53dnsupdate_ED7CD84C.name}"
       },
-      "dns_wildcardstaging_certmanagerkey_984E230E": {
+      "dns_route53issuer_certmanagerkey_0A684111": {
         "//": {
           "metadata": {
-            "path": "dns/wildcard-staging/cert-manager-key",
-            "uniqueId": "dns_wildcardstaging_certmanagerkey_984E230E"
+            "path": "dns/route53-issuer/cert-manager-key",
+            "uniqueId": "dns_route53issuer_certmanagerkey_0A684111"
           }
         },
-        "user": "${aws_iam_user.dns_wildcardstaging_certmanager_FDD523B0.name}"
+        "user": "${aws_iam_user.dns_route53issuer_certmanager_6B26B6E3.name}"
       }
     },
     "aws_iam_policy": {
-      "dns_route53_ddnsupdate_FDF3B6D1": {
+      "dns_route53dnsupdate_dnsupdatepolicy_961508D7": {
         "//": {
           "metadata": {
-            "path": "dns/route-53/ddns-update",
-            "uniqueId": "dns_route53_ddnsupdate_FDF3B6D1"
+            "path": "dns/route53-dns-update/dns-update-policy",
+            "uniqueId": "dns_route53dnsupdate_dnsupdatepolicy_961508D7"
           }
         },
-        "name": "ddns-update",
+        "name": "dns-update",
         "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DDNSUpdate\",\"Effect\":\"Allow\",\"Action\":[\"route53:ChangeResourceRecordSets\",\"route53:ListResourceRecordSets\"],\"Resource\":\"${aws_route53_zone.dns_zone_2E2729FB.arn}\"}]}"
       },
-      "dns_wildcardstaging_certmanagerpolicy_FC78ABE1": {
+      "dns_route53issuer_certmanagerpolicy_E4697B5A": {
         "//": {
           "metadata": {
-            "path": "dns/wildcard-staging/cert-manager-policy",
-            "uniqueId": "dns_wildcardstaging_certmanagerpolicy_FC78ABE1"
+            "path": "dns/route53-issuer/cert-manager-policy",
+            "uniqueId": "dns_route53issuer_certmanagerpolicy_E4697B5A"
           }
         },
         "name": "cert-manager",
@@ -81,45 +81,45 @@
       }
     },
     "aws_iam_user": {
-      "dns_route53_ddns_F6DBD01D": {
+      "dns_route53dnsupdate_ED7CD84C": {
         "//": {
           "metadata": {
-            "path": "dns/route-53/ddns",
-            "uniqueId": "dns_route53_ddns_F6DBD01D"
+            "path": "dns/route53-dns-update/dns-update",
+            "uniqueId": "dns_route53dnsupdate_ED7CD84C"
           }
         },
-        "name": "ddns"
+        "name": "dns-update"
       },
-      "dns_wildcardstaging_certmanager_FDD523B0": {
+      "dns_route53issuer_certmanager_6B26B6E3": {
         "//": {
           "metadata": {
-            "path": "dns/wildcard-staging/cert-manager",
-            "uniqueId": "dns_wildcardstaging_certmanager_FDD523B0"
+            "path": "dns/route53-issuer/cert-manager",
+            "uniqueId": "dns_route53issuer_certmanager_6B26B6E3"
           }
         },
         "name": "cert-manager"
       }
     },
     "aws_iam_user_policy_attachment": {
-      "dns_route53_ddnsattachment_7EEFB914": {
+      "dns_route53dnsupdate_dnsupdatepolicyattachment_5F726C4D": {
         "//": {
           "metadata": {
-            "path": "dns/route-53/ddns-attachment",
-            "uniqueId": "dns_route53_ddnsattachment_7EEFB914"
+            "path": "dns/route53-dns-update/dns-update-policy-attachment",
+            "uniqueId": "dns_route53dnsupdate_dnsupdatepolicyattachment_5F726C4D"
           }
         },
-        "policy_arn": "${aws_iam_policy.dns_route53_ddnsupdate_FDF3B6D1.arn}",
-        "user": "${aws_iam_user.dns_route53_ddns_F6DBD01D.name}"
+        "policy_arn": "${aws_iam_policy.dns_route53dnsupdate_dnsupdatepolicy_961508D7.arn}",
+        "user": "${aws_iam_user.dns_route53dnsupdate_ED7CD84C.name}"
       },
-      "dns_wildcardstaging_certmanagerattachment_F70C105E": {
+      "dns_route53issuer_certmanagerattachment_AACA1779": {
         "//": {
           "metadata": {
-            "path": "dns/wildcard-staging/cert-manager-attachment",
-            "uniqueId": "dns_wildcardstaging_certmanagerattachment_F70C105E"
+            "path": "dns/route53-issuer/cert-manager-attachment",
+            "uniqueId": "dns_route53issuer_certmanagerattachment_AACA1779"
           }
         },
-        "policy_arn": "${aws_iam_policy.dns_wildcardstaging_certmanagerpolicy_FC78ABE1.arn}",
-        "user": "${aws_iam_user.dns_wildcardstaging_certmanager_FDD523B0.name}"
+        "policy_arn": "${aws_iam_policy.dns_route53issuer_certmanagerpolicy_E4697B5A.arn}",
+        "user": "${aws_iam_user.dns_route53issuer_certmanager_6B26B6E3.name}"
       }
     },
     "aws_route53_zone": {
@@ -171,7 +171,7 @@
         "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}",
         "repository": "https://charts.jetstack.io",
         "values": [
-          "{\"installCRDs\":true,\"replicaCount\":0}"
+          "{\"installCRDs\":true}"
         ],
         "version": "1.6.1"
       },
@@ -193,35 +193,44 @@
       }
     },
     "kubectl_manifest": {
-      "dns_wildcardstaging_cert_certmanifest_B5911B79": {
+      "dns_nregnernetobjectObject_nregnernetobjectObjectmanifest_0D02DA36": {
         "//": {
           "metadata": {
-            "path": "dns/wildcard-staging/cert/cert-manifest",
-            "uniqueId": "dns_wildcardstaging_cert_certmanifest_B5911B79"
+            "path": "dns/nregner.net-[object Object]/nregner.net-[object Object]-manifest",
+            "uniqueId": "dns_nregnernetobjectObject_nregnernetobjectObjectmanifest_0D02DA36"
           }
         },
-        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"Certificate\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"nregner.net\"\n  },\n  \"spec\": {\n    \"secretName\": \"letsencrypt-cert\",\n    \"issuerRef\": {\n      \"kind\": \"ClusterIssuer\",\n      \"name\": \"letsencrypt\"\n    },\n    \"commonName\": \"nregner.net\",\n    \"dnsNames\": [\n      \"nregner.net\",\n      \"*.nregner.net\"\n    ]\n  }\n}"
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"Certificate\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"nregner.net\",\n    \"labels\": {\n      \"issuer\": \"letsencrypt\"\n    }\n  },\n  \"spec\": {\n    \"secretName\": \"nregner.net-cert\",\n    \"issuerRef\": {\n      \"kind\": \"ClusterIssuer\",\n      \"name\": \"letsencrypt\"\n    },\n    \"commonName\": \"nregner.net\",\n    \"dnsNames\": [\n      \"nregner.net\",\n      \"*.nregner.net\"\n    ]\n  }\n}"
       },
-      "dns_wildcardstaging_issuer_issuermanifest_F4704418": {
+      "dns_route53issuer_letsencrypt_letsencryptmanifest_D6374AC8": {
         "//": {
           "metadata": {
-            "path": "dns/wildcard-staging/issuer/issuer-manifest",
-            "uniqueId": "dns_wildcardstaging_issuer_issuermanifest_F4704418"
+            "path": "dns/route53-issuer/letsencrypt/letsencrypt-manifest",
+            "uniqueId": "dns_route53issuer_letsencrypt_letsencryptmanifest_D6374AC8"
           }
         },
-        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"letsencrypt\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt\"\n      },\n      \"solvers\": [\n        {\n          \"dns01\": {\n            \"route53\": {\n              \"region\": \"us-west-2\",\n              \"hostedZoneID\": \"${aws_route53_zone.dns_zone_2E2729FB.id}\",\n              \"accessKeyID\": \"${aws_iam_access_key.dns_wildcardstaging_certmanagerkey_984E230E.id}\",\n              \"secretAccessKeySecretRef\": {\n                \"name\": \"${kubernetes_secret.dns_wildcardstaging_certmanageraccesskey_F9E8476B.metadata[0].name}\",\n                \"key\": \"secret\"\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}"
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"letsencrypt\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt\"\n      },\n      \"solvers\": [\n        {\n          \"selector\": {\n            \"matchLabels\": {\n              \"issuer\": \"letsencrypt\"\n            }\n          },\n          \"dns01\": {\n            \"route53\": {\n              \"region\": \"us-west-2\",\n              \"hostedZoneID\": \"${aws_route53_zone.dns_zone_2E2729FB.id}\",\n              \"accessKeyID\": \"${aws_iam_access_key.dns_route53issuer_certmanagerkey_0A684111.id}\",\n              \"secretAccessKeySecretRef\": {\n                \"name\": \"${kubernetes_secret.dns_route53issuer_certmanageraccesskey_1645FAB2.metadata[0].name}\",\n                \"key\": \"secret\"\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}"
+      },
+      "dns_route53issuer_letsencryptstaging_letsencryptstagingmanifest_6269C098": {
+        "//": {
+          "metadata": {
+            "path": "dns/route53-issuer/letsencrypt-staging/letsencrypt-staging-manifest",
+            "uniqueId": "dns_route53issuer_letsencryptstaging_letsencryptstagingmanifest_6269C098"
+          }
+        },
+        "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"letsencrypt-staging\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-staging-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt-staging\"\n      },\n      \"solvers\": [\n        {\n          \"selector\": {\n            \"matchLabels\": {\n              \"issuer\": \"letsencrypt-staging\"\n            }\n          },\n          \"dns01\": {\n            \"route53\": {\n              \"region\": \"us-west-2\",\n              \"hostedZoneID\": \"${aws_route53_zone.dns_zone_2E2729FB.id}\",\n              \"accessKeyID\": \"${aws_iam_access_key.dns_route53issuer_certmanagerkey_0A684111.id}\",\n              \"secretAccessKeySecretRef\": {\n                \"name\": \"${kubernetes_secret.dns_route53issuer_certmanageraccesskey_1645FAB2.metadata[0].name}\",\n                \"key\": \"secret\"\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}"
       }
     },
     "kubernetes_cron_job": {
-      "dns_route53_update_60C50A01": {
+      "dns_route53dnsupdate_9B14B191": {
         "//": {
           "metadata": {
-            "path": "dns/route-53/update",
-            "uniqueId": "dns_route53_update_60C50A01"
+            "path": "dns/route53-dns-update/update",
+            "uniqueId": "dns_route53dnsupdate_9B14B191"
           }
         },
         "metadata": {
-          "generate_name": "update-route-53-",
+          "generate_name": "update-route53-dns-update-",
           "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
         },
         "spec": {
@@ -229,13 +238,13 @@
           "failed_jobs_history_limit": 1,
           "job_template": {
             "metadata": {
-              "generate_name": "update-route-53-"
+              "generate_name": "update-route53-dns-update-"
             },
             "spec": {
               "backoff_limit": 0,
               "template": {
                 "metadata": {
-                  "generate_name": "update-route-53-"
+                  "generate_name": "update-route53-dns-update-"
                 },
                 "spec": {
                   "container": [
@@ -243,16 +252,16 @@
                       "command": [
                         "/bin/bash",
                         "-c",
-                        "${file(\"../../../src/dns/route53-ddns.sh\")}"
+                        "${file(\"../../../src/dns/route53-dns-update.sh\")}"
                       ],
                       "env": [
                         {
                           "name": "AWS_ACCESS_KEY_ID",
-                          "value": "${aws_iam_access_key.dns_route53_ddnsaccesskey_AFB46BAD.id}"
+                          "value": "${aws_iam_access_key.dns_route53dnsupdate_dnsupdateaccesskey_0221C0D9.id}"
                         },
                         {
                           "name": "AWS_SECRET_ACCESS_KEY",
-                          "value": "${aws_iam_access_key.dns_route53_ddnsaccesskey_AFB46BAD.secret}"
+                          "value": "${aws_iam_access_key.dns_route53dnsupdate_dnsupdateaccesskey_0221C0D9.secret}"
                         },
                         {
                           "name": "AWS_DEFAULT_REGION",
@@ -264,11 +273,42 @@
                         },
                         {
                           "name": "HOSTED_ZONE_ID",
-                          "value": "${aws_route53_zone.dns_zone_2E2729FB.id}"
+                          "value": "${aws_route53_zone.dns_zone_2E2729FB.zone_id}"
                         }
                       ],
                       "image": "amazon/aws-cli:2.4.27",
-                      "name": "route-53-0"
+                      "name": "route53-dns-update-0"
+                    },
+                    {
+                      "command": [
+                        "/bin/bash",
+                        "-c",
+                        "${file(\"../../../src/dns/route53-dns-update.sh\")}"
+                      ],
+                      "env": [
+                        {
+                          "name": "AWS_ACCESS_KEY_ID",
+                          "value": "${aws_iam_access_key.dns_route53dnsupdate_dnsupdateaccesskey_0221C0D9.id}"
+                        },
+                        {
+                          "name": "AWS_SECRET_ACCESS_KEY",
+                          "value": "${aws_iam_access_key.dns_route53dnsupdate_dnsupdateaccesskey_0221C0D9.secret}"
+                        },
+                        {
+                          "name": "AWS_DEFAULT_REGION",
+                          "value": "us-west-2"
+                        },
+                        {
+                          "name": "NAME",
+                          "value": "*.nregner.net."
+                        },
+                        {
+                          "name": "HOSTED_ZONE_ID",
+                          "value": "${aws_route53_zone.dns_zone_2E2729FB.zone_id}"
+                        }
+                      ],
+                      "image": "amazon/aws-cli:2.4.27",
+                      "name": "route53-dns-update-1"
                     }
                   ],
                   "restart_policy": "Never"
@@ -410,7 +450,7 @@
               "hosts": [
                 "nregner.net"
               ],
-              "secret_name": "letsencrypt-cert"
+              "secret_name": "nregner.net-cert"
             }
           ]
         }
@@ -427,7 +467,7 @@
         "manifest": {
           "apiVersion": "v1",
           "data": {
-            "Corefile": "\n            .:53 {\n              errors\n              health {\n               lameduck 5s\n              }\n              ready\n              log . {\n               class error\n              }\n              kubernetes cluster.local in-addr.arpa ip6.arpa {\n               pods insecure\n               fallthrough in-addr.arpa ip6.arpa\n              }\n              prometheus :9153\n              forward . 8.8.8.8 8.8.4.4\n              cache 30\n              loop\n              reload\n              loadbalance\n              hosts {\n                10.0.1.1 local-node\n                fallthrough\n              }\n            }\n          "
+            "Corefile": "${file(\"../../../src/dns/Corefile\")}"
           },
           "kind": "ConfigMap",
           "metadata": {
@@ -451,15 +491,15 @@
       }
     },
     "kubernetes_secret": {
-      "dns_wildcardstaging_certmanageraccesskey_F9E8476B": {
+      "dns_route53issuer_certmanageraccesskey_1645FAB2": {
         "//": {
           "metadata": {
-            "path": "dns/wildcard-staging/cert-manager-access-key",
-            "uniqueId": "dns_wildcardstaging_certmanageraccesskey_F9E8476B"
+            "path": "dns/route53-issuer/cert-manager-access-key",
+            "uniqueId": "dns_route53issuer_certmanageraccesskey_1645FAB2"
           }
         },
         "data": {
-          "secret": "${aws_iam_access_key.dns_wildcardstaging_certmanagerkey_984E230E.secret}"
+          "secret": "${aws_iam_access_key.dns_route53issuer_certmanagerkey_0A684111.secret}"
         },
         "metadata": {
           "name": "cert-manager-access-key",

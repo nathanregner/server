@@ -1,35 +1,30 @@
 import { Construct } from "constructs";
 import * as k8s from "@cdktf/provider-kubernetes";
-import { ITerraformDependable } from "cdktf";
 import { Manifest } from "../common";
-import { Certificate } from "../common/manifest/Certificate.v1";
 import { ClusterIssuer } from "../common/manifest/ClusterIssuer.v1";
 import { iam, route53 } from "../../.gen/providers/aws";
 
-interface Config {
+export interface Issuer {
+  name: string;
+  server: string;
+}
+
+export interface Route53DnsCertificateManagerConfig {
   namespace: string;
   region: string;
   zone: route53.Route53Zone;
-  issuer: { name: string; server: string };
-  dns: { domain: string; wildcards: string[] };
-  dependsOn: ITerraformDependable[];
 }
 
-export class Route53DNSCert extends Construct {
-  readonly issuerName: string;
-  readonly secretName: string;
+export class Route53CertificateIssuer extends Construct {
+  readonly staging: Issuer;
+  readonly production: Issuer;
 
   constructor(
     scope: Construct,
     id: string,
-    { namespace, region, zone, issuer, dns, dependsOn }: Config
+    private config: Route53DnsCertificateManagerConfig
   ) {
     super(scope, id);
-
-    this.issuerName = issuer.name;
-    this.secretName = `${issuer.name}-cert`;
-
-    this.node.addDependency(...dependsOn);
 
     const user = new iam.IamUser(this, "cert-manager", {
       name: "cert-manager",
@@ -53,7 +48,7 @@ export class Route53DNSCert extends Construct {
               "route53:ChangeResourceRecordSets",
               "route53:ListResourceRecordSets",
             ],
-            Resource: zone.arn,
+            Resource: config.zone.arn,
           },
           {
             Effect: "Allow",
@@ -69,15 +64,36 @@ export class Route53DNSCert extends Construct {
     });
 
     const keySecret = new k8s.Secret(this, "cert-manager-access-key", {
-      metadata: { namespace, name: "cert-manager-access-key" },
+      metadata: {
+        namespace: this.config.namespace,
+        name: "cert-manager-access-key",
+      },
       data: { secret: key.secret },
     });
+    const accessKey = {
+      id: key.id,
+      secretName: keySecret.metadata.name,
+    };
 
-    new Manifest<ClusterIssuer>(this, "issuer", {
+    this.staging = this.issuer(accessKey, {
+      name: "letsencrypt-staging",
+      server: "https://acme-staging-v02.api.letsencrypt.org/directory",
+    });
+    this.production = this.issuer(accessKey, {
+      name: "letsencrypt",
+      server: "https://acme-v02.api.letsencrypt.org/directory",
+    });
+  }
+
+  private issuer(
+    accessKey: { id: string; secretName: string },
+    issuer: Issuer
+  ) {
+    new Manifest<ClusterIssuer>(this, issuer.name, {
       content: {
         apiVersion: "cert-manager.io/v1",
         kind: "ClusterIssuer",
-        metadata: { namespace, name: issuer.name },
+        metadata: { namespace: this.config.namespace, name: issuer.name },
         spec: {
           acme: {
             server: issuer.server,
@@ -85,14 +101,15 @@ export class Route53DNSCert extends Construct {
             privateKeySecretRef: { name: issuer.name },
             solvers: [
               {
+                selector: { matchLabels: { issuer: issuer.name } },
                 // https://cert-manager.io/docs/configuration/acme/dns01/google/
                 dns01: {
                   route53: {
-                    region,
-                    hostedZoneID: zone.id,
-                    accessKeyID: key.id,
+                    region: this.config.region,
+                    hostedZoneID: this.config.zone.id,
+                    accessKeyID: accessKey.id,
                     secretAccessKeySecretRef: {
-                      name: keySecret.metadata.name,
+                      name: accessKey.secretName,
                       key: "secret",
                     },
                   },
@@ -103,20 +120,6 @@ export class Route53DNSCert extends Construct {
         },
       },
     });
-
-    // TODO: This should live elsewhere
-    new Manifest<Certificate>(this, "cert", {
-      content: {
-        apiVersion: "cert-manager.io/v1",
-        kind: "Certificate",
-        metadata: { namespace, name: dns.domain },
-        spec: {
-          secretName: this.secretName,
-          issuerRef: { kind: "ClusterIssuer", name: issuer.name },
-          commonName: dns.domain,
-          dnsNames: [dns.domain, ...dns.wildcards],
-        },
-      },
-    });
+    return issuer;
   }
 }
