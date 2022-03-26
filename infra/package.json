@@ -51,11 +51,11 @@
   "targets": {
     "main": {
       "source": "main.ts",
-      "isLibrary": true
+      "context": "node"
     },
     "generate-manifests": {
       "source": "generate-manifests.ts",
-      "isLibrary": true
+      "context": "node"
     }
   }
 }
