@@ -179,11 +179,7 @@ export interface ClusterIssuer {
             /**
              * name of the Azure environment (default AzurePublicCloud)
              */
-            environment?:
-              | "AzurePublicCloud"
-              | "AzureChinaCloud"
-              | "AzureGermanCloud"
-              | "AzureUSGovernmentCloud";
+            environment?: "AzurePublicCloud" | "AzureChinaCloud" | "AzureGermanCloud" | "AzureUSGovernmentCloud";
             /**
              * name of the DNS zone that should be used
              */

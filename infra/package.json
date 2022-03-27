@@ -2,22 +2,18 @@
   "name": "infra",
   "version": "1.0.0",
   "private": true,
-  "license": "MPL-2.0",
-  "source": "main.ts",
   "main": "dist/main.js",
+  "source": "main.ts",
   "scripts": {
-    "build": "tsc",
-    "compile": "tsc --pretty",
-    "deploy:watch": "cdktf watch --auto-approve",
+    "build": "parcel build",
+    "check:watch": "tsc -w --noEmit",
     "format": "prettier --write **/*.{ts,json}",
-    "get": "cdktf get",
-    "manifests:generate": "npm run compile && node target/src/manifest-generator.js",
-    "synth": "cdktf synth",
-    "synth:watch": "parcel watch & nodemon --watch dist/main.js --exec node dist/main.js",
+    "generate:cdktf": "cdktf get",
+    "generate:manifests": "npm run compile && node target/src/manifest-generator.js",
+    "synth:watch": "mkdir dist; touch dist/main.js; parcel watch & nodemon --watch dist/main.js --exec node dist/main.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "upgrade": "npm-check-updates -u",
-    "watch": "tsc -w"
+    "upgrade": "npm-check-updates -u"
   },
   "dependencies": {
     "@cdktf/provider-helm": "^0.3.52",
@@ -46,7 +42,7 @@
     "typescript": "^4.6.3"
   },
   "engines": {
-    "node": ">=10.12"
+    "node": ">=16"
   },
   "targets": {
     "main": {

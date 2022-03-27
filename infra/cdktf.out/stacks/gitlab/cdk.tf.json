@@ -41,22 +41,11 @@
         "namespace": "${kubernetes_namespace.gitlab_37C03C67.metadata[0].name}",
         "repository": "https://charts.gitlab.io/",
         "values": [
-          "{\"certmanager\":{\"install\":false},\"prometheus\":{\"install\":false},\"global\":{\"ingress\":{\"enabled\":false,\"configureCertmanager\":false}},\"gitlab-runner\":{\"enabled\":true,\"gitlabUrl\":\"http://gitlab-webservice-default:8181\"},\"nginx-ingress\":{\"enabled\":false},\"gitlab\":{\"gitaly\":{\"persistence\":{\"storageClass\":\"gitlab-gitaly\",\"size\":\"50Gi\"}}},\"minio\":{\"persistence\":{\"storageClass\":\"gitlab-minio\",\"size\":\"10Gi\"}},\"postgresql\":{\"persistence\":{\"storageClass\":\"gitlab-postgresql\",\"size\":\"8Gi\"}},\"redis\":{\"master\":{\"persistence\":{\"storageClass\":\"gitlab-redis\",\"size\":\"5Gi\"}}},\"registry\":{\"enabled\":false},\"toolbox\":{\"persistence\":{\"storageClass\":\"gitlab-toolbox\",\"size\":\"5Gi\"}}}"
+          "{\"certmanager\":{\"install\":false},\"prometheus\":{\"install\":false},\"global\":{\"ingress\":{\"enabled\":false,\"configureCertmanager\":false},\"minio\":{\"enabled\":true}},\"gitlab-runner\":{\"enabled\":true,\"gitlabUrl\":\"http://gitlab-webservice-default:8181\"},\"nginx-ingress\":{\"enabled\":false},\"gitlab\":{\"gitaly\":{\"persistence\":{\"storageClass\":\"gitlab-gitaly\",\"size\":\"50Gi\"}}},\"minio\":{\"persistence\":{\"storageClass\":\"gitlab-minio\",\"size\":\"10Gi\"}},\"postgresql\":{\"persistence\":{\"storageClass\":\"gitlab-postgresql\",\"size\":\"8Gi\"}},\"redis\":{\"master\":{\"persistence\":{\"storageClass\":\"gitlab-redis\",\"size\":\"5Gi\"}}},\"registry\":{\"enabled\":false},\"toolbox\":{\"persistence\":{\"storageClass\":\"gitlab-toolbox\",\"size\":\"5Gi\"}}}"
         ],
-        "version": "5.5.0",
+        "version": "5.6.1",
         "wait": false,
         "wait_for_jobs": false
-      }
-    },
-    "kubectl_manifest": {
-      "gitlab_gitlabmapping_gitlabmappingmapping_gitlabmappingmappingmanifest_A0DDC3FC": {
-        "//": {
-          "metadata": {
-            "path": "gitlab/gitlab-mapping/gitlab-mapping-mapping/gitlab-mapping-mapping-manifest",
-            "uniqueId": "gitlab_gitlabmapping_gitlabmappingmapping_gitlabmappingmappingmanifest_A0DDC3FC"
-          }
-        },
-        "yaml_body": "{\n  \"apiVersion\": \"getambassador.io/v3alpha1\",\n  \"kind\": \"Mapping\",\n  \"metadata\": {\n    \"namespace\": \"gitlab\",\n    \"name\": \"gitlab\"\n  },\n  \"spec\": {\n    \"prefix\": \"\",\n    \"host\": \"gitlab.nregner.ddns.net\",\n    \"service\": \"gitlab-webservice-default:8181\"\n  }\n}"
       }
     },
     "kubernetes_namespace": {

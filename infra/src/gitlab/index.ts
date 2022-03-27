@@ -3,7 +3,7 @@ import { Construct } from "constructs";
 import * as helm from "@cdktf/provider-helm";
 import * as k8s from "@cdktf/provider-kubernetes";
 import { values } from "../common/helm";
-import { k8sBackend, k8sProvider, Mapping } from "../common";
+import { k8sBackend, k8sProvider } from "../common";
 
 export class GitlabStack extends TerraformStack {
   constructor(scope: Construct) {
@@ -50,7 +50,7 @@ export class GitlabStack extends TerraformStack {
       name: "gitlab",
       repository: "https://charts.gitlab.io/",
       chart: "gitlab",
-      version: "5.5.0",
+      version: "5.6.1",
       wait: false,
       waitForJobs: false,
       values: values({
@@ -61,7 +61,7 @@ export class GitlabStack extends TerraformStack {
         // components
         global: {
           ingress: { enabled: false, configureCertmanager: false },
-          // minio: { enabled: false },
+          minio: { enabled: true },
         },
         "gitlab-runner": {
           enabled: true,
@@ -75,15 +75,6 @@ export class GitlabStack extends TerraformStack {
         registry: { enabled: false },
         toolbox: { persistence: persistence("toolbox", "5Gi") },
       }),
-    });
-
-    new Mapping(this, "gitlab-mapping", {
-      metadata: { namespace: "gitlab", name: "gitlab" },
-      spec: {
-        host: "gitlab.nregner.ddns.net",
-        prefix: "",
-        service: "gitlab-webservice-default:8181",
-      },
     });
   }
 }

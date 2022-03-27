@@ -25,20 +25,18 @@ export class Certificate extends Manifest<crd.Certificate> {
   ) {
     const secretName = `${domain.commonName}-cert`;
     super(scope, `${domain.commonName}-${issuer}`, {
-      content: {
-        apiVersion: "cert-manager.io/v1",
-        kind: "Certificate",
-        metadata: {
-          namespace: namespace,
-          name: domain.commonName,
-          labels: { issuer: issuer.name },
-        },
-        spec: {
-          secretName,
-          issuerRef: { kind: "ClusterIssuer", name: issuer.name },
-          commonName: domain.commonName,
-          dnsNames: [domain.commonName, ...(domain.names ?? [])],
-        },
+      apiVersion: "cert-manager.io/v1",
+      kind: "Certificate",
+      metadata: {
+        namespace: namespace,
+        name: domain.commonName,
+        labels: { issuer: issuer.name },
+      },
+      spec: {
+        secretName,
+        issuerRef: { kind: "ClusterIssuer", name: issuer.name },
+        commonName: domain.commonName,
+        dnsNames: [domain.commonName, ...(domain.names ?? [])],
       },
     });
     this.secretName = secretName;

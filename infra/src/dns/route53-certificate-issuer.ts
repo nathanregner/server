@@ -90,33 +90,31 @@ export class Route53CertificateIssuer extends Construct {
     issuer: Issuer
   ) {
     new Manifest<ClusterIssuer>(this, issuer.name, {
-      content: {
-        apiVersion: "cert-manager.io/v1",
-        kind: "ClusterIssuer",
-        metadata: { namespace: this.config.namespace, name: issuer.name },
-        spec: {
-          acme: {
-            server: issuer.server,
-            email: "nathanregner@gmail.com",
-            privateKeySecretRef: { name: issuer.name },
-            solvers: [
-              {
-                selector: { matchLabels: { issuer: issuer.name } },
-                // https://cert-manager.io/docs/configuration/acme/dns01/google/
-                dns01: {
-                  route53: {
-                    region: this.config.region,
-                    hostedZoneID: this.config.zone.id,
-                    accessKeyID: accessKey.id,
-                    secretAccessKeySecretRef: {
-                      name: accessKey.secretName,
-                      key: "secret",
-                    },
+      apiVersion: "cert-manager.io/v1",
+      kind: "ClusterIssuer",
+      metadata: { namespace: this.config.namespace, name: issuer.name },
+      spec: {
+        acme: {
+          server: issuer.server,
+          email: "nathanregner@gmail.com",
+          privateKeySecretRef: { name: issuer.name },
+          solvers: [
+            {
+              selector: { matchLabels: { issuer: issuer.name } },
+              // https://cert-manager.io/docs/configuration/acme/dns01/google/
+              dns01: {
+                route53: {
+                  region: this.config.region,
+                  hostedZoneID: this.config.zone.id,
+                  accessKeyID: accessKey.id,
+                  secretAccessKeySecretRef: {
+                    name: accessKey.secretName,
+                    key: "secret",
                   },
                 },
               },
-            ],
-          },
+            },
+          ],
         },
       },
     });
