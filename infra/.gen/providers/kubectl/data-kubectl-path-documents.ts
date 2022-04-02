@@ -39,7 +39,7 @@ export class DataKubectlPathDocuments extends cdktf.TerraformDataSource {
   // =================
   // STATIC PROPERTIES
   // =================
-  public static readonly tfResourceType: string = "kubectl_path_documents";
+  public static readonly tfResourceType = "kubectl_path_documents";
 
   // ===========
   // INITIALIZER
@@ -56,7 +56,9 @@ export class DataKubectlPathDocuments extends cdktf.TerraformDataSource {
     super(scope, id, {
       terraformResourceType: 'kubectl_path_documents',
       terraformGeneratorMetadata: {
-        providerName: 'kubectl'
+        providerName: 'kubectl',
+        providerVersion: '1.14.0',
+        providerVersionConstraint: '>= 1.13.1'
       },
       provider: config.provider,
       dependsOn: config.dependsOn,

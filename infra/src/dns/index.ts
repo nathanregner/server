@@ -6,7 +6,7 @@ import * as helm from "@cdktf/provider-helm";
 import { values } from "../common/helm";
 import { NginxIngress } from "./nginx-ingress";
 import { Route53DnsUpdate } from "./route53-dns-update";
-import { AwsProvider, route53 } from "../../.gen/providers/aws/";
+import { AwsProvider, route53 } from "@cdktf/provider-aws/lib/";
 import { Route53CertificateIssuer } from "./route53-certificate-issuer";
 import { Certificate } from "./certificate";
 

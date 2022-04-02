@@ -2,7 +2,7 @@ import { Construct } from "constructs";
 import * as k8s from "@cdktf/provider-kubernetes";
 import { Manifest } from "../common";
 import { ClusterIssuer } from "../common/manifest/ClusterIssuer.v1";
-import { iam, route53 } from "../../.gen/providers/aws";
+import { iam, route53 } from "@cdktf/provider-aws";
 
 export interface Issuer {
   name: string;

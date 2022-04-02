@@ -2,7 +2,7 @@ import { Construct } from "constructs";
 import { Fn } from "cdktf";
 import { CronJobSpecJobTemplate } from "@cdktf/provider-kubernetes/lib/cron-job";
 import * as k8s from "@cdktf/provider-kubernetes";
-import { iam, route53 } from "../../.gen/providers/aws";
+import { iam, route53 } from "@cdktf/provider-aws";
 
 export interface Route53DnsUpdateConfig {
   namespace: string;

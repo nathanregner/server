@@ -21,7 +21,7 @@ export class DataKubectlFilenameList extends cdktf.TerraformDataSource {
   // =================
   // STATIC PROPERTIES
   // =================
-  public static readonly tfResourceType: string = "kubectl_filename_list";
+  public static readonly tfResourceType = "kubectl_filename_list";
 
   // ===========
   // INITIALIZER
@@ -38,7 +38,9 @@ export class DataKubectlFilenameList extends cdktf.TerraformDataSource {
     super(scope, id, {
       terraformResourceType: 'kubectl_filename_list',
       terraformGeneratorMetadata: {
-        providerName: 'kubectl'
+        providerName: 'kubectl',
+        providerVersion: '1.14.0',
+        providerVersionConstraint: '>= 1.13.1'
       },
       provider: config.provider,
       dependsOn: config.dependsOn,

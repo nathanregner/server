@@ -21,7 +21,7 @@ export class ServerVersion extends cdktf.TerraformResource {
   // =================
   // STATIC PROPERTIES
   // =================
-  public static readonly tfResourceType: string = "kubectl_server_version";
+  public static readonly tfResourceType = "kubectl_server_version";
 
   // ===========
   // INITIALIZER
@@ -38,7 +38,9 @@ export class ServerVersion extends cdktf.TerraformResource {
     super(scope, id, {
       terraformResourceType: 'kubectl_server_version',
       terraformGeneratorMetadata: {
-        providerName: 'kubectl'
+        providerName: 'kubectl',
+        providerVersion: '1.14.0',
+        providerVersionConstraint: '>= 1.13.1'
       },
       provider: config.provider,
       dependsOn: config.dependsOn,

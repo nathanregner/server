@@ -145,7 +145,7 @@ export class KubectlProvider extends cdktf.TerraformProvider {
   // =================
   // STATIC PROPERTIES
   // =================
-  public static readonly tfResourceType: string = "kubectl";
+  public static readonly tfResourceType = "kubectl";
 
   // ===========
   // INITIALIZER
@@ -163,6 +163,7 @@ export class KubectlProvider extends cdktf.TerraformProvider {
       terraformResourceType: 'kubectl',
       terraformGeneratorMetadata: {
         providerName: 'kubectl',
+        providerVersion: '1.14.0',
         providerVersionConstraint: '>= 1.13.1'
       },
       terraformProviderSource: 'gavinbunney/kubectl'
