@@ -43,7 +43,7 @@ export class DnsStack extends TerraformStack {
       })),
     });
     new Route53DnsUpdate(this, "route53-dns-update", {
-      namespace: ns.metadata.name!!,
+      namespace: ns.metadata.name,
       region: aws.region!!,
       zone,
       domains: [domain.commonName, ...domain.names],
@@ -83,7 +83,7 @@ export class DnsStack extends TerraformStack {
     //
 
     new NginxIngress(this, "nginx", {
-      namespace: ns.metadata.name!!,
+      namespace: ns.metadata.name,
       certificate,
     });
 
