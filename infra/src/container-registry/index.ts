@@ -30,7 +30,7 @@ export class ContainerRegistry extends TerraformStack {
     const password = new Password(this, "password", { length: 32 });
     const htpasswd = new k8s.Secret(this, "htpasswd", {
       metadata: {
-        namespace: ns.metadata.name!!,
+        namespace: ns.metadata.name,
         generateName: "htpasswd",
       },
       data: {
@@ -42,7 +42,7 @@ export class ContainerRegistry extends TerraformStack {
 
     const regcred = new k8s.Secret(this, "regcred", {
       metadata: {
-        namespace: ns.metadata.name!!,
+        namespace: ns.metadata.name,
         generateName: "regcred",
       },
       type: "kubernetes.io/dockerconfigjson",
@@ -69,7 +69,7 @@ export class ContainerRegistry extends TerraformStack {
       app: "container-registry",
     };
     const metadata = {
-      namespace: ns.metadata.name!!,
+      namespace: ns.metadata.name,
       name: "container-registry",
       labels,
     };

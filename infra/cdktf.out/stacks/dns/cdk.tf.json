@@ -8,6 +8,22 @@
     "outputs": {
     }
   },
+  "data": {
+    "kubernetes_service_v1": {
+      "dns_nginx_gitlabwebservicedefault_053D58C9": {
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/gitlab-webservice-default",
+            "uniqueId": "dns_nginx_gitlabwebservicedefault_053D58C9"
+          }
+        },
+        "metadata": {
+          "name": "gitlab-webservice-default",
+          "namespace": "gitlab"
+        }
+      }
+    }
+  },
   "provider": {
     "aws": [
       {
@@ -193,29 +209,29 @@
       }
     },
     "kubectl_manifest": {
-      "dns_nregnernetobjectObject_nregnernetobjectObjectmanifest_0D02DA36": {
+      "dns_nregnernetletsencrypt_DA9DF352": {
         "//": {
           "metadata": {
-            "path": "dns/nregner.net-[object Object]/nregner.net-[object Object]-manifest",
-            "uniqueId": "dns_nregnernetobjectObject_nregnernetobjectObjectmanifest_0D02DA36"
+            "path": "dns/nregner.net-letsencrypt",
+            "uniqueId": "dns_nregnernetletsencrypt_DA9DF352"
           }
         },
         "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"Certificate\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"nregner.net\",\n    \"labels\": {\n      \"issuer\": \"letsencrypt\"\n    }\n  },\n  \"spec\": {\n    \"secretName\": \"nregner.net-cert\",\n    \"issuerRef\": {\n      \"kind\": \"ClusterIssuer\",\n      \"name\": \"letsencrypt\"\n    },\n    \"commonName\": \"nregner.net\",\n    \"dnsNames\": [\n      \"nregner.net\",\n      \"*.nregner.net\"\n    ]\n  }\n}"
       },
-      "dns_route53issuer_letsencrypt_letsencryptmanifest_D6374AC8": {
+      "dns_route53issuer_letsencrypt_1C040437": {
         "//": {
           "metadata": {
-            "path": "dns/route53-issuer/letsencrypt/letsencrypt-manifest",
-            "uniqueId": "dns_route53issuer_letsencrypt_letsencryptmanifest_D6374AC8"
+            "path": "dns/route53-issuer/letsencrypt",
+            "uniqueId": "dns_route53issuer_letsencrypt_1C040437"
           }
         },
         "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"letsencrypt\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt\"\n      },\n      \"solvers\": [\n        {\n          \"selector\": {\n            \"matchLabels\": {\n              \"issuer\": \"letsencrypt\"\n            }\n          },\n          \"dns01\": {\n            \"route53\": {\n              \"region\": \"us-west-2\",\n              \"hostedZoneID\": \"${aws_route53_zone.dns_zone_2E2729FB.id}\",\n              \"accessKeyID\": \"${aws_iam_access_key.dns_route53issuer_certmanagerkey_0A684111.id}\",\n              \"secretAccessKeySecretRef\": {\n                \"name\": \"${kubernetes_secret.dns_route53issuer_certmanageraccesskey_1645FAB2.metadata[0].name}\",\n                \"key\": \"secret\"\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}"
       },
-      "dns_route53issuer_letsencryptstaging_letsencryptstagingmanifest_6269C098": {
+      "dns_route53issuer_letsencryptstaging_19967F62": {
         "//": {
           "metadata": {
-            "path": "dns/route53-issuer/letsencrypt-staging/letsencrypt-staging-manifest",
-            "uniqueId": "dns_route53issuer_letsencryptstaging_letsencryptstagingmanifest_6269C098"
+            "path": "dns/route53-issuer/letsencrypt-staging",
+            "uniqueId": "dns_route53issuer_letsencryptstaging_19967F62"
           }
         },
         "yaml_body": "{\n  \"apiVersion\": \"cert-manager.io/v1\",\n  \"kind\": \"ClusterIssuer\",\n  \"metadata\": {\n    \"namespace\": \"${kubernetes_namespace.dns_9A634489.metadata[0].name}\",\n    \"name\": \"letsencrypt-staging\"\n  },\n  \"spec\": {\n    \"acme\": {\n      \"server\": \"https://acme-staging-v02.api.letsencrypt.org/directory\",\n      \"email\": \"nathanregner@gmail.com\",\n      \"privateKeySecretRef\": {\n        \"name\": \"letsencrypt-staging\"\n      },\n      \"solvers\": [\n        {\n          \"selector\": {\n            \"matchLabels\": {\n              \"issuer\": \"letsencrypt-staging\"\n            }\n          },\n          \"dns01\": {\n            \"route53\": {\n              \"region\": \"us-west-2\",\n              \"hostedZoneID\": \"${aws_route53_zone.dns_zone_2E2729FB.id}\",\n              \"accessKeyID\": \"${aws_iam_access_key.dns_route53issuer_certmanagerkey_0A684111.id}\",\n              \"secretAccessKeySecretRef\": {\n                \"name\": \"${kubernetes_secret.dns_route53issuer_certmanageraccesskey_1645FAB2.metadata[0].name}\",\n                \"key\": \"secret\"\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}"
@@ -384,8 +400,36 @@
             ],
             "port": [
               {
-                "name": "app",
+                "name": "http",
                 "port": 6000,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ]
+      },
+      "dns_nginx_gitlabwebservicedefaultproxyendpoints_E0445FA2": {
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/gitlab-webservice-default-proxy-endpoints",
+            "uniqueId": "dns_nginx_gitlabwebservicedefaultproxyendpoints_E0445FA2"
+          }
+        },
+        "metadata": {
+          "name": "${kubernetes_service.dns_nginx_gitlabwebservicedefaultproxy_9D7179A6.metadata[0].name}",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "subset": [
+          {
+            "address": [
+              {
+                "ip": "${data.kubernetes_service_v1.dns_nginx_gitlabwebservicedefault_053D58C9.spec.0.cluster_ip}"
+              }
+            ],
+            "port": [
+              {
+                "name": "http",
+                "port": 8080,
                 "protocol": "TCP"
               }
             ]
@@ -414,6 +458,25 @@
           "ingress_class_name": "nginx",
           "rule": [
             {
+              "host": "gitlab.nregner.net",
+              "http": {
+                "path": [
+                  {
+                    "backend": {
+                      "service": {
+                        "name": "${kubernetes_service.dns_nginx_gitlabwebservicedefaultproxy_9D7179A6.metadata[0].name}",
+                        "port": {
+                          "name": "http"
+                        }
+                      }
+                    },
+                    "path": "/",
+                    "path_type": "Prefix"
+                  }
+                ]
+              }
+            },
+            {
               "host": "nregner.net",
               "http": {
                 "path": [
@@ -432,9 +495,9 @@
                   {
                     "backend": {
                       "service": {
-                        "name": "${kubernetes_service.dns_nginx_craigslistapi_17481855.metadata[0].name}",
+                        "name": "craigslist-api",
                         "port": {
-                          "number": 6000
+                          "name": "http"
                         }
                       }
                     },
@@ -523,10 +586,34 @@
           "cluster_ip": "None",
           "port": [
             {
-              "name": "app",
+              "name": "http",
               "port": 6000,
               "protocol": "TCP",
               "target_port": "6000"
+            }
+          ],
+          "type": "ClusterIP"
+        }
+      },
+      "dns_nginx_gitlabwebservicedefaultproxy_9D7179A6": {
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/gitlab-webservice-default-proxy",
+            "uniqueId": "dns_nginx_gitlabwebservicedefaultproxy_9D7179A6"
+          }
+        },
+        "metadata": {
+          "name": "gitlab-webservice-default",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "spec": {
+          "cluster_ip": "None",
+          "port": [
+            {
+              "name": "http",
+              "port": 8080,
+              "protocol": "TCP",
+              "target_port": "8080"
             }
           ],
           "type": "ClusterIP"

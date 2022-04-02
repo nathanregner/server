@@ -3,6 +3,8 @@ import * as helm from "@cdktf/provider-helm";
 import * as k8s from "@cdktf/provider-kubernetes";
 import { values } from "../common/helm";
 import { Certificate } from "./certificate";
+import { IngressV1SpecRuleHttpPathBackendService } from "@cdktf/provider-kubernetes";
+import { Fn, TerraformOutput } from "cdktf";
 
 export interface NginxIngressConfig {
   namespace: string;
@@ -40,6 +42,12 @@ export class NginxIngress extends Construct {
       port: 6000,
     });
 
+    const gitlab = this.externalService(namespace, {
+      namespace: "gitlab",
+      name: "gitlab-webservice-default",
+      port: 8080,
+    });
+
     new k8s.IngressV1(this, "ingress", {
       metadata: {
         namespace,
@@ -53,6 +61,18 @@ export class NginxIngress extends Construct {
       spec: {
         ingressClassName: "nginx",
         rule: [
+          {
+            host: `gitlab.${certificate.domain.commonName}`,
+            http: {
+              path: [
+                {
+                  path: "/",
+                  pathType: "Prefix",
+                  backend: { service: gitlab },
+                },
+              ],
+            },
+          },
           {
             host: certificate.domain.commonName,
             http: {
@@ -70,12 +90,7 @@ export class NginxIngress extends Construct {
                 {
                   path: "/craigslist-api(/|$)(.*)",
                   pathType: "Prefix",
-                  backend: {
-                    service: {
-                      name: api.metadata.name,
-                      port: { number: 6000 },
-                    },
-                  },
+                  backend: { service: api },
                 },
               ],
             },
@@ -93,16 +108,55 @@ export class NginxIngress extends Construct {
     this.httpbin(namespace);
   }
 
+  private externalService(
+    namespace: string,
+    service: { namespace: string; name: string; port: number }
+  ): IngressV1SpecRuleHttpPathBackendService {
+    const proxy = "http";
+    const proxyService = new k8s.Service(this, `${service.name}-proxy`, {
+      metadata: { namespace, name: service.name },
+      spec: {
+        type: "ClusterIP",
+        clusterIp: "None",
+        port: [
+          {
+            name: proxy,
+            port: service.port,
+            protocol: "TCP",
+            targetPort: `${service.port}`,
+          },
+        ],
+      },
+    });
+    const sourceService = new k8s.DataKubernetesServiceV1(this, service.name, {
+      metadata: { namespace: service.namespace, name: service.name },
+    });
+    new k8s.Endpoints(this, `${service.name}-proxy-endpoints`, {
+      metadata: { namespace, name: proxyService.metadata.name },
+      subset: [
+        {
+          address: [{ ip: sourceService.spec("0").clusterIp }],
+          port: [{ name: proxy, port: service.port, protocol: "TCP" }],
+        },
+      ],
+    });
+    return {
+      name: proxyService.metadata.name,
+      port: { name: proxy },
+    };
+  }
+
   private localService(
     namespace: string,
     { name, port }: { name: string; port: number }
-  ) {
-    const service = new k8s.Service(this, name, {
+  ): IngressV1SpecRuleHttpPathBackendService {
+    const http = "http";
+    new k8s.Service(this, name, {
       metadata: { namespace, name },
       spec: {
         type: "ClusterIP",
         clusterIp: "None",
-        port: [{ name: "app", port, protocol: "TCP", targetPort: `${port}` }],
+        port: [{ name: http, port, protocol: "TCP", targetPort: `${port}` }],
       },
     });
     new k8s.Endpoints(this, `${name}-endpoints`, {
@@ -110,11 +164,14 @@ export class NginxIngress extends Construct {
       subset: [
         {
           address: [{ ip: "10.0.1.1" }],
-          port: [{ name: "app", port: port, protocol: "TCP" }],
+          port: [{ name: http, port, protocol: "TCP" }],
         },
       ],
     });
-    return service;
+    return {
+      name,
+      port: { name: http },
+    };
   }
 
   httpbin(namespace: string) {

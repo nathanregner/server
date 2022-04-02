@@ -17,30 +17,18 @@ export class GitlabStack extends TerraformStack {
     });
 
     const persistence = (name: string, size: string) => {
-      const storageClass = `gitlab-${name}`;
+      const storageClass = "microk8s-hostpath";
 
-      new k8s.StorageClass(this, `gitlab-${name}-storage-class`, {
-        metadata: { name: storageClass },
-        storageProvisioner: "local",
-        reclaimPolicy: "Delete", // TODO
+      /*
+      new k8s.PersistentVolumeClaim(this, `gitlab-${name}-claim`, {
+        metadata: { namespace: ns.metadata.name, name: `gitlab-${name}` },
+        spec: {
+          storageClassName: storageClass,
+          accessModes: ["ReadWriteOnce"],
+          resources: { requests: { storage: size } },
+        },
       });
-
-      new k8s.PersistentVolume(this, `gitlab-${name}-persistent-volume`, {
-        metadata: { name: storageClass },
-        spec: [
-          {
-            storageClassName: storageClass,
-            accessModes: ["ReadWriteOnce"],
-            capacity: { storage: size },
-            persistentVolumeSource: {
-              hostPath: {
-                path: `/tmp/gitlab/${name}`,
-                type: "DirectoryOrCreate",
-              },
-            },
-          },
-        ],
-      });
+*/
 
       return { storageClass, size };
     };
@@ -50,7 +38,7 @@ export class GitlabStack extends TerraformStack {
       name: "gitlab",
       repository: "https://charts.gitlab.io/",
       chart: "gitlab",
-      version: "5.6.1",
+      version: "5.9.2",
       wait: false,
       waitForJobs: false,
       values: values({
@@ -59,10 +47,7 @@ export class GitlabStack extends TerraformStack {
         prometheus: { install: false },
 
         // components
-        global: {
-          ingress: { enabled: false, configureCertmanager: false },
-          minio: { enabled: true },
-        },
+        global: { ingress: { enabled: false, configureCertmanager: false } },
         "gitlab-runner": {
           enabled: true,
           gitlabUrl: "http://gitlab-webservice-default:8181",
