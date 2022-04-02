@@ -13,7 +13,6 @@ export class Manifest<T> extends kubectl.Manifest {
     id: string,
     manifest: T & { metadata: Metadata }
   ) {
-    console.log(manifest);
     super(scope, id, {
       yamlBody: JSON.stringify(manifest, undefined, 2),
     });
