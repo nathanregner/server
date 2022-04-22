@@ -3,7 +3,7 @@
     "metadata": {
       "backend": "kubernetes",
       "stackName": "gitlab",
-      "version": "0.9.4"
+      "version": "0.10.2"
     },
     "outputs": {
     }
@@ -281,15 +281,15 @@
     "required_providers": {
       "helm": {
         "source": "helm",
-        "version": "~> 2.3"
+        "version": "2.5.1"
       },
       "kubectl": {
         "source": "gavinbunney/kubectl",
-        "version": ">= 1.13.1"
+        "version": "1.14.0"
       },
       "kubernetes": {
         "source": "kubernetes",
-        "version": "~> 2.0"
+        "version": "2.10.0"
       }
     }
   }
