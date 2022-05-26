@@ -6,3 +6,4 @@ https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-deploy-eck.html
 wget https://download.elastic.co/downloads/eck/2.2.0/crds.yaml
 wget https://download.elastic.co/downloads/eck/2.2.0/operator.yaml
 ```
+

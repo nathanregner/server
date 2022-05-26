@@ -1,15 +1,16 @@
 {
   "name": "k8s",
   "scripts": {
-    "format": "prettier --write **/*.{ts,yaml,json}"
-  },
-  "devDependencies": {
-    "@types/node": "^14",
-    "prettier": "^2.6.2"
+    "format": "prettier --write **/*.{ts,yaml,json}",
+    "generate": "crd2pulumi --nodejsName eck --nodejsPath eck/gen eck/crds.yaml --force"
   },
   "dependencies": {
     "@pulumi/kubernetes": "^3.0.0",
     "@pulumi/kubernetesx": "^0.1.5",
     "@pulumi/pulumi": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14",
+    "prettier": "^2.6.2"
   }
 }
