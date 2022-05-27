@@ -2,6 +2,7 @@ import * as k8s from "@pulumi/kubernetes";
 import * as kx from "@pulumi/kubernetesx";
 import { EckOperator } from "./eck";
 import { createPostgresOperator } from "./pg";
+import { PgoOperator } from "./pgo";
 
 new k8s.Provider("k8s", { context: "k3d-local" });
 
@@ -19,4 +20,5 @@ new k8s.Provider("k8s", { context: "k3d-local" });
 // export const name = deployment.metadata.name;
 
 // new EckOperator();
-createPostgresOperator();
+// createPostgresOperator();
+new PgoOperator();
