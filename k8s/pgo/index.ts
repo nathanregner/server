@@ -20,28 +20,37 @@ export class PgoOperator {
   }
 
   createTestCluster() {
-    const pv = new k8s.core.v1.PersistentVolume("data", {
+    const storageClass = new k8s.storage.v1.StorageClass("local", {
+      metadata: { name: "local", labels: { type: "data" } },
+      provisioner: "local",
+      reclaimPolicy: "Retain",
+      allowVolumeExpansion: true,
+    });
+    const dataVolume = new k8s.core.v1.PersistentVolume("data", {
       metadata: { name: "pg-data" },
       spec: {
         accessModes: ["ReadWriteOnce"],
         capacity: { storage: "25Gi" },
-        storageClassName: "local-path",
+        storageClassName: storageClass.metadata.name,
         hostPath: {
           path: "/tmp/pg-data",
           type: "DirectoryOrCreate",
         },
+        volumeMode: "Filesystem",
       },
     });
-    const pvb = new k8s.core.v1.PersistentVolume("backup", {
+
+    const backupVolume = new k8s.core.v1.PersistentVolume("backup", {
       metadata: { name: "pg-backup" },
       spec: {
         accessModes: ["ReadWriteOnce"],
         capacity: { storage: "25Gi" },
-        storageClassName: "local-path",
+        storageClassName: storageClass.metadata.name,
         hostPath: {
           path: "/tmp/pg-backup",
           type: "DirectoryOrCreate",
         },
+        volumeMode: "Filesystem",
       },
     });
 
@@ -57,10 +66,16 @@ export class PgoOperator {
             dataVolumeClaimSpec: {
               accessModes: ["ReadWriteOnce"],
               resources: { requests: { storage: "1Gi" } },
+              storageClassName: storageClass.metadata.name,
               selector: {
-                matchExpressions: [
-                  { key: "name", operator: "In", values: [pv.metadata.name] },
-                ],
+                matchLabels: { type: "data" },
+                // matchExpressions: [
+                //   {
+                //     key: "name",
+                //     operator: "In",
+                //     values: [dataVolume.metadata.name],
+                //   },
+                // ],
               },
             },
           },
@@ -76,12 +91,13 @@ export class PgoOperator {
                   volumeClaimSpec: {
                     accessModes: ["ReadWriteOnce"],
                     resources: { requests: { storage: "1Gi" } },
+                    storageClassName: storageClass.metadata.name,
                     selector: {
                       matchExpressions: [
                         {
                           key: "name",
                           operator: "In",
-                          values: [pvb.metadata.name],
+                          values: [backupVolume.metadata.name],
                         },
                       ],
                     },
