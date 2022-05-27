@@ -4,3 +4,6 @@
 [submodule "infra/hairpin-proxy"]
 	path = infra/hairpin-proxy
 	url = https://github.com/compumike/hairpin-proxy
+[submodule "k8s/pgo/postgres-operator"]
+	path = k8s/pgo/postgres-operator
+	url = https://github.com/CrunchyData/postgres-operator-examples/
