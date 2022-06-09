@@ -6,7 +6,7 @@ import * as helm from "@cdktf/provider-helm";
 import { values } from "../common/helm";
 import { NginxIngress } from "./nginx-ingress";
 import { Route53DnsUpdate } from "./route53-dns-update";
-import { AwsProvider, route53 } from "@cdktf/provider-aws/lib/";
+import { AwsProvider, route53, ses } from "@cdktf/provider-aws/lib/";
 import { Route53CertificateIssuer } from "./route53-certificate-issuer";
 import { Certificate } from "./certificate";
 
@@ -47,6 +47,44 @@ export class DnsStack extends TerraformStack {
       region: aws.region!!,
       zone,
       domains: [domain.commonName, ...domain.names],
+    });
+
+    //
+    // SES Domain
+    //
+
+    const identity = new ses.SesDomainIdentity(this, "verified-identity", {
+      domain: domain.commonName,
+    });
+
+    new route53.Route53Record(this, "verified-identity-record", {
+      zoneId: zone.id,
+      name: `_amazonses.${domain.commonName}`,
+      type: "TXT",
+      ttl: 60,
+      records: [identity.verificationToken],
+    });
+
+    const mailFromDomain = new ses.SesDomainMailFrom(this, "craigslist", {
+      domain: identity.domain,
+      mailFromDomain: `craigslist.${domain.commonName}`,
+      behaviorOnMxFailure: "RejectMessage",
+    });
+
+    // get records in the console
+    new route53.Route53Record(this, "craigslist-mx-record", {
+      zoneId: zone.id,
+      name: mailFromDomain.mailFromDomain,
+      type: "MX",
+      ttl: 60,
+      records: ["10 feedback-smtp.us-west-2.amazonses.com"],
+    });
+    new route53.Route53Record(this, "craigslist-spf-record", {
+      zoneId: zone.id,
+      name: mailFromDomain.mailFromDomain,
+      type: "TXT",
+      ttl: 300,
+      records: ["v=spf1 include:amazonses.com ~all"],
     });
 
     //

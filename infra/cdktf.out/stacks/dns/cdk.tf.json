@@ -122,6 +122,53 @@
         "user": "${aws_iam_user.dns_route53issuer_certmanager_6B26B6E3.name}"
       }
     },
+    "aws_route53_record": {
+      "dns_craigslistmxrecord_1090981B": {
+        "//": {
+          "metadata": {
+            "path": "dns/craigslist-mx-record",
+            "uniqueId": "dns_craigslistmxrecord_1090981B"
+          }
+        },
+        "name": "${aws_ses_domain_mail_from.dns_craigslist_07B1FFE0.mail_from_domain}",
+        "records": [
+          "10 feedback-smtp.us-west-2.amazonses.com"
+        ],
+        "ttl": 60,
+        "type": "MX",
+        "zone_id": "${aws_route53_zone.dns_zone_2E2729FB.id}"
+      },
+      "dns_craigslistspfrecord_111F3F93": {
+        "//": {
+          "metadata": {
+            "path": "dns/craigslist-spf-record",
+            "uniqueId": "dns_craigslistspfrecord_111F3F93"
+          }
+        },
+        "name": "${aws_ses_domain_mail_from.dns_craigslist_07B1FFE0.mail_from_domain}",
+        "records": [
+          "v=spf1 include:amazonses.com ~all"
+        ],
+        "ttl": 300,
+        "type": "TXT",
+        "zone_id": "${aws_route53_zone.dns_zone_2E2729FB.id}"
+      },
+      "dns_verifiedidentityrecord_F5694602": {
+        "//": {
+          "metadata": {
+            "path": "dns/verified-identity-record",
+            "uniqueId": "dns_verifiedidentityrecord_F5694602"
+          }
+        },
+        "name": "_amazonses.nregner.net",
+        "records": [
+          "${aws_ses_domain_identity.dns_verifiedidentity_BF2F0769.verification_token}"
+        ],
+        "ttl": 60,
+        "type": "TXT",
+        "zone_id": "${aws_route53_zone.dns_zone_2E2729FB.id}"
+      }
+    },
     "aws_route53_zone": {
       "dns_zone_2E2729FB": {
         "//": {
@@ -156,6 +203,30 @@
             "name": "${element(aws_route53_zone.dns_zone_2E2729FB.name_servers, 3)}"
           }
         ]
+      }
+    },
+    "aws_ses_domain_identity": {
+      "dns_verifiedidentity_BF2F0769": {
+        "//": {
+          "metadata": {
+            "path": "dns/verified-identity",
+            "uniqueId": "dns_verifiedidentity_BF2F0769"
+          }
+        },
+        "domain": "nregner.net"
+      }
+    },
+    "aws_ses_domain_mail_from": {
+      "dns_craigslist_07B1FFE0": {
+        "//": {
+          "metadata": {
+            "path": "dns/craigslist",
+            "uniqueId": "dns_craigslist_07B1FFE0"
+          }
+        },
+        "behavior_on_mx_failure": "RejectMessage",
+        "domain": "${aws_ses_domain_identity.dns_verifiedidentity_BF2F0769.domain}",
+        "mail_from_domain": "craigslist.nregner.net"
       }
     },
     "helm_release": {
