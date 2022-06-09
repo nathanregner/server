@@ -122,6 +122,54 @@
         "user": "${aws_iam_user.dns_route53issuer_certmanager_6B26B6E3.name}"
       }
     },
+    "aws_route53_record": {
+      "dns_sendinbluedkim_B91B0CE0": {
+        "//": {
+          "metadata": {
+            "path": "dns/sendinblue-dkim",
+            "uniqueId": "dns_sendinbluedkim_B91B0CE0"
+          }
+        },
+        "name": "mail._domainkey.nregner.net",
+        "records": [
+          "k=rsa;p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDeMVIzrCa3T14JsNY0IRv5/2V1/v2itlviLQBwXsa7shBD6TrBkswsFUToPyMRWC9tbR/5ey0nRBH0ZVxp+lsmTxid2Y2z+FApQ6ra2VsXfbJP3HE6wAO0YTVEJt1TmeczhEd2Jiz/fcabIISgXEdSpTYJhb0ct0VJRxcg4c8c7wIDAQAB"
+        ],
+        "ttl": 60,
+        "type": "TXT",
+        "zone_id": "${aws_route53_zone.dns_zone_2E2729FB.id}"
+      },
+      "dns_sendinbluedmarc_F800C722": {
+        "//": {
+          "metadata": {
+            "path": "dns/sendinblue-dmarc",
+            "uniqueId": "dns_sendinbluedmarc_F800C722"
+          }
+        },
+        "name": "_dmarc.nregner.net",
+        "records": [
+          "v=DMARC1; p=none; sp=none; rua=mailto:dmarc@mailinblue.com!10m; ruf=mailto:dmarc@mailinblue.com!10m; rf=afrf; pct=100; ri=86400"
+        ],
+        "ttl": 60,
+        "type": "TXT",
+        "zone_id": "${aws_route53_zone.dns_zone_2E2729FB.id}"
+      },
+      "dns_sendinbluespf_AD6CEB46": {
+        "//": {
+          "metadata": {
+            "path": "dns/sendinblue-spf",
+            "uniqueId": "dns_sendinbluespf_AD6CEB46"
+          }
+        },
+        "name": "nregner.net",
+        "records": [
+          "v=spf1 include:spf.sendinblue.com mx ~all",
+          "Sendinblue-code:cb50c333834cbfd1efd0e0107585833c"
+        ],
+        "ttl": 60,
+        "type": "TXT",
+        "zone_id": "${aws_route53_zone.dns_zone_2E2729FB.id}"
+      }
+    },
     "aws_route53_zone": {
       "dns_zone_2E2729FB": {
         "//": {

@@ -6,7 +6,7 @@ import * as helm from "@cdktf/provider-helm";
 import { values } from "../common/helm";
 import { NginxIngress } from "./nginx-ingress";
 import { Route53DnsUpdate } from "./route53-dns-update";
-import { AwsProvider, route53 } from "@cdktf/provider-aws/lib/";
+import { AwsProvider, route53, ses, sns } from "@cdktf/provider-aws/lib/";
 import { Route53CertificateIssuer } from "./route53-certificate-issuer";
 import { Certificate } from "./certificate";
 
@@ -47,6 +47,39 @@ export class DnsStack extends TerraformStack {
       region: aws.region!!,
       zone,
       domains: [domain.commonName, ...domain.names],
+    });
+
+    //
+    // SendInBlue
+    //
+
+    new route53.Route53Record(this, "sendinblue-dkim", {
+      zoneId: zone.id,
+      name: `mail._domainkey.${domain.commonName}`,
+      type: "TXT",
+      ttl: 60,
+      records: [
+        "k=rsa;p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDeMVIzrCa3T14JsNY0IRv5/2V1/v2itlviLQBwXsa7shBD6TrBkswsFUToPyMRWC9tbR/5ey0nRBH0ZVxp+lsmTxid2Y2z+FApQ6ra2VsXfbJP3HE6wAO0YTVEJt1TmeczhEd2Jiz/fcabIISgXEdSpTYJhb0ct0VJRxcg4c8c7wIDAQAB",
+      ],
+    });
+    new route53.Route53Record(this, "sendinblue-spf", {
+      zoneId: zone.id,
+      name: domain.commonName,
+      type: "TXT",
+      ttl: 60,
+      records: [
+        "v=spf1 include:spf.sendinblue.com mx ~all",
+        "Sendinblue-code:cb50c333834cbfd1efd0e0107585833c",
+      ],
+    });
+    new route53.Route53Record(this, "sendinblue-dmarc", {
+      zoneId: zone.id,
+      name: `_dmarc.${domain.commonName}`,
+      type: "TXT",
+      ttl: 60,
+      records: [
+        "v=DMARC1; p=none; sp=none; rua=mailto:dmarc@mailinblue.com!10m; ruf=mailto:dmarc@mailinblue.com!10m; rf=afrf; pct=100; ri=86400",
+      ],
     });
 
     //
