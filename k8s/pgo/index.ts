@@ -20,10 +20,12 @@ export class PgoOperator {
   }
 
   createTestCluster() {
+    /*
     const storageClass = new k8s.storage.v1.StorageClass("local", {
       metadata: { name: "local", labels: { type: "data" } },
-      provisioner: "local",
+      provisioner: "kubernetes.io/no-provisioner",
       reclaimPolicy: "Retain",
+      volumeBindingMode: "WaitForFirstConsumer",
       allowVolumeExpansion: true,
     });
     const dataVolume = new k8s.core.v1.PersistentVolume("data", {
@@ -31,52 +33,98 @@ export class PgoOperator {
       spec: {
         accessModes: ["ReadWriteOnce"],
         capacity: { storage: "25Gi" },
+        persistentVolumeReclaimPolicy: "Retain",
         storageClassName: storageClass.metadata.name,
-        hostPath: {
-          path: "/tmp/pg-data",
-          type: "DirectoryOrCreate",
+        local: { path: "/tmp/pg-data" },
+        nodeAffinity: {
+          required: {
+            nodeSelectorTerms: [
+              {
+                matchExpressions: [
+                  {
+                    key: "kubernetes.io/hostname",
+                    operator: "In",
+                    values: ["my-node"],
+                  },
+                ],
+              },
+            ],
+          },
         },
-        volumeMode: "Filesystem",
+        // hostPath: {
+        //   path: "/tmp/pg-data",
+        //   type: "DirectoryOrCreate",
+        // },
+        // volumeMode: "Filesystem",
       },
     });
+
+    // new k8s.core.v1.PersistentVolumeClaim("data-claim", {
+    //   metadata: { name: "data-claim" },
+    //   spec: {
+    //     accessModes: ["ReadWriteOnce"],
+    //     storageClassName: storageClass.metadata.name,
+    //     resources: { requests: { storage: "5Gi" } },
+    //   },
+    // });
 
     const backupVolume = new k8s.core.v1.PersistentVolume("backup", {
       metadata: { name: "pg-backup" },
       spec: {
         accessModes: ["ReadWriteOnce"],
         capacity: { storage: "25Gi" },
+        persistentVolumeReclaimPolicy: "Retain",
         storageClassName: storageClass.metadata.name,
-        hostPath: {
-          path: "/tmp/pg-backup",
-          type: "DirectoryOrCreate",
+        local: { path: "/tmp/pg-backup" },
+        nodeAffinity: {
+          required: {
+            nodeSelectorTerms: [
+              {
+                matchExpressions: [
+                  {
+                    key: "kubernetes.io/hostname",
+                    operator: "In",
+                    values: ["my-node"],
+                  },
+                ],
+              },
+            ],
+          },
         },
-        volumeMode: "Filesystem",
+        // hostPath: {
+        //   path: "/tmp/pg-data",
+        //   type: "DirectoryOrCreate",
+        // },
+        // volumeMode: "Filesystem",
       },
     });
+*/
 
-    return new pgo.v1beta1.PostgresCluster("test-cluster", {
-      metadata: { name: "test" },
+    return new pgo.v1beta1.PostgresCluster("craigslist-cluster", {
+      metadata: { name: "craigslist" },
       spec: {
-        image:
-          "registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.2-1",
         postgresVersion: 14,
+        postGISVersion: "3.1",
+        users: [
+          { databases: ["craigslist"], name: "postgres", options: "SUPERUSER" },
+        ],
         instances: [
           {
             name: "instance1",
             dataVolumeClaimSpec: {
               accessModes: ["ReadWriteOnce"],
               resources: { requests: { storage: "1Gi" } },
-              storageClassName: storageClass.metadata.name,
-              selector: {
-                matchLabels: { type: "data" },
-                // matchExpressions: [
-                //   {
-                //     key: "name",
-                //     operator: "In",
-                //     values: [dataVolume.metadata.name],
-                //   },
-                // ],
-              },
+              // storageClassName: dataVolume.spec.storageClassName,
+              // selector: {
+              //   matchLabels: { type: "data" },
+              //   // matchExpressions: [
+              //   //   {
+              //   //     key: "name",
+              //   //     operator: "In",
+              //   //     values: [dataVolume.metadata.name],
+              //   //   },
+              //   // ],
+              // },
             },
           },
         ],
@@ -91,16 +139,16 @@ export class PgoOperator {
                   volumeClaimSpec: {
                     accessModes: ["ReadWriteOnce"],
                     resources: { requests: { storage: "1Gi" } },
-                    storageClassName: storageClass.metadata.name,
-                    selector: {
-                      matchExpressions: [
-                        {
-                          key: "name",
-                          operator: "In",
-                          values: [backupVolume.metadata.name],
-                        },
-                      ],
-                    },
+                    // storageClassName: backupVolume.spec.storageClassName,
+                    // selector: {
+                    //   matchExpressions: [
+                    //     {
+                    //       key: "name",
+                    //       operator: "In",
+                    //       values: [backupVolume.metadata.name],
+                    //     },
+                    //   ],
+                    // },
                   },
                 },
               },
