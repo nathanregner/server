@@ -83,6 +83,35 @@ export class DnsStack extends TerraformStack {
     });
 
     //
+    // SendInBlue
+    //
+
+    const records = [
+      {
+        name: "em5726",
+        value: "u27378089.wl090.sendgrid.net",
+      },
+      {
+        name: "s1._domainkey",
+        value: "s1.domainkey.u27378089.wl090.sendgrid.net",
+      },
+      {
+        name: "s2._domainkey",
+        value: "s2.domainkey.u27378089.wl090.sendgrid.net",
+      },
+    ];
+
+    for (const { name, value } of records) {
+      new route53.Route53Record(this, `sendgrid-${name}`, {
+        zoneId: zone.id,
+        name: `${name}.${domain.commonName}`,
+        type: "CNAME",
+        ttl: 60,
+        records: [value],
+      });
+    }
+
+    //
     // Certificate
     //
 

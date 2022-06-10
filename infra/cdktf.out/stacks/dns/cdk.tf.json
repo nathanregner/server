@@ -123,6 +123,51 @@
       }
     },
     "aws_route53_record": {
+      "dns_sendgridem5726_044E60AB": {
+        "//": {
+          "metadata": {
+            "path": "dns/sendgrid-em5726",
+            "uniqueId": "dns_sendgridem5726_044E60AB"
+          }
+        },
+        "name": "em5726.nregner.net",
+        "records": [
+          "u27378089.wl090.sendgrid.net"
+        ],
+        "ttl": 60,
+        "type": "CNAME",
+        "zone_id": "${aws_route53_zone.dns_zone_2E2729FB.id}"
+      },
+      "dns_sendgrids1domainkey_0C300E60": {
+        "//": {
+          "metadata": {
+            "path": "dns/sendgrid-s1._domainkey",
+            "uniqueId": "dns_sendgrids1domainkey_0C300E60"
+          }
+        },
+        "name": "s1._domainkey.nregner.net",
+        "records": [
+          "s1.domainkey.u27378089.wl090.sendgrid.net"
+        ],
+        "ttl": 60,
+        "type": "CNAME",
+        "zone_id": "${aws_route53_zone.dns_zone_2E2729FB.id}"
+      },
+      "dns_sendgrids2domainkey_5B5BBEB1": {
+        "//": {
+          "metadata": {
+            "path": "dns/sendgrid-s2._domainkey",
+            "uniqueId": "dns_sendgrids2domainkey_5B5BBEB1"
+          }
+        },
+        "name": "s2._domainkey.nregner.net",
+        "records": [
+          "s2.domainkey.u27378089.wl090.sendgrid.net"
+        ],
+        "ttl": 60,
+        "type": "CNAME",
+        "zone_id": "${aws_route53_zone.dns_zone_2E2729FB.id}"
+      },
       "dns_sendinbluedkim_B91B0CE0": {
         "//": {
           "metadata": {
