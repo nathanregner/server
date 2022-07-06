@@ -39,6 +39,10 @@ export class NginxIngress extends Construct {
       name: "craigslist-api",
       port: 6000,
     });
+    const nlp = this.localService(namespace, {
+      name: "nlp",
+      port: 4000,
+    });
 
     new k8s.IngressV1(this, "ingress", {
       metadata: {
@@ -74,6 +78,16 @@ export class NginxIngress extends Construct {
                     service: {
                       name: api.metadata.name,
                       port: { number: 6000 },
+                    },
+                  },
+                },
+                {
+                  path: "/nlp(/|$)(.*)",
+                  pathType: "Prefix",
+                  backend: {
+                    service: {
+                      name: nlp.metadata.name,
+                      port: { number: 4000 },
                     },
                   },
                 },

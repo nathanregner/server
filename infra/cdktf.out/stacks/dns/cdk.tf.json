@@ -439,6 +439,34 @@
             ]
           }
         ]
+      },
+      "dns_nginx_nlpendpoints_7906840E": {
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/nlp-endpoints",
+            "uniqueId": "dns_nginx_nlpendpoints_7906840E"
+          }
+        },
+        "metadata": {
+          "name": "nlp",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "subset": [
+          {
+            "address": [
+              {
+                "ip": "10.0.1.1"
+              }
+            ],
+            "port": [
+              {
+                "name": "app",
+                "port": 4000,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ]
       }
     },
     "kubernetes_ingress_v1": {
@@ -487,6 +515,18 @@
                       }
                     },
                     "path": "/craigslist-api(/|$)(.*)",
+                    "path_type": "Prefix"
+                  },
+                  {
+                    "backend": {
+                      "service": {
+                        "name": "${kubernetes_service.dns_nginx_nlp_09684682.metadata[0].name}",
+                        "port": {
+                          "number": 4000
+                        }
+                      }
+                    },
+                    "path": "/nlp(/|$)(.*)",
                     "path_type": "Prefix"
                   }
                 ]
@@ -605,6 +645,30 @@
           "selector": {
             "app": "httpbin"
           }
+        }
+      },
+      "dns_nginx_nlp_09684682": {
+        "//": {
+          "metadata": {
+            "path": "dns/nginx/nlp",
+            "uniqueId": "dns_nginx_nlp_09684682"
+          }
+        },
+        "metadata": {
+          "name": "nlp",
+          "namespace": "${kubernetes_namespace.dns_9A634489.metadata[0].name}"
+        },
+        "spec": {
+          "cluster_ip": "None",
+          "port": [
+            {
+              "name": "app",
+              "port": 4000,
+              "protocol": "TCP",
+              "target_port": "4000"
+            }
+          ],
+          "type": "ClusterIP"
         }
       }
     }
