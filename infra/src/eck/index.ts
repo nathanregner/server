@@ -11,9 +11,6 @@ export class EckStack extends TerraformStack {
 
     k8sBackend(this, "eck");
     k8sProvider(this);
-
-    this.manifests("crds", "./src/eck/crds.yaml");
-    this.manifests("operator", "./src/eck/operator.yaml");
   }
 
   manifests(prefix: string, path: string) {
